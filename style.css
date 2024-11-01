@@ -1,0 +1,384 @@
+@font-face {
+  font-family: 'shiftyNotes';
+  src: url('./shiftynotes/ShiftyNotesRegular.ttf');
+}
+
+@font-face {
+  font-family: 'ittyBitty';
+  src: url('./itty-bitty-notebook-font/IttyBittyNotebook.ttf');
+}
+
+@font-face {
+  font-family: 'myBooks';
+  src: url('./my-books/MyBooks.ttf');
+}
+
+@font-face {
+  font-family: 'simpleNoteFont';
+  src: url('./simple-note-font/SimpleNote-w1pxz.ttf');
+}
+
+body {
+  margin: 0;
+  background-color: #ffe0b5;
+  background-image: url('/brown-paper.jpg');
+  background-size: 20%;
+  font-family: ittyBitty;
+  font-size: 15pt;
+}
+
+h1, h2, h3 {
+  font-family: myBooks;
+}
+
+.articleBody {
+  max-width: calc(min(1100px, 100% - 20px));
+  margin-left: calc((100% - min(1100px, 100% - 20px) - 300px) / 2);
+}
+
+.articleBodyCenter {
+  padding-top: 110px;
+  max-width: calc(min(1100px, 100% - 20px));
+  margin: auto;
+}
+
+.articleBodyCenter img {
+  margin: auto;
+  display: block;
+}
+
+.split-page {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.split-img {
+  flex: 1;
+}
+
+.split-img img {
+  width: 80%;
+}
+
+.navHeader {
+  background-color: #4a4a4a;
+  background: url('/paperboard.jpg');
+  background-size: 20%;
+  color: white;
+  padding: 10px 0px;
+  position: fixed;
+  width: 100%;
+  min-height: 80px;
+  max-height: 80px;
+  z-index: 100;
+  border-bottom: #4a4a4a90 solid 5px;
+}
+
+.navContainer {
+  max-width: calc(min(1100px, 100% - 20px));
+  margin: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.projLogo img {
+  height: 80px;
+}
+
+.pageDropdown {
+  position: relative;
+  color: black;
+}
+
+.pageDropdownPreview {
+  background-image: url('/cardboard-small.png');
+  background-size: 100%;
+  width: 190px;
+  height: 30px;
+  padding: 10px 20px 10px 50px;
+  border-radius: 10px;
+  line-height: 30px;
+  cursor: pointer;
+}
+
+.pageDropdownResults {
+  position: absolute;
+  top: 95px;
+  left: 0;
+  overflow-y: scroll;
+  /* this just doesn't work :/ */
+  overflow-x: visible;
+  width: 300px;
+  margin-left: -20px;
+  height: calc(100vh - 95px - 10px);
+  display: none;
+}
+
+.pageDropdownResults.active {
+  display: block;
+}
+
+.pageDropdownResults hr {
+  margin: 5px -20px;
+  border: 2px solid #4a4a4a50;
+}
+
+.pageDropdownSection {
+  padding: 10px 20px;
+  background-image: url('/pink-concrete.jpg');
+  background-size: 100%;
+  border-radius: 10px;
+  margin-block-start: 20px;
+}
+
+.pageDropdownSectionTitle {
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+a.pageDropdownItem {
+  text-decoration: none;
+  color: black;
+  display: block;
+  position: relative;
+}
+
+/* TODO: Do this better */
+.iconNotes::before {
+  content: "📝";
+}
+.iconTask::before {
+  content: "🎮";
+}
+.iconWIP::before {
+  content: "🚧";
+}
+
+.pageDropdownItem.complete::after {
+  content: "✅";
+  position: absolute;
+  right: 0;
+}
+
+.dfaSection {
+  background: url('/cardboard-resize.png');
+  background-size: cover;
+  padding: 20px 45px 45px 45px;
+}
+
+.smallSection {
+  background: url('/cardboard-small.png');
+  background-size: cover;
+  padding: 18px 50px;
+}
+
+.nextButton {
+  display: block;
+  float: right;
+  width: 50px;
+  height: 30px;
+
+  line-height: 30px;
+  text-align: center;
+
+  padding: 5px 10px;
+
+  background: url('/paperboard.jpg');
+  background-size: 1000%;
+  border-radius: 10px;
+
+  text-decoration: none;
+  color: white;
+
+  margin-bottom: 20px;
+}
+
+.lockedScene {
+  position: relative;
+  transition: visibility 0s, opacity 0.5s linear;
+}
+
+.lockContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  max-width: 300px;
+  text-align: center;
+}
+
+.lockBG {
+  width: 100%;
+  min-height: 250px;
+  background-color: #4a4a4a40;
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+}
+
+.contentContainer {
+  transition: visibility 0s, opacity 0.5s linear;
+}
+
+.articleSections {
+  width: 300px;
+  position: fixed;
+  right: calc(max(25px, (50% - min(1100px, 100% - 20px) / 2 - 150px) * 0.6));
+  top: 10vh;
+}
+
+@media screen and (max-width: 1450px) {
+  .articleSections {
+    display: none;
+  }
+
+  .articleBody {
+    margin: auto;
+  }
+
+}
+
+.articleSections ul {
+  list-style-type: none;
+}
+
+.articleSections ul li {
+  margin: 10px 0px;
+}
+
+li.active {
+  font-weight: 600;
+  text-decoration: underline;
+}
+li.locked {
+  opacity: 0.5;
+}
+li.locked::before {
+  content: "🔒";
+  margin-left: -20px;
+}
+
+.progressBorder {
+  width: 100%;
+  min-height: 20px;
+  background-color: #4a4a4a80;
+  border-radius: 10px;
+  display: none;
+  margin: 5px 0px;
+}
+
+.progressBar {
+  width: 0;
+  height: 20px;
+  background-color: #4cdf49;
+  border-radius: 10px;
+  transition: width 0.5s;
+}
+
+.red {
+  color: red;
+}
+
+.scene {
+  width: 80%;
+  min-height: 500px;
+  position: relative;
+  margin: auto;
+}
+
+.sceneLong {
+  min-height: 800px;
+}
+
+.playScene {
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  top: 20%;
+  left: 20%;
+  background-color: #4a4a4a40;
+  border: 1px solid #aaaaaa40;
+  border-radius: 20px;
+}
+
+.playTriangle {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 130px solid #ffffff80;
+  border-top: 50px solid transparent;
+  border-bottom: 50px solid transparent;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.modal {
+  position: absolute;
+  color: white;
+  width: calc(60% - 60px);
+  height: calc(60% - 60px);
+  padding: 30px;
+  top: 20%;
+  left: 20%;
+  background-color: #4a4a4ab0;
+  border: 1px solid #aaaaaab0;
+  border-radius: 20px;
+  justify-content: space-around;
+  flex-direction: column;
+  /* Gets set to flex */
+  display: none;
+}
+
+.modal .modalContent {
+  width: 80%;
+}
+
+.modal .modalActions {
+  width: 80%;
+}
+
+.modal .modalActions .modalButton {
+  float: right;
+  width: 50px;
+  height: 30px;
+}
+
+/* HIGHLIGHTER */
+.highlight {
+  margin-left: -8px;
+  margin-right: -8px;
+  padding: 0px 8px;
+}
+
+.highlight-red {
+  background: linear-gradient(105deg, #0000 8%, #fb6f92 10%, #fb6f92 90%, #0000 92%);
+}
+.highlight-orange {
+  background: linear-gradient(105deg, #0000 8%, #e76f51 10%, #e76f51 90%, #0000 92%);
+}
+.highlight-green {
+  background: linear-gradient(105deg, #0000 8%, #60d394 10%, #60d394 90%, #0000 92%);
+}
+.highlight-blue {
+  background: linear-gradient(105deg, #0000 8%, #70d6ff 10%, #70d6ff 90%, #0000 92%);
+}
+.highlight-purple {
+  background: linear-gradient(105deg, #0000 8%, #b388eb 10%, #b388eb 90%, #0000 92%);
+}
+.highlight-red-long {
+  background: linear-gradient(105deg, #0000 1%, #fb6f92 2%, #fb6f92 98%, #0000 99%);
+}
+.highlight-orange-long {
+  background: linear-gradient(105deg, #0000 1%, #e76f51 2%, #e76f51 98%, #0000 99%);
+}
+.highlight-green-long {
+  background: linear-gradient(105deg, #0000 1%, #60d394 2%, #60d394 98%, #0000 99%);
+}
+.highlight-blue-long {
+  background: linear-gradient(105deg, #0000 1%, #70d6ff 2%, #70d6ff 98%, #0000 99%);
+}
+.highlight-purple-long {
+  background: linear-gradient(105deg, #0000 1%, #b388eb 2%, #b388eb 98%, #0000 99%);
+}
