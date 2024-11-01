@@ -20,19 +20,19 @@ const navContent = (title) => `
         <div class="pageDropdownSection dfaSection">
           <h4 class="pageDropdownSectionTitle">DFA</h4>
           <hr />
-          <a class="iconNotes pageDropdownItem ${isComplete(`dfaIntro`) && `complete` }" href="/pages/dfa_intro.html">
+          <a class="iconNotes pageDropdownItem ${isComplete(`dfaIntro`) && `complete` }" href="/pages/dfa_intro">
             What is a DFA?
           </a>
-          <a class="iconTask pageDropdownItem ${isComplete(`dfaExecute`) && `complete` }" href="/pages/dfa_sim.html">
+          <a class="iconTask pageDropdownItem ${isComplete(`dfaExecute`) && `complete` }" href="/pages/dfa_sim">
             Running the algorithm
           </a>
-          <a class="iconTask pageDropdownItem ${isComplete(`dfaCategorise`) && `complete` }" href="/pages/dfa_categorise.html">
+          <a class="iconTask pageDropdownItem ${isComplete(`dfaCategorise`) && `complete` }" href="/pages/dfa_categorise">
             Analysing DFAs
           </a>
-          <a class="iconTask pageDropdownItem ${isComplete(`dfaCreate`) && `complete` }" href="/pages/dfa_create.html">
+          <a class="iconTask pageDropdownItem ${isComplete(`dfaCreate`) && `complete` }" href="/pages/dfa_create">
             Making DFAs
           </a>
-          <a class="iconTask pageDropdownItem ${isComplete(`dfaMatch`) && `complete` }" href="/pages/dfa_match.html">
+          <a class="iconTask pageDropdownItem ${isComplete(`dfaMatch`) && `complete` }" href="/pages/dfa_match">
             Recognising languages
           </a>
         </div>
