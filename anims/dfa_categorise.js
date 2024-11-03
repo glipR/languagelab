@@ -65,7 +65,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.verify.setDisabled(true);
   GS.verify.onClick = () => {
     const msg = GS.categories.validate();
-    msg ? onFailure(msg) : onSuccess("Correct!");
+    msg ? onFailure(msg) : onSuccess(`Correct! One possible description is: ${opts.exampleDescription}.`);
   }
   GS.screen.addChild(GS.verify);
   GS.verifyIcon = new PIXI.Graphics();

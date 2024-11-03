@@ -12,7 +12,8 @@ const t2Tasks = [{
     { value: "a", category: "Rejected" },
     { value: "abbbaaab", category: "Accepted" },
     { value: "baa", category: "Rejected" },
-  ]
+  ],
+  exampleDescription: "Words ending with a b",
 }, {
   graph: t2JSON,
   categories: ["Accepted", "Rejected"],
@@ -22,7 +23,8 @@ const t2Tasks = [{
     { value: "bababa", category: "Rejected" },
     { value: "aaa", category: "Rejected" },
     { value: "babaaaa", category: "Accepted" },
-  ]
+  ],
+  exampleDescription: "baba, but the a's can be replaced with any positive number of a's",
 }, {
   graph: t3JSON,
   categories: ["Accepted", "Rejected"],
@@ -31,7 +33,8 @@ const t2Tasks = [{
     { value: "aabb", category: "Rejected" },
     { value: "abbbb", category: "Accepted" },
     { value: "baa", category: "Accepted" },
-  ]
+  ],
+  exampleDescription: "Words that don't contain the first character ever again",
 }, {
   graph: t4JSON,
   categories: ["Accepted", "Rejected"],
@@ -40,7 +43,8 @@ const t2Tasks = [{
     { value: "haaha", category: "Rejected" },
     { value: "aaaaaa", category: "Accepted" },
     { value: "aaahaaaaa", category: "Rejected" },
-  ]
+  ],
+  exampleDescription: "any collection of a occurs in a group of 3. h can be anywhere else",
 }];
 
 const contentText = `
