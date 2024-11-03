@@ -185,8 +185,9 @@ class Categories {
       );
       // This is off by one to align with category indices, and so -1 is unassigned.
       this.state.assigned[this.state.selected] = closestIndex - 1;
+      this.onChange?.();
       if (!this.state.assigned.includes(-1)) {
-        this.onSubmit?.(this.validate());
+        this.onSubmit?.();
       }
 
       this.state.selected = -1;

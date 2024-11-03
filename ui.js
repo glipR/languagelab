@@ -1,4 +1,4 @@
-import { black, white, red } from "./colours.js";
+import { black, white, red, lightGrey } from "./colours.js";
 import { mergeDeep } from "./utils.js";
 
 class KeyEntryModal extends PIXI.Container {
@@ -95,6 +95,48 @@ class KeyEntryModal extends PIXI.Container {
   destroy() {
     window.removeEventListener("keydown", this.keydownListener);
     super.destroy();
+  }
+}
+
+class FloatingButton extends PIXI.Container {
+  constructor(opts) {
+    super();
+    this.opts = mergeDeep({
+      bg: {
+        fill: white,
+        disabledFill: lightGrey,
+        stroke: { color: black, width: 2 },
+      },
+      width: 100,
+      height: 100,
+    }, opts);
+    this.disabled = false;
+    this.bg = new PIXI.Graphics()
+      .rect(0, 0, this.opts.width, this.opts.height)
+      .fill(new PIXI.Color(0xffffff))
+      .stroke(this.opts.bg.stroke);
+    this.bg.tint = this.opts.bg.fill;
+    this.addChild(this.bg);
+
+    this.bg.interactive = true;
+    this.bg.buttonMode = true;
+    this.bg.cursor = "pointer";
+    this.bg.on("pointerdown", () => {
+      if (!this.disabled) {
+        this.onClick?.();
+      }
+    });
+  }
+
+  setDisabled(disabled) {
+    this.disabled = disabled;
+    if (this.disabled) {
+      this.bg.cursor = "default";
+      this.bg.tint = this.opts.bg.disabledFill;
+    } else {
+      this.bg.cursor = "pointer";
+      this.bg.tint = this.opts.bg.fill;
+    }
   }
 }
 
@@ -203,6 +245,7 @@ class TextEntry extends PIXI.Container {
         }
         this.text.text = this.curText;
         this.cursor.position.set(this.text.width / this.curText.length * this.focusedIndex, 0);
+        this.onChange?.(this.curText);
         return;
       }
     };
@@ -222,4 +265,4 @@ class TextEntry extends PIXI.Container {
 
 }
 
-export { KeyEntryModal, Checkbox, TextEntry };
+export { KeyEntryModal, Checkbox, TextEntry, FloatingButton };
