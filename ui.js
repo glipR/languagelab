@@ -102,6 +102,11 @@ class FloatingButton extends PIXI.Container {
   constructor(opts) {
     super();
     this.opts = mergeDeep({
+      label: {
+        text: "",
+        fill: black,
+        fontSize: 24,
+      },
       bg: {
         fill: white,
         disabledFill: lightGrey,
@@ -126,6 +131,13 @@ class FloatingButton extends PIXI.Container {
         this.onClick?.();
       }
     });
+
+    if (this.opts?.label?.text) {
+      this.label = new PIXI.Text({ text: this.opts?.label?.text, style: { ...this.opts.label } });
+      this.label.anchor.set(0.5, 0.5);
+      this.label.position.set(this.opts.width / 2, this.opts.height / 2);
+      this.addChild(this.label);
+    }
   }
 
   setDisabled(disabled) {
