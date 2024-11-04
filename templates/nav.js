@@ -35,6 +35,9 @@ const navContent = (title) => `
           <a class="iconTask pageDropdownItem ${isComplete(`dfaMatch`) && `complete` }" href="/pages/dfa_match">
             Recognising languages
           </a>
+          <a class="iconCode pageDropdownItem ${isComplete(`dfaAlgorithm`) && `complete` }" href="/pages/dfa_code_execute">
+            Implementing the algorithm
+          </a>
         </div>
         <div class="pageDropdownSection smallSection">
           <h4 class="iconWIP pageDropdownSectionTitle"> NFA</h4>

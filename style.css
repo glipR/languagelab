@@ -155,6 +155,9 @@ a.pageDropdownItem {
 .iconWIP::before {
   content: "🚧";
 }
+.iconCode::before {
+  content: "💽";
+}
 
 .pageDropdownItem.complete::after {
   content: "✅";
@@ -381,4 +384,9 @@ li.locked::before {
 }
 .highlight-purple-long {
   background: linear-gradient(105deg, #0000 1%, #b388eb 2%, #b388eb 98%, #0000 99%);
+}
+
+#editor {
+  width: 100%;
+  min-height: 200px;
 }
