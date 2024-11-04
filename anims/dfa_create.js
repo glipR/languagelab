@@ -22,7 +22,7 @@ const check = () => {
   const word = GS.checkingDFA.combine(GS.dfa.dfa, (me, other) => me ^ other).findAcceptingString()
   const checkingAccepts = word !== null && GS.checkingDFA.simulateWord(word) === "Accept";
   if (word === null) {
-    GS.onSuccess();
+    GS.onSuccess('You DFA is correct!');
   } else {
     GS.onFailure(`Your DFA ${checkingAccepts ? 'rejects' : 'accepts'} the string "${word}", but it shouldn't.`);
   }

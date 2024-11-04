@@ -42,7 +42,7 @@ const wordIndexPosition = ((i, word) => {
     x: localFirstCharPos.x,
     y: localFirstCharPos.y,
   }
-})
+});
 
 const moveBetween = (l1, l2, duration, graph, nodePointer, wordPointer, word) => {
   const edge = graph.edgeMap[`${l1}->${l2}`];
