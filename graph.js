@@ -237,7 +237,15 @@ class AbstractEdge {
     if (position === "middle") {
       return this.edgeInterp(0.5);
     } else if (position === "end") {
-      return this.edgeInterp(Math.min(this.drawnAmount, this.findRadiusRatio(false, this.to.style.radius)));
+      const t = Math.min(
+        this.drawnAmount,
+        this.findRadiusRatio(false, this.to.style.radius)
+      );
+      return {
+        // Use the line position, but the pure bezier angle.
+        position: this.edgeInterp(t).position,
+        angle: this.bezierEdgeInterp(t).angle,
+      }
     }
     throw new Error('Invalid position');
   }
