@@ -46,6 +46,7 @@ const wordIndexPosition = ((i, word) => {
 
 const moveBetween = (l1, l2, duration, graph, nodePointer, wordPointer, word) => {
   const edge = graph.edgeMap[`${l1}->${l2}`];
+  if (!edge) return new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, () => {});
   const oldWordIndex = GS.curWordIndex;
   const curWordPos = word ? wordIndexPosition(GS.curWordIndex, word) : 0;
   GS.curWordIndex++;
@@ -191,11 +192,11 @@ const example2 = () => {
       { from: 'E', to: 'O', label: 'a', style: { edgeAnchor: {
         x: 0,
         y: -60,
-      }, arrow: { endOffsetPortion: 0.09 } } },
+      } } },
       { from: 'O', to: 'E', label: 'a', style: { edgeAnchor: {
         x: 0,
         y: 60,
-      }, arrow: { endOffsetPortion: 0.09 } } },
+      } } },
       { from: 'E', to: 'E', label: 'b' },
       { from: 'O', to: 'O', label: 'b' },
     ]
@@ -280,13 +281,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.easings = easings;
   GS.graph = new Graph();
   const nodeStyle = { radius: 30, fill: bg_dark, strokeWidth: 3, stroke: black, showLabel: true };
-  const edgeStyle = (lab) => ({ lineWidth: 5, edgeLabel: lab, stroke: black, arrow: {
-    direction: 'forward',
-    position: 'end',
-    size: 20,
-    width: 5,
-    endOffset: 30,
-  } });
+  const edgeStyle = (lab) => ({ edgeLabel: lab });
   GS.graph.fromJSON({
     nodes: {
       A: { position: { x: 250, y: 300 }, style: {...nodeStyle, isEntry: true, entryWidth: 5 } },
@@ -305,7 +300,6 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
           x: 0,
           y: -100,
         },
-        arrow: {...edgeStyle('b').arrow, endOffsetPortion: 0.09},
       } },
       { from: 'C', to: 'C', style: edgeStyle('a') },
       { from: 'D', to: 'D', style: edgeStyle('b') },
@@ -466,8 +460,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     GS.graph.edges.forEach(e => {
       e.style.edgeLabel.split(',').forEach((lab, i) => {
         const char = lab.trim();
-        const fakeSource = new Node(e.from.label, e.from.position, {...e.from.style});
-        let fakeDest = new Node(e.to.label, e.to.position, {...e.to.style});
+        const fakeSource = new Node(e.from.label, e.from.position, {...e.from.style, radius: 0});
+        let fakeDest = new Node(e.to.label, e.to.position, {...e.to.style, radius: 0});
         if (e.from.label === e.to.label) {
           fakeDest = fakeSource
         }
@@ -478,18 +472,16 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         const edgeStyleCopy = mergeDeep({},
           {...edgeStyle(e.style.edgeLabel)},
           {
-            stroke: e.style.stroke,
+            stroke: {
+              color: e.style.stroke.color,
+              width: e.style.stroke.width,
+            },
             edgeLabelOffset: 4,
           },
           e.from.label === e.to.label ? {
-            loopOffset: {x: 0, y: -20},
-            loopAnchorMult: 0.7,
-            arrow: {
-              size: 15,
-              width: 3,
-              position: 'middle',
-              offsetPosition: {x: 7, y: 0},
-            }
+            loopOffset: {x: 0, y: -25},
+            loopAnchorMult: 1.7,
+            edgeLabelOffset: 3,
           } : {},
         );
         const copy = AbstractEdge.decide(fakeSource, fakeDest, edgeStyleCopy);
@@ -498,8 +490,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
           fakeSource.desiredPosition = {x: 675 + 112.5/2 + "ab".indexOf(char) * 112.5, y: 275 + 60 * "ABCDE".indexOf(e.from.label)};
           fakeDest.desiredPosition = {x: 675 + 112.5/2 + "ab".indexOf(char) * 112.5, y: 275 + 60 * "ABCDE".indexOf(e.from.label)};
         } else {
-          fakeSource.desiredPosition = {x: 675 + 112.5*(-0.2) + "ab".indexOf(char) * 112.5, y: 260 + 60 * "ABCDE".indexOf(e.from.label)};
-          fakeDest.desiredPosition = {x: 675 + 112.5*(1.2) + "ab".indexOf(char) * 112.5, y: 260 + 60 * "ABCDE".indexOf(e.from.label)};
+          fakeSource.desiredPosition = {x: 675 + 112.5*(0.1) + "ab".indexOf(char) * 112.5, y: 260 + 60 * "ABCDE".indexOf(e.from.label)};
+          fakeDest.desiredPosition = {x: 675 + 112.5*(0.9) + "ab".indexOf(char) * 112.5, y: 260 + 60 * "ABCDE".indexOf(e.from.label)};
         }
         copyEdges[copy.from.label + char] = copy;
       });
@@ -605,7 +597,6 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   });
 
   //
-
   const e1 = example1();
   const e2 = example2();
 

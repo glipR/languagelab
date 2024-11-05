@@ -7,8 +7,8 @@ export const t1JSON = {
   edges: [
     { from: 'A', to: 'A', label: 'a' },
     { from: 'B', to: 'B', label: 'b' },
-    { from: 'B', to: 'A', label: 'a', style: {edgeAnchor: { x: 0, y: -40 }, arrow: {endOffsetPortion: 0.09}} },
-    { from: 'A', to: 'B', label: 'b', style: {edgeAnchor: { x: 0, y: 40 }, arrow: {endOffsetPortion: 0.09}} },
+    { from: 'B', to: 'A', label: 'a', style: {edgeAnchor: { x: 0, y: -40 }} },
+    { from: 'A', to: 'B', label: 'b', style: {edgeAnchor: { x: 0, y: 40 }} },
     { from: 'C', to: 'A', label: 'a' },
     { from: 'C', to: 'B', label: 'b' },
   ],

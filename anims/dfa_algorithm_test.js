@@ -73,13 +73,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.onFailure = onFailure;
   GS.graph = new Graph();
   const nodeStyle = { radius: 30, fill: bg_dark, strokeWidth: 3, stroke: black, showLabel: true };
-  const edgeStyle = (lab) => ({ lineWidth: 5, edgeLabel: lab, stroke: black, arrow: {
-    direction: 'forward',
-    position: 'end',
-    size: 20,
-    width: 5,
-    endOffset: 30,
-  } });
+  const edgeStyle = (lab) => ({ edgeLabel: lab });
   GS.graph.fromJSON({
     nodes: {
       A: { position: { x: 250, y: 300 }, style: {...nodeStyle, isEntry: true, entryWidth: 5 } },
@@ -98,7 +92,6 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
           x: 0,
           y: -100,
         },
-        arrow: {...edgeStyle('b').arrow, endOffsetPortion: 0.09},
       } },
       { from: 'C', to: 'C', style: edgeStyle('a') },
       { from: 'D', to: 'D', style: edgeStyle('b') },

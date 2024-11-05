@@ -68,6 +68,7 @@ class DFADraw {
         }
         const pos = this.screen.globalToLocal(e.data.global.x, e.data.global.y);
         this.fakeTargetNode.position = pos;
+        this.fakeTargetNode.style.radius = 0;
         this.fakeEdge.to = this.fakeTargetNode;
         this.fakeEdge.updateGraphic();
       } else if (this.curState === DFADraw.DRAG_EDGE) {
@@ -95,7 +96,7 @@ class DFADraw {
         if (this.selectedEdge.from.label === this.selectedEdge.to.label) {
           newStyle = mergeDeep({...this.selectedEdge.style}, { loopOffset: this.fakeEdge.style.loopOffset });
         } else {
-          newStyle = mergeDeep({...this.selectedEdge.style}, { arrow: {endOffsetPortion: 0.1}, edgeAnchor: this.fakeEdge.style.edgeAnchor });
+          newStyle = mergeDeep({...this.selectedEdge.style}, { edgeAnchor: this.fakeEdge.style.edgeAnchor });
         }
         this.dfa.removeEdge(this.selectedEdge);
         this.removeFakeEdge();
@@ -139,7 +140,7 @@ class DFADraw {
     if (edge.from.label === edge.to.label) {
       this.fakeEdge = new LoopEdge(edge.from, edge.to, mergeDeep({...DFADraw.baseEdgeStyle}, edge.style, {loopOffset: { x: 0, y: -75 }}));
     } else {
-      this.fakeEdge = new CurveEdge(edge.from, edge.to, mergeDeep({...DFADraw.baseEdgeStyle}, edge.style, {arrow: {endOffsetPortion: 0.1}, edgeAnchor: { x: 0, y: 0 }}));
+      this.fakeEdge = new CurveEdge(edge.from, edge.to, mergeDeep({...DFADraw.baseEdgeStyle}, edge.style, {edgeAnchor: { x: 0, y: 0 }}));
     }
     this.fakeEdge.graphic.alpha = 0.5;
     this.fakeEdge.edgeLine.interactive = false;

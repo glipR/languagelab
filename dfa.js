@@ -4,13 +4,7 @@ import { mergeDeep } from "./utils.js";
 
 class DFA extends Graph {
   static baseNodeStyle = { radius: 30, fill: bg_dark, strokeWidth: 3, stroke: black, showLabel: true, entryWidth: 5 };
-  static baseEdgeStyle = (lab) => ({ lineWidth: 5, edgeLabel: lab, stroke: black, arrow: {
-    direction: 'forward',
-    position: 'end',
-    size: 20,
-    width: 5,
-    endOffset: 30,
-  } });
+  static baseEdgeStyle = (lab) => ({ edgeLabel: lab });
 
   fromJSON(json) {
     console.log(json);
