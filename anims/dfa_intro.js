@@ -145,15 +145,15 @@ const example1 = () => {
     nodePointer.alpha = v;
   });
 
-  const moveMovement = moveBetween('S', 'B', 60, g, nodePointer)
-    .then(moveBetween('B', 'B', 45, g, nodePointer))
-    .then(moveBetween('B', 'B', 45, g, nodePointer))
+  const moveMovement = moveBetween('S', 'B', 45, g, nodePointer)
+    .then(moveBetween('B', 'B', 30, g, nodePointer))
+    .then(moveBetween('B', 'B', 30, g, nodePointer))
     .then(new ValueTween(g.nodes['B'].position, g.nodes['S'].position, 60, GS.easings.easeInOutQuad, (v) => {
       nodePointer.position.set(v.x, v.y - 60);
     }))
-    .then(moveBetween('S', 'A', 60, g, nodePointer))
-    .then(moveBetween('A', 'A', 45, g, nodePointer))
-    .then(moveBetween('A', 'A', 45, g, nodePointer))
+    .then(moveBetween('S', 'A', 45, g, nodePointer))
+    .then(moveBetween('A', 'A', 30, g, nodePointer))
+    .then(moveBetween('A', 'A', 30, g, nodePointer))
 
   const nodeFadeOut = new ValueTween(1, 0, 60, GS.easings.easeInOutQuad, (v) => {
     nodePointer.alpha = v;
@@ -161,20 +161,20 @@ const example1 = () => {
 
   return delay(0)
     .then(nodeFadeIns['S'])
-    .then(delay(30))
-    .then(nodeFadeIns['A'], delay(20).then(nodeFadeIns['B']))
-    .then(delay(60))
-    .then(startFade, finalFades['A'])
-    .then(delay(60))
+    .then(delay(150))
+    .then(nodeFadeIns['A'], delay(180).then(nodeFadeIns['B']))
+    .then(delay(120))
+    .then(startFade, delay(40).then(finalFades['A']))
+    .then(delay(170))
     // Edges from S
     .then(...edgeDrags.filter(e => e[0].from.label === 'S').map(e => e.slice(1)).flat())
-    .then(delay(60))
+    .then(delay(380))
     // All other edges
     .then(...edgeDrags.filter(e => e[0].from.label !== 'S').map(e => e.slice(1)).flat())
-    .then(delay(60))
+    .then(delay(280))
     // Make S final
     .then(finalFades['S'])
-    .then(delay(60))
+    .then(delay(200))
     .then(nodeFadeIn)
     .then(moveMovement)
     .then(nodeFadeOut)
@@ -206,6 +206,7 @@ const example2 = () => {
     n.graphic.visible = false;
     n.separatedGraphic.visible = false;
     n.innerCircle.alpha = 0;
+    n.entry.alpha = 0;
   });
   g.edges.forEach(e => {
     e.drawnAmount = 0;
@@ -225,6 +226,13 @@ const example2 = () => {
     [n.label]: n.tweenPop(60)
   }), {});
 
+  const startFades = Object.values(g.nodes).reduce((o, n) => ({
+    ...o,
+    [n.label]: new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+      n.entry.alpha = v;
+      n.updateGraphic();
+    })
+  }), {});
   const finalFades = Object.values(g.nodes).reduce((o, n) => ({
     ...o,
     [n.label]: new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
@@ -250,10 +258,10 @@ const example2 = () => {
 
   const moveMovement = moveBetween('E', 'O', 60, g, nodePointer)
     .then(moveBetween('O', 'E', 45, g, nodePointer))
-    .then(moveBetween('E', 'O', 45, g, nodePointer))
-    .then(moveBetween('O', 'O', 45, g, nodePointer))
-    .then(moveBetween('O', 'E', 45, g, nodePointer))
-    .then(moveBetween('E', 'E', 45, g, nodePointer))
+    .then(moveBetween('E', 'O', 30, g, nodePointer))
+    .then(moveBetween('O', 'O', 30, g, nodePointer))
+    .then(moveBetween('O', 'E', 20, g, nodePointer))
+    .then(moveBetween('E', 'E', 20, g, nodePointer))
 
   const nodeFadeOut = new ValueTween(1, 0, 60, GS.easings.easeInOutQuad, (v) => {
     nodePointer.alpha = v;
@@ -261,12 +269,15 @@ const example2 = () => {
 
   return delay(0)
     .then(nodeFadeIns['E'], delay(20).then(nodeFadeIns['O']))
-    .then(delay(60))
+    .then(delay(820))
     // Edges from S
     .then(...edgeDrags.filter(e => e[0].from.label !== e[0].to.label).map(e => e.slice(1)).flat())
-    .then(delay(60))
+    .then(delay(320))
     // All other edges
     .then(...edgeDrags.filter(e => e[0].from.label === e[0].to.label).map(e => e.slice(1)).flat())
+    .then(delay(80))
+    // Make E start
+    .then(startFades['E'])
     .then(delay(60))
     // Make E final
     .then(finalFades['E'])
@@ -274,6 +285,7 @@ const example2 = () => {
     .then(nodeFadeIn)
     .then(moveMovement)
     .then(nodeFadeOut)
+    // TODO: Shift this into a 2x2 table with regex vs fa formulations for the two examples.
     .then(fadeAll);
 }
 
@@ -573,20 +585,20 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   // T: We do this by taking each letter in the [word], and moving along the [associated transition] to a [new state].
   // Line up the [] with elements of the first movement.
   const algorithmExecution = moveBetween('A', 'D', 120, GS.graph, nodePointer, wordPointer, word)
-    .then(delay(60))
+    .then(delay(160))
     .then(moveBetween('D', 'D', 120, GS.graph, nodePointer, wordPointer, word))
     .then(delay(45))
     .then(moveBetween('D', 'E', 90, GS.graph, nodePointer, wordPointer, word))
     .then(delay(30))
     .then(moveBetween('E', 'B', 60, GS.graph, nodePointer, wordPointer, word))
     .then(delay(20))
-    .then(moveBetween('B', 'C', 60, GS.graph, nodePointer, wordPointer, word))
+    .then(moveBetween('B', 'C', 45, GS.graph, nodePointer, wordPointer, word))
     .then(delay(20))
-    .then(moveBetween('C', 'C', 60, GS.graph, nodePointer, wordPointer, word))
+    .then(moveBetween('C', 'C', 45, GS.graph, nodePointer, wordPointer, word))
     .then(delay(20))
-    .then(moveBetween('C', 'A', 60, GS.graph, nodePointer, wordPointer, word))
+    .then(moveBetween('C', 'A', 30, GS.graph, nodePointer, wordPointer, word))
     .then(delay(20))
-    .then(moveBetween('A', 'D', 60, GS.graph, nodePointer, wordPointer, word))
+    .then(moveBetween('A', 'D', 30, GS.graph, nodePointer, wordPointer, word))
 
   const fadeAll = new ValueTween(1, 0, 60, easings.easeInOutQuad, (v) => {
     GS.graph.graph.alpha = v;
@@ -600,36 +612,89 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   const e1 = example1();
   const e2 = example2();
 
-  TweenManager.add(delay(100) // was 510
-    .then(vertFadeIns) // 60
-    .then(delay(90))
-    .then(...edgeDrags) // 120
-    .then(...edgeLabels) // 60
-    .then(delay(160))
-    .then(...vertColorTweens) // 60
-    .then(delay(60))
-    .then(...edgeColorTweens) // 60
-    .then(graphShrinkAndShift) // 60
-    .then(copyNodesMove) // 60
-    .then(copyEdgesMove) // 160
-    .then(delay(240))
-    .then(removeAll)
-    .then(...fadeVertColorTweens, ...fadeEdgeColorTweens) // 60
-    .then(delay(60))
-    .then(fadeWordTween) // 60
-    .then(delay(60))
-    .then(...vertStartTweens) // 90
-    .then(delay(60))
-    .then(...vertEndTweens) // 90
-    .then(delay(60))
-    .then(pointerFade) // 60
-    .then(delay(60))
-    .then(algorithmExecution)
-    .then(fadeAll)
-    .then(e1).then(delay(30))
-    .then(e2).then(delay(30))
-    .then(new Tween(1, easings.easeInOutQuad, ()=>{}, ()=>{}, onSuccess))
-  );
+  const skipTime = 0;
+
+  PIXI.sound.Sound.from({
+    url: '/audio/dfaIntro.mp3',
+    preload: true,
+    loaded: (err, sound) => {
+      // TODO: D(eterministic)F(inite)A(utomaton)
+      // Have words going into the DFA (Shrink and Unshrink!)
+      // and turning green/red as they get categorised
+      TweenManager.add(delay(100 + 600) // was 510
+        .then(vertFadeIns) // 60
+        .then(delay(90))
+        .then(...edgeDrags) // 120
+        .then(...edgeLabels) // 60
+        .then(delay(60))
+        .then(delay(120))
+        .then(delay(520))
+        .then(...vertColorTweens) // 60
+        .then(delay(60))
+        .then(...edgeColorTweens) // 60
+        .then(graphShrinkAndShift) // 60
+        .then(copyNodesMove) // 60
+        .then(copyEdgesMove) // 160
+        .then(delay(240))
+        .then(removeAll)
+        .then(...fadeVertColorTweens, ...fadeEdgeColorTweens) // 60
+        .then(delay(60))
+        .then(...vertStartTweens) // 90
+        .then(delay(60))
+        .then(...vertEndTweens) // 90
+        .then(delay(120))
+        .then(fadeWordTween) // 60
+        .then(delay(40))
+        .then(pointerFade) // 60
+        .then(delay(340))
+        .then(algorithmExecution)
+        .then(delay(240))
+        .then(fadeAll)
+        .then(delay(900))
+        .then(e1).then(delay(180))
+        .then(e2).then(delay(30))
+        .then(new Tween(1, easings.easeInOutQuad, ()=>{}, ()=>{}, onSuccess)));
+      TweenManager.skipSeconds(skipTime);
+      const playFourthSection = () => {
+        const instance = sound.play({
+          start: Math.max(skipTime - 111.8, 0) + 121,
+        });
+      }
+      const playThirdSection = () => {
+        const instance = sound.play({
+          start: Math.max(skipTime - 71, 0) + 76.6,
+          end: 117.4,
+        });
+        instance.on('end', () => {
+          playFourthSection();
+        });
+      }
+      const playSecondSection = () => {
+        const instance = sound.play({
+          start: Math.max(skipTime - 61, 0) + 64.2,
+          end: 74.2
+        });
+        instance.on('end', () => {
+          playThirdSection();
+        });
+      }
+      if (skipTime < 61) {
+        const instance = sound.play({
+          start: skipTime,
+          end: 61,
+        });
+        instance.on('end', () => {
+          playSecondSection();
+        });
+      } else if (skipTime < 71) {
+        playSecondSection();
+      } else if (skipTime < 111.8) {
+        playThirdSection();
+      } else {
+        playFourthSection();
+      }
+    }
+  });
 
 }
 
