@@ -1,7 +1,9 @@
 import { interpValue, ValueTween, Tween } from './tween.js';
-import { magnitude, vectorCombine, negate, bezier, partialBezier } from './utils.js';
+import { magnitude, vectorCombine, negate, bezier, partialBezier, mergeDeep } from './utils.js';
 import { CircleCover, RectangleCover } from './tools/paper_cover.js';
 import easings from 'https://cdn.jsdelivr.net/npm/easings.net@1.0.3/+esm';
+import { DrawnBezier } from './tools/drawnBezier.js';
+import { black } from './colours.js';
 
 const labelFontStyle = {
   fontFamily: 'Ittybittynotebook',
@@ -132,10 +134,30 @@ class Node {
 }
 
 class AbstractEdge {
+
+  baseStyle() {
+    return {
+      points: 6,
+      maxLineDist: 6,
+      forcedDistance: 0.8,
+      stroke: {
+        width: 5,
+        color: black,
+      },
+      arrow: {
+        direction: 'forward',
+        position: 'end',
+        size: 20,
+        width: 5,
+        endOffset: 30,
+      }
+    }
+  }
+
   constructor(from, to, style) {
     this.from = from;
     this.to = to;
-    this.style = {...style};
+    this.style = {...this.baseStyle(), ...style};
     this.drawnAmount = 1;
     this.onActions = {};
     this.initGraphic();
@@ -164,7 +186,7 @@ class AbstractEdge {
     this.graphic.addChild(this.labelBG);
     this.graphic.addChild(this.arrowGraphic);
     this.graphic.addChild(this.labelText);
-    this.edgeLine = new PIXI.Graphics();
+    this.edgeLine = new DrawnBezier(this.style, this.getBezierPoints(), this.drawnAmount);
     this.graphic.addChild(this.edgeLine);
     this.clickableEdge = new PIXI.GraphicsContext();
     // Assign clickableEdge to hitArea of edgeLine.
@@ -190,15 +212,58 @@ class AbstractEdge {
   }
 
   edgeInterp(t) {
+    const points = this.edgeLine.getDrawnPoints(t);
+    const finalPoints = this.edgeLine.getDrawnPoints(1);
+    return points.length === 1 ? {
+      position: points[0],
+      angle: bezier(0.5, points[0], finalPoints[1]).angle,
+    } : {
+      position: points[points.length-1],
+      angle: bezier(0.5, points[points.length-2], points[points.length-1]).angle,
+    };
+  }
+
+  bezierEdgeInterp(t) {
+    // Interpolates on the original bezier points, rather than the drawn points.
+    const points = this.getBezierPoints();
+    return bezier(t, ...points);
+  }
+
+  getBezierPoints() {
     throw new Error('Not implemented');
   }
 
   getArrowTransform(position) {
-    throw new Error('Not implemented');
+    if (position === "middle") {
+      return this.edgeInterp(0.5);
+    } else if (position === "end") {
+      return this.edgeInterp(Math.min(this.drawnAmount, this.findRadiusRatio(false, this.to.style.radius)));
+    }
+    throw new Error('Invalid position');
   }
 
-  getLabelTransform(position) {
-    throw new Error('Not implemented');
+  getLabelTransform() {
+    const midTransform = this.bezierEdgeInterp(this.style.labelRatio ?? 0.5);
+    const upsideDown = midTransform.angle > Math.PI / 2 || midTransform.angle < -Math.PI / 2;
+    // Upside down? Flip it 180
+    if (upsideDown) {
+      midTransform.angle += midTransform.angle > 0 ? Math.PI : -Math.PI;
+    }
+    const normalOff = this.style.stroke.width * (this.style.edgeLabelOffset ?? 6);
+    const offsetAngle = midTransform.angle + Math.PI / 2;
+    return {
+      position: {
+        x: (
+          midTransform.position.x
+          - Math.cos(offsetAngle) * normalOff
+        ),
+        y: (
+          midTransform.position.y
+          - Math.sin(offsetAngle) * normalOff
+        ),
+      },
+      angle: midTransform.angle,
+    }
   }
 
   findRadiusRatio(start, radius) {
@@ -231,6 +296,24 @@ class AbstractEdge {
     this.updateClickable();
   }
 
+  updateLine() {
+    this.edgeLine.drawnAmount = this.drawnAmount;
+    this.edgeLine.setDrawnBezier(this.getBezierPoints());
+    this.edgeLine.updateDrawnGraphic();
+  }
+
+  updateClickable() {
+    const points = this.edgeLine.getDrawnPoints(this.drawnAmount);
+    this.clickableEdge.clear();
+    this.clickableEdge.moveTo(points[0].x, points[0].y);
+    points.slice(1).forEach((point) => {
+      this.clickableEdge.lineTo(point.x, point.y);
+    });
+    this.clickableEdge
+      .stroke({width: this.style.clickWidth ?? (3 * this.style.stroke.width)});
+    this.edgeLine.cursor = Object.keys(this.onActions).length > 0 ? 'pointer' : 'default';
+  }
+
   updateArrow() {
     this.arrowGraphic.clear();
     if (!this.style.arrow || this.drawnAmount === 0) return;
@@ -238,7 +321,7 @@ class AbstractEdge {
     const arrowStyle = this.style.arrow;
     const arrowWidth = arrowStyle.width;
     const arrowSize = arrowStyle.size;
-    const arrowStroke = arrowStyle.stroke ?? this.style.stroke;
+    const arrowStroke = arrowStyle.stroke ?? this.style.stroke.color;
     const arrowTransform = this.getArrowTransform(arrowStyle.position);
 
     this.arrowGraphic
@@ -270,6 +353,14 @@ class AbstractEdge {
     this.labelBG.updateGraphic();
   }
 
+  updateStyle(style) {
+    this.style = mergeDeep(this.style, style);
+    this.edgeLine.updateStyle(this.style);
+    // TODO: Add an onStyleChange event that subclasses attach to instead.
+    // Don't call updateGraphic, as this will mean multiple updateGraphic calls.
+    this.updateGraphic();
+  }
+
   static decide(from, to, style) {
     if (style.edgeAnchor) {
       return new CurveEdge(from, to, style);
@@ -296,13 +387,11 @@ class AbstractEdge {
 
   colorEdgeTween(color, duration, easing, colorLabels) {
     const strokeTween = new ValueTween(0, 1, duration, easing, (value) => {
-      this.style.stroke = interpValue(this.oldColor, color, value);
-      this.updateGraphic();
-    }, () => { this.oldColor = this.style.stroke });
+      this.updateStyle({ stroke: { color: interpValue(this.oldColor, color, value) } });
+    }, () => { this.oldColor = this.style.stroke.color });
     if (colorLabels !== undefined) {
       strokeTween.during(new ValueTween(0, 1, duration, easing, (value) => {
-        this.style.labelStyle.fill = interpValue(this.oldStyle.fill ?? new PIXI.Color(0), this.newStyle.fill, value);
-        this.updateGraphic();
+        this.updateStyle({ labelStyle: { fill: interpValue(this.oldStyle.fill ?? new PIXI.Color(0), this.newStyle.fill, value) } });
       }, () => { this.oldStyle = {...this.style.labelStyle}; this.style.labelStyle = {...this.oldStyle}; this.newStyle = {...this.style.labelStyle, fill: color} }));
     }
     return strokeTween;
@@ -311,115 +400,22 @@ class AbstractEdge {
 
 class StraightEdge extends AbstractEdge {
 
-  edgeInterp(t) {
-    const diff = this.diff().angle;
-    return {
-      position: interpValue(this.getEdgeStart(), this.getEdgeEnd(), t),
-      angle: diff,
-    }
-  }
-
-  drawnEdgeStart() {
-    const diff = {
-      x: this.getEdgeEnd().x - this.getEdgeStart().x,
-      y: this.getEdgeEnd().y - this.getEdgeStart().y,
-    }
-    const diffAngle = Math.atan2(diff.y, diff.x);
-    return {
-      x: this.getEdgeStart().x + Math.cos(diffAngle) * this.from.style.radius,
-      y: this.getEdgeStart().y + Math.sin(diffAngle) * this.from.style.radius,
-    }
-  }
-
-  drawnEdgeEnd() {
-    const diffAngle = this.diff().angle
-    const actualEnd = {
-      x: this.getEdgeEnd().x - Math.cos(diffAngle) * this.to.style.radius,
-      y: this.getEdgeEnd().y - Math.sin(diffAngle) * this.to.style.radius,
-    }
-    return interpValue(this.drawnEdgeStart(), actualEnd, this.drawnAmount);
-  }
-
-  diff() {
-    const diff = {
-      x: this.getEdgeEnd().x - this.getEdgeStart().x,
-      y: this.getEdgeEnd().y - this.getEdgeStart().y,
-    }
-    return {
-      magnitude: magnitude(diff),
-      angle: Math.atan2(diff.y, diff.x),
-      vector: diff,
-    }
-  }
-
-  preDrawLine(graphics) {
-    graphics.clear();
-    const start = this.drawnEdgeStart();
-    const end = this.drawnEdgeEnd();
-    graphics
-      .moveTo(start.x, start.y)
-      .lineTo(end.x, end.y);
-  }
-
-  updateLine() {
-    this.preDrawLine(this.edgeLine);
-    this.edgeLine
-      .stroke({width: this.style.lineWidth, color: this.style.stroke});
-  }
-
-  updateClickable() {
-    this.preDrawLine(this.clickableEdge);
-    this.clickableEdge
-      .stroke({width: this.style.clickWidth ?? (3 * this.style.lineWidth)});
-    this.edgeLine.cursor = Object.keys(this.onActions).length > 0 ? 'pointer' : 'default';
-  }
-
-  getArrowTransform(position) {
-    const arrowAngle = this.diff().angle;
-    if (position === "middle") {
-      return {
-        position: interpValue(this.drawnEdgeStart(), this.drawnEdgeEnd(), 0.5),
-        angle: arrowAngle,
-      }
-    } else if (position === "end") {
-      return {
-        position: this.drawnEdgeEnd(),
-        angle: arrowAngle,
-      }
-    }
-    throw new Error('Invalid position');
-  }
-
-  getLabelTransform() {
-    let lineAngle = this.diff().angle;
-    const upsideDown = lineAngle > Math.PI / 2 || lineAngle < -Math.PI / 2;
-    // Upside down? Flip it 180
-    if (upsideDown) {
-      lineAngle += lineAngle > 0 ? Math.PI : -Math.PI;
-    }
-    const normalOff = this.style.lineWidth * (this.style.edgeLabelOffset ?? 6);
-    const offsetAngle = lineAngle + Math.PI / 2;
-    const startPoint = this.edgeInterp(this.style.labelRatio ?? 0.5).position;
-    return {
-      position: {
-        x: (
-          startPoint.x
-          - Math.cos(offsetAngle) * normalOff
-        ),
-        y: (
-          startPoint.y
-          - Math.sin(offsetAngle) * normalOff
-        ),
-      },
-      angle: lineAngle,
-    }
+  getBezierPoints() {
+    return [this.getEdgeStart(), this.getEdgeEnd()];
   }
 
 }
 
 class CurveEdge extends AbstractEdge {
 
-  getPartialBezierPoints(t) {
+  baseStyle() {
+    return {
+      ...super.baseStyle(),
+      edgeAnchor: { x: 0, y: -75 },
+    }
+  }
+
+  getBezierPoints() {
     const vertexMidpoint = interpValue(this.getEdgeStart(), this.getEdgeEnd(), 0.5);
     const anchorAngle = Math.atan2(this.style.edgeAnchor.y, this.style.edgeAnchor.x);
     const anchorOffset = {
@@ -432,171 +428,42 @@ class CurveEdge extends AbstractEdge {
     const fullAnchor1 = vectorCombine(vertexMidpoint, this.style.edgeAnchor, startDist < endDist ? anchorOffset : negate(anchorOffset));
     const fullAnchor2 = vectorCombine(vertexMidpoint, this.style.edgeAnchor, startDist < endDist ? negate(anchorOffset) : anchorOffset);
     const fullEnd = this.getEdgeEnd();
-
-    return partialBezier(t, start, fullAnchor1, fullAnchor2, fullEnd);
-  }
-
-  edgeInterp(t) {
-    return bezier(t, ...this.getPartialBezierPoints(1));
-  }
-
-  preDrawLine(graphics) {
-    graphics.clear();
-    const [start, anchor1, anchor2, end] = this.getPartialBezierPoints(this.drawnAmount);
-    graphics.moveTo(start.x, start.y)
-    graphics.bezierCurveTo(
-      anchor1.x, anchor1.y,
-      anchor2.x, anchor2.y,
-      end.x, end.y,
-    );
-  }
-
-  updateLine() {
-    this.preDrawLine(this.edgeLine);
-    this.edgeLine.stroke({width: this.style.lineWidth, color: this.style.stroke});
-  }
-
-  updateClickable() {
-    this.preDrawLine(this.clickableEdge);
-    this.clickableEdge.stroke({width: this.style.clickWidth ?? (3 * this.style.lineWidth)});
-    this.edgeLine.cursor = Object.keys(this.onActions).length > 0 ? 'pointer' : 'default';
-  }
-
-  getArrowTransform(position) {
-    if (position === "middle") {
-      return this.edgeInterp(0.5);
-    } else if (position === "end") {
-      return this.edgeInterp(Math.min(this.drawnAmount, this.findRadiusRatio(false, this.to.style.radius)));
-    }
-    throw new Error(`Invalid position ${position}`);
-  }
-
-  getLabelTransform() {
-    const midTransform = this.edgeInterp(this.style.labelRatio ?? 0.5);
-    const upsideDown = midTransform.angle > Math.PI / 2 || midTransform.angle < -Math.PI / 2;
-    // Upside down? Flip it 180
-    if (upsideDown) {
-      midTransform.angle += midTransform.angle > 0 ? Math.PI : -Math.PI;
-    }
-    const normalOff = this.style.lineWidth * (this.style.edgeLabelOffset ?? 6);
-    const offsetAngle = midTransform.angle + Math.PI / 2;
-    return {
-      position: {
-        x: (
-          midTransform.position.x
-          - Math.cos(offsetAngle) * normalOff
-        ),
-        y: (
-          midTransform.position.y
-          - Math.sin(offsetAngle) * normalOff
-        ),
-      },
-      angle: midTransform.angle,
-    }
+    return [start, fullAnchor1, fullAnchor2, fullEnd];
   }
 
 }
 
 class LoopEdge extends AbstractEdge {
 
-  bezierLines(t) {
+  baseStyle() {
+    return {
+      ...super.baseStyle(),
+      loopOffset: { x: 0, y: -75 },
+      loopAnchorMult: 0.8,
+      points: 10,
+      maxLineDist: 1.5,
+      forcedDistance: 1,
+    }
+  }
+
+  getBezierPoints() {
     const loopOffset = this.style.loopOffset ?? {x: 0, y: -75};
     const loopAngle = Math.atan2(loopOffset.y, loopOffset.x);
     const startLoop = this.getEdgeStart();
     const anchorPoint = {
-      x: startLoop.x + loopOffset.x,
-      y: startLoop.y + loopOffset.y
+      x: startLoop.x + loopOffset.x * 1.4,
+      y: startLoop.y + loopOffset.y * 1.4
     }
     const controlOffset = {
-      x: Math.cos(loopAngle + Math.PI / 2) * magnitude(loopOffset) * (this.style.loopAnchorMult ?? 0.3),
-      y: Math.sin(loopAngle + Math.PI / 2) * magnitude(loopOffset) * (this.style.loopAnchorMult ?? 0.3)
+      x: Math.cos(loopAngle + Math.PI / 2) * magnitude(loopOffset) * (this.style.loopAnchorMult ?? 0.8),
+      y: Math.sin(loopAngle + Math.PI / 2) * magnitude(loopOffset) * (this.style.loopAnchorMult ?? 0.8)
     }
-    const controlCenter = interpValue(startLoop, anchorPoint, 0.8);
-
-    const line1 = partialBezier(Math.min(2*t, 1),
+    return [
       startLoop,
-      vectorCombine(controlCenter, negate(controlOffset)),
       vectorCombine(anchorPoint, negate(controlOffset)),
-      anchorPoint,
-    );
-    const line2 = partialBezier(Math.max(2*t - 1, 0),
-      anchorPoint,
       vectorCombine(anchorPoint, controlOffset),
-      vectorCombine(controlCenter, controlOffset),
       startLoop,
-    );
-    if (t < 0.5) {
-      return [line1];
-    } return [line1, line2];
-  }
-
-  edgeInterp(t) {
-    const lines = this.bezierLines(1);
-    if (t < 0.5) {
-      return bezier(2*t, ...lines[0]);
-    }
-    return bezier(2*t - 1, ...lines[1]);
-  }
-
-  preDrawLine(graphics) {
-    const lines = this.bezierLines(this.drawnAmount);
-    graphics.clear();
-    graphics.moveTo(lines[0][0].x, lines[0][0].y);
-    for (let i = 0; i < lines.length; i++) {
-      graphics.bezierCurveTo(
-        lines[i][1].x, lines[i][1].y,
-        lines[i][2].x, lines[i][2].y,
-        lines[i][3].x, lines[i][3].y,
-      )
-    }
-  }
-
-  updateLine() {
-    this.preDrawLine(this.edgeLine);
-    this.edgeLine.stroke({width: this.style.lineWidth, color: this.style.stroke});
-  }
-
-  updateClickable() {
-    this.preDrawLine(this.clickableEdge);
-    this.clickableEdge.stroke({width: this.style.clickWidth ?? (3 * this.style.lineWidth)});
-    this.edgeLine.cursor = Object.keys(this.onActions).length > 0 ? 'pointer' : 'default';
-  }
-
-  getArrowTransform(position) {
-    if (position === "middle") {
-      const transform = this.edgeInterp(0.5)
-      return {
-        position: vectorCombine(transform.position, this.style?.arrow?.offsetPosition ?? { x: 0, y: 0}),
-        angle: transform.angle,
-      }
-    } else if (position === "end") {
-      return this.edgeInterp(Math.min(this.drawnAmount, this.findRadiusRatio(false, this.from.style.radius)));
-    }
-    throw new Error(`Invalid position ${position}`);
-  }
-
-  getLabelTransform() {
-    const midTransform = this.edgeInterp(this.style.labelRatio ?? 0.5);
-    const upsideDown = midTransform.angle > Math.PI / 2 || midTransform.angle < -Math.PI / 2;
-    // Upside down? Flip it 180
-    if (upsideDown) {
-      midTransform.angle += midTransform.angle > 0 ? Math.PI : -Math.PI;
-    }
-    const normalOff = this.style.lineWidth * (this.style.edgeLabelOffset ?? 6);
-    const offsetAngle = midTransform.angle + Math.PI / 2;
-    return {
-      position: {
-        x: (
-          midTransform.position.x
-          - Math.cos(offsetAngle) * normalOff
-        ),
-        y: (
-          midTransform.position.y
-          - Math.sin(offsetAngle) * normalOff
-        ),
-      },
-      angle: midTransform.angle,
-    }
+    ]
   }
 
 }
