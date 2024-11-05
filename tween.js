@@ -27,6 +27,17 @@ class TweenManager {
     this.tweens = this.tweens.filter((_, i) => !to_remove.includes(i));
   }
 
+  static skipSeconds(seconds) {
+    const fixedDT = 2;
+    let curT = 0;
+    const endT = seconds * 60;
+    while (curT < endT - fixedDT) {
+      this.update(fixedDT);
+      curT += fixedDT;
+    }
+    this.update(endT - curT);
+  }
+
   static clear() {
     this.tweens = [];
   }
@@ -174,7 +185,13 @@ class ValueTween extends Tween {
 const delay = (duration) => new Tween(duration, t => t, () => {});
 const chain = (tweens) => tweens.reduce((acc, tween) => acc.then(tween), delay(0));
 const atOnce = (tweens) => tweens.slice(1).reduce((acc, tween) => acc.during(tween), tweens[0]);
-const randomDelay = (tweens, maxDelay=20) => delay(0).then(...tweens.map(tween => delay(Math.random() * maxDelay).then(tween)));
+const randomDelay = (tweens, maxDelay=20) => {
+  const randoms = Array.from({length: tweens.length}, () => Math.random() * maxDelay);
+  // Ensure the final delay time is always the same. For audio timing.
+  const maxIndex = Math.floor(Math.random() * randoms.length);
+  randoms[maxIndex] = maxDelay;
+  return delay(0).then(...tweens.map((tween, i) => delay(randoms[i]).then(tween)))
+};
 
 export {
   TweenManager, Tween, PropertyTween, ValueTween,
