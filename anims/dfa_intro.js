@@ -412,6 +412,90 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   nodePointer.alpha = 0;
   wordPointer.alpha = 0;
 
+  const testWordsData = [
+    { word: "baaaa", result: true },
+    { word: "bbaabb", result: false },
+    { word: "abba", result: false },
+    { word: "ab", result: true },
+  ]
+  const testWordContainer = new PIXI.Container();
+  const testWords = testWordsData.map((d, i) => {
+    const t = new PIXI.Text(d.word, {...baseStyle});
+    t.anchor.set(0.5, 0.5);
+    const wordCover = new RectangleCover(t, {points: 18, randMult: 0.2});
+    const wordContainer = new PIXI.Container();
+    wordContainer.position.set(500, 150);
+    wordContainer.alpha = 0;
+    wordContainer.pivot.set(wordContainer.width/2, -wordContainer.height/2);
+    wordContainer.addChild(wordCover);
+    wordContainer.addChild(t);
+    testWordContainer.addChild(wordContainer);
+    return {container: wordContainer, text: t, cover: wordCover, result: d.result};
+  });
+  GS.screen.addChild(testWordContainer);
+
+  const moveTestWord = ({ container, text, cover, result }, height) => {
+    const popWordIn = new ValueTween(0, 1, 20, GS.easings.easeOutElastic, (v) => {
+      container.scale.set(v);
+    }).during( new ValueTween(0, 1, 20, GS.easings.easeOutCubic, (v) => {
+      container.alpha = v;
+    }));
+    const shiftToCenter = new ValueTween({x: 500, y: 150}, {x: 500, y: 300}, 20, GS.easings.easeInOutQuad, ({x, y}) => {
+      container.position.set(x, y);
+    }).during(new ValueTween(1, 0.3, 20, GS.easings.easeInOutQuad, (v) => {
+      container.scale.set(v);
+    }));
+    const shiftToCorrectPosition = new ValueTween({x: 500, y: 300}, {x: 500 + 200 * (result ? 1 : -1), y: height}, 20, GS.easings.easeInOutQuad, ({x, y}) => {
+      container.position.set(x, y);
+    }).during(new ValueTween(black, result ? green : red, 20, GS.easings.easeInOutQuad, (v) => {
+      text.style.fill = v;
+    })).during(new ValueTween(0.3, 1, 20, GS.easings.easeInOutQuad, (v) => {
+      container.scale.set(v);
+    }));
+    return popWordIn.then(shiftToCenter).then(shiftToCorrectPosition);
+  }
+  const testWordTweens = testWords.map((w, i) => {
+    return delay(i*30).then(moveTestWord(w, [450, 450, 400, 400][i]));
+  });
+
+  const abbreviated = "Deterministic Finite Automaton";
+  const title = new PIXI.Text(abbreviated, {...baseStyle, fontSize: 128});
+  const titleContainer = new PIXI.Container();
+  const titles = ["D", "F", "A"].map((c, i) => {
+    const t = new PIXI.Text(c, {...baseStyle, fontSize: 128});
+    t.position.set([0, 145, 209][i], 0);
+    t.alpha = 0;
+    return t;
+  });
+  titleContainer.addChild(title);
+  titles.forEach(t => titleContainer.addChild(t));
+  titleContainer.pivot.set(titleContainer.width/2, titleContainer.height/2);
+  titleContainer.position.set(500, 300);
+  titleContainer.alpha = 0;
+  const titleCover = new RectangleCover(titleContainer, {points: 20, randMult: 0.1, width: 100});
+  titleCover.position.set(500, 300);
+  titleCover.alpha = 0;
+  GS.screen.addChild(titleCover);
+  GS.screen.addChild(titleContainer);
+
+  const showTitle = new ValueTween(0, 1, 60, easings.easeInOutQuad, (v) => {
+    titleContainer.alpha = v;
+  });
+  const titleShift = new ValueTween(0, 1, 60, easings.easeInOutQuad, (v) => {
+    titleCover.alpha = v;
+    titles.forEach((t, i) => {
+      t.alpha = 1;
+      t.style.fill = interpValue(black, highlightColours[i], easings.easeOutQuint(v));
+      t.position.set(interpValue([0, 145, 209][i], titleContainer.width/2 - 30 + 30*i, v), 0);
+    });
+    title.alpha = 1 - v;
+  });
+  const titleFade = new ValueTween(1, 0, 60, easings.easeInOutQuad, (v) => {
+    titleContainer.alpha = v;
+    titleCover.alpha = v;
+    testWordContainer.alpha = v;
+  });
+
   // T: Text
   // T: A deterministic finite automaton is kind of like an algorithm for identifying if a particular word is in a language.
 
@@ -618,10 +702,15 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     url: '/audio/dfaIntro.mp3',
     preload: true,
     loaded: (err, sound) => {
-      // TODO: D(eterministic)F(inite)A(utomaton)
-      // Have words going into the DFA (Shrink and Unshrink!)
-      // and turning green/red as they get categorised
-      TweenManager.add(delay(100 + 600) // was 510
+      TweenManager.add(delay(100) // was 510
+        .then(showTitle) // 60
+        .then(delay(60))
+        .then(titleShift) // 60
+        .then(delay(60))
+        .then(...testWordTweens) // 150
+        .then(delay(90))
+        .then(titleFade) // 60
+        .then(delay(60))
         .then(vertFadeIns) // 60
         .then(delay(90))
         .then(...edgeDrags) // 120
