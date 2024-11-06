@@ -558,9 +558,6 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         const char = lab.trim();
         const fakeSource = new Node(e.from.label, e.from.position, {...e.from.style, radius: 0});
         let fakeDest = new Node(e.to.label, e.to.position, {...e.to.style, radius: 0});
-        if (e.from.label === e.to.label) {
-          fakeDest = fakeSource
-        }
         fakeSource.graphic.visible = false;
         fakeSource.startPosition = tableContainer.toLocal(GS.graph.graph.toGlobal(fakeSource.position));
         fakeDest.graphic.visible = false;
@@ -583,8 +580,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         const copy = AbstractEdge.decide(fakeSource, fakeDest, edgeStyleCopy);
         tableContainer.addChild(copy.graphic);
         if (e.from.label === e.to.label) {
-          fakeSource.desiredPosition = {x: 675 + 112.5/2 + "ab".indexOf(char) * 112.5, y: 275 + 60 * "ABCDE".indexOf(e.from.label)};
-          fakeDest.desiredPosition = {x: 675 + 112.5/2 + "ab".indexOf(char) * 112.5, y: 275 + 60 * "ABCDE".indexOf(e.from.label)};
+          fakeSource.desiredPosition = {x: 675 + 112.5*0.4 + "ab".indexOf(char) * 112.5, y: 275 + 60 * "ABCDE".indexOf(e.from.label)};
+          fakeDest.desiredPosition = {x: 675 + 112.5*0.6 + "ab".indexOf(char) * 112.5, y: 275 + 60 * "ABCDE".indexOf(e.from.label)};
         } else {
           fakeSource.desiredPosition = {x: 675 + 112.5*(0.1) + "ab".indexOf(char) * 112.5, y: 260 + 60 * "ABCDE".indexOf(e.from.label)};
           fakeDest.desiredPosition = {x: 675 + 112.5*(0.9) + "ab".indexOf(char) * 112.5, y: 260 + 60 * "ABCDE".indexOf(e.from.label)};

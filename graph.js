@@ -373,7 +373,7 @@ class AbstractEdge {
     if (style.edgeAnchor) {
       return new CurveEdge(from, to, style);
     }
-    if (from === to) {
+    if (from.label === to.label) {
       return new LoopEdge(from, to, style);
     }
     return new StraightEdge(from, to, style);
@@ -459,20 +459,20 @@ class LoopEdge extends AbstractEdge {
   getBezierPoints() {
     const loopOffset = this.style.loopOffset ?? {x: 0, y: -75};
     const loopAngle = Math.atan2(loopOffset.y, loopOffset.x);
-    const startLoop = this.getEdgeStart();
+    const midLoop = interpValue(this.getEdgeStart(), this.getEdgeEnd(), 0.5);
     const anchorPoint = {
-      x: startLoop.x + loopOffset.x * 1.4,
-      y: startLoop.y + loopOffset.y * 1.4
+      x: midLoop.x + loopOffset.x * 1.4,
+      y: midLoop.y + loopOffset.y * 1.4
     }
     const controlOffset = {
       x: Math.cos(loopAngle + Math.PI / 2) * magnitude(loopOffset) * (this.style.loopAnchorMult ?? 0.8),
       y: Math.sin(loopAngle + Math.PI / 2) * magnitude(loopOffset) * (this.style.loopAnchorMult ?? 0.8)
     }
     return [
-      startLoop,
+      this.getEdgeStart(),
       vectorCombine(anchorPoint, negate(controlOffset)),
       vectorCombine(anchorPoint, controlOffset),
-      startLoop,
+      this.getEdgeEnd(),
     ]
   }
 
