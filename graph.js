@@ -420,6 +420,7 @@ class CurveEdge extends AbstractEdge {
     return {
       ...super.baseStyle(),
       edgeAnchor: { x: 0, y: -75 },
+      smoothScaling: 50,
     }
   }
 
@@ -451,6 +452,7 @@ class LoopEdge extends AbstractEdge {
       points: 10,
       maxLineDist: 1.5,
       forcedDistance: 1,
+      smoothScaling: 3,
     }
   }
 

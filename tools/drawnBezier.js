@@ -1,6 +1,6 @@
 import { black } from "../colours.js";
 import { interpValue } from "../tween.js";
-import { bezier, mergeDeep, vectorCombine } from "../utils.js";
+import { bezier, combineEasing, magnitude, mergeDeep, negate, vectorCombine } from "../utils.js";
 
 export class DrawnBezier extends PIXI.Graphics {
   constructor(fixStyle, bezier, drawnAmount=0) {
@@ -15,6 +15,8 @@ export class DrawnBezier extends PIXI.Graphics {
       forcedDistance: 0.5,
       scaleRandomsWithDrawnAmount: false,
       midPointDrawEasing: (t) => t,
+      smooth: true,
+      smoothScaling: 10,
 
     }, {...fixStyle});
     this.drawnAmount = drawnAmount;
@@ -91,11 +93,47 @@ export class DrawnBezier extends PIXI.Graphics {
     return allPoints;
   }
 
-  updateDrawnGraphic() {
+  drawSmooth() {
     const points = this.getDrawnPoints(this.drawnAmount);
+    let controlVectors = points.slice(1, -1).map((_, index) => {
+      const prevPoint = points[index];
+      const nextPoint = points[index+2];
+      const controlVector = vectorCombine(nextPoint, negate(prevPoint));
+      const controlMag = magnitude(controlVector) / this.fixStyle.smoothScaling;
+      return { x: controlVector.x / controlMag, y: controlVector.y / controlMag };
+    });
+    const firstControl = vectorCombine(points[1], negate(points[0]));
+    const firstControlMag = magnitude(firstControl) / this.fixStyle.smoothScaling;
+    const finalControl = vectorCombine(points[points.length-1], negate(points[points.length-2]));
+    const finalControlMag = magnitude(finalControl) / this.fixStyle.smoothScaling;
+    controlVectors = [
+      { x: firstControl.x / firstControlMag, y: firstControl.y / firstControlMag },
+      ...controlVectors,
+      { x: finalControl.x / finalControlMag, y: finalControl.y / finalControlMag },
+    ]
     this.clear();
     this.moveTo(points[0].x, points[0].y);
-    points.slice(1).forEach(point => this.lineTo(point.x, point.y));
+    for (let i=0; i<points.length-1; i++) {
+      const controlOut = vectorCombine(points[i], controlVectors[i]);
+      const controlIn = vectorCombine(points[i+1], negate(controlVectors[i+1]));
+      this.bezierCurveTo(
+        controlOut.x, controlOut.y,
+        controlIn.x, controlIn.y,
+        points[i+1].x, points[i+1].y
+      );
+    }
     this.stroke(this.fixStyle.stroke);
+  }
+
+  updateDrawnGraphic() {
+    const points = this.getDrawnPoints(this.drawnAmount);
+    if (this.fixStyle.smooth) {
+      this.drawSmooth();
+    } else {
+      this.clear();
+      this.moveTo(points[0].x, points[0].y);
+      points.slice(1).forEach(point => this.lineTo(point.x, point.y));
+      this.stroke(this.fixStyle.stroke);
+    }
   }
 }
