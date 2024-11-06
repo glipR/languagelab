@@ -6,6 +6,7 @@ import StyledText from '../text.js';
 import Screen from '../screen.js';
 import DFA from '../dfa.js';
 import { RectangleCover } from '../tools/paper_cover.js';
+import { DrawnBezier } from '../tools/drawnBezier.js';
 
 const GS = {
   curWordIndex: 0,
@@ -76,6 +77,10 @@ const moveBetween = (l1, l2, duration, graph, nodePointer, wordPointer, word) =>
 };
 
 const example1 = () => {
+  GS.example1Container = new PIXI.Container();
+  GS.example1Container.pivot.set(500, 300);
+  GS.example1Container.position.set(500, 300);
+  GS.screen.addChild(GS.example1Container);
   const g = new DFA();
   g.fromJSON({
     nodes: {
@@ -90,7 +95,7 @@ const example1 = () => {
       { from: 'B', to: 'B', label: 'a, b' },
     ]
   });
-  GS.screen.addChild(g.graph);
+  GS.example1Container.addChild(g.graph);
   Object.values(g.nodes).forEach(n => {
     n.graphic.visible = false;
     n.separatedGraphic.visible = false;
@@ -131,7 +136,7 @@ const example1 = () => {
   }), {});
   const edgeDrags = g.edges.map(e => [e, e.growEdgeTween(120, GS.easings.easeInOutQuad), e.showLabelTween(60, GS.easings.easeInOutQuad)]);
   const fadeAll = new ValueTween(1, 0, 60, GS.easings.easeInOutQuad, (v) => {
-    g.graph.alpha = v;
+    GS.example1Container.alpha = v;
   });
 
   const nodePointer = new PIXI.Graphics();
@@ -139,7 +144,7 @@ const example1 = () => {
   nodePointer.moveTo(-10, 10).lineTo(10, 10).lineTo(0, 25).lineTo(-10, 10).fill(black);
   nodePointer.position.set(g.nodes['S'].position.x, g.nodes['S'].position.y - 60);
   nodePointer.alpha = 0;
-  GS.screen.addChild(nodePointer);
+  GS.example1Container.addChild(nodePointer);
 
   const nodeFadeIn = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
     nodePointer.alpha = v;
@@ -182,6 +187,10 @@ const example1 = () => {
 }
 
 const example2 = () => {
+  GS.example2Container = new PIXI.Container();
+  GS.example2Container.pivot.set(500, 300);
+  GS.example2Container.position.set(500, 300);
+  GS.screen.addChild(GS.example2Container);
   const g = new DFA();
   g.fromJSON({
     nodes: {
@@ -201,7 +210,7 @@ const example2 = () => {
       { from: 'O', to: 'O', label: 'b' },
     ]
   });
-  GS.screen.addChild(g.graph);
+  GS.example2Container.addChild(g.graph);
   Object.values(g.nodes).forEach(n => {
     n.graphic.visible = false;
     n.separatedGraphic.visible = false;
@@ -242,7 +251,7 @@ const example2 = () => {
   }), {});
   const edgeDrags = g.edges.map(e => [e, e.growEdgeTween(120, GS.easings.easeInOutQuad), e.showLabelTween(60, GS.easings.easeInOutQuad)]);
   const fadeAll = new ValueTween(1, 0, 60, GS.easings.easeInOutQuad, (v) => {
-    g.graph.alpha = v;
+    GS.example2Container.alpha = v;
   });
 
   const nodePointer = new PIXI.Graphics();
@@ -250,7 +259,7 @@ const example2 = () => {
   nodePointer.moveTo(-10, 10).lineTo(10, 10).lineTo(0, 25).lineTo(-10, 10).fill(black);
   nodePointer.position.set(g.nodes['E'].position.x, g.nodes['E'].position.y - 60);
   nodePointer.alpha = 0;
-  GS.screen.addChild(nodePointer);
+  GS.example2Container.addChild(nodePointer);
 
   const nodeFadeIn = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
     nodePointer.alpha = v;
@@ -285,8 +294,74 @@ const example2 = () => {
     .then(nodeFadeIn)
     .then(moveMovement)
     .then(nodeFadeOut)
-    // TODO: Shift this into a 2x2 table with regex vs fa formulations for the two examples.
-    .then(fadeAll);
+}
+
+const comparison = () => {
+  // TODO: Shift this into a 2x2 table with regex vs fa formulations for the two examples.
+  GS.comparisonContainer = new PIXI.Container();
+  GS.screen.addChild(GS.comparisonContainer);
+
+  const fadeExample1Tween = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+    GS.example1Container.alpha = v;
+  }, () => {
+    // On start of this, scale and set postition.
+    GS.example1Container.scale.set(0.5);
+    GS.example1Container.position.set(750, 200);
+  });
+  const shiftExample2Tween = new ValueTween(1, 0.5, 60, GS.easings.easeInOutQuad, (v) => {
+    GS.example2Container.scale.set(v);
+  }).during(new ValueTween({x: 500, y: 300}, {x: 750, y: 430}, 60, GS.easings.easeInOutQuad, (v) => {
+    GS.example2Container.position.set(v.x, v.y);
+  }));
+
+  const regexText1 = new PIXI.Text("a(a|b)*", {...baseStyle, fontSize: 64});
+  const regexText2 = new PIXI.Text("b*(ab*ab*)*", {...baseStyle, fontSize: 64});
+  regexText1.anchor.set(0.5, 0.5);
+  regexText2.anchor.set(0.5, 0.5);
+  regexText1.position.set(300, 200);
+  regexText2.position.set(300, 430);
+  regexText1.alpha = 0;
+  regexText2.alpha = 0;
+  GS.comparisonContainer.addChild(regexText1);
+  GS.comparisonContainer.addChild(regexText2);
+
+  const regexFadeIn = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+    regexText1.alpha = v;
+    regexText2.alpha = v;
+  });
+
+  const languageLines = new PIXI.Container();
+  const vertMidLine = new DrawnBezier({ points: 20, stroke: { width: 5 }, maxLineDist: 2.5}, [{ x: 500, y: 50 }, { x: 500, y: 500 }]);
+  const horizMidLine = new DrawnBezier({ points: 20, stroke: { width: 5 }, maxLineDist: 2.5}, [{ x: 100, y: 320 }, { x: 900, y: 320 }]);
+  languageLines.addChild(vertMidLine);
+  languageLines.addChild(horizMidLine);
+  GS.comparisonContainer.addChild(languageLines);
+
+  const drawLang = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+    vertMidLine.drawnAmount = v;
+    vertMidLine.updateDrawnGraphic();
+    horizMidLine.drawnAmount = v;
+    horizMidLine.updateDrawnGraphic();
+  });
+
+  const coverRects = new PIXI.Container();
+  const rect1 = new PIXI.Graphics().rect(100, 50, 400, 270).fill(green);
+  const rect2 = new PIXI.Graphics().rect(500, 50, 400, 270).fill(red);
+  const rect3 = new PIXI.Graphics().rect(100, 320, 400, 180).fill(red);
+  const rect4 = new PIXI.Graphics().rect(500, 320, 400, 180).fill(green);
+  coverRects.addChild(rect1);
+  coverRects.addChild(rect2);
+  coverRects.addChild(rect3);
+  coverRects.addChild(rect4);
+  GS.comparisonContainer.addChild(coverRects);
+  coverRects.alpha = 0;
+
+  return delay(0)
+    .then(fadeExample1Tween, shiftExample2Tween, regexFadeIn, drawLang)
+    .then(delay(90))
+    .then(new ValueTween(0, 0.4, 60, GS.easings.easeInOutQuad, (v) => {
+      coverRects.alpha = v;
+    }));
 }
 
 const loader = (app, easings, onSuccess, onFailure, opts) => {
@@ -692,6 +767,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   //
   const e1 = example1();
   const e2 = example2();
+  const comp = comparison();
 
   const skipTime = 0;
 
@@ -739,7 +815,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         .then(delay(900))
         .then(e1).then(delay(180))
         .then(e2).then(delay(30))
-        .then(new Tween(1, easings.easeInOutQuad, ()=>{}, ()=>{}, onSuccess)));
+        .then(new Tween(1, easings.easeInOutQuad, ()=>{}, ()=>{}, onSuccess))
+        .then(comp));
       TweenManager.skipSeconds(skipTime);
       const playFourthSection = () => {
         const instance = sound.play({
