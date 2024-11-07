@@ -16,7 +16,20 @@ const manifest = {
         // TODO: Move elsewhere
         "bg": "/brown-paper.jpg",
         "pick": "/pick_trim.m4a",
-        "Ittybittynotebook": "/itty-bitty-notebook-font/IttyBittyNotebook.ttf"
+        "Ittybittynotebook": "/itty-bitty-notebook-font/IttyBittyNotebook.ttf",
+        "Standing": "/mario/standing.webp",
+        "Running": "/mario/run.png",
+        "Crouching": "/mario/crouch.png",
+        "Diving": "/mario/dive.png",
+        "Jumping": "/mario/jump.png",
+        "Pounding": "/mario/pound.webp",
+        "Punching": "/mario/punch.png",
+        "Sweeping": "/mario/sweep.png",
+        "ButtonA": "/mario/a.svg",
+        "ButtonB": "/mario/b.svg",
+        "Down": "/mario/down.svg",
+        "ButtonZ": "/mario/z.svg",
+        "Right": "/mario/right.svg",
       }
     }
   ]

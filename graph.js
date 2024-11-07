@@ -420,7 +420,7 @@ class CurveEdge extends AbstractEdge {
     return {
       ...super.baseStyle(),
       edgeAnchor: { x: 0, y: -75 },
-      smoothScaling: 50,
+      smooth: false,
     }
   }
 

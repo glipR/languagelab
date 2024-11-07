@@ -8,6 +8,7 @@ import DFA from '../dfa.js';
 import { RectangleCover } from '../tools/paper_cover.js';
 import { DrawnBezier } from '../tools/drawnBezier.js';
 
+// TODO: Try out styling the pointer.
 const GS = {
   curWordIndex: 0,
 };
@@ -362,6 +363,95 @@ const comparison = () => {
     .then(new ValueTween(0, 0.4, 60, GS.easings.easeInOutQuad, (v) => {
       coverRects.alpha = v;
     }));
+}
+
+const mario = () => {
+  GS.marioContainer = new PIXI.Container();
+  GS.screen.addChild(GS.marioContainer);
+
+  const extraNodeStyle = { radius: 40 }
+  GS.marioDFA = new DFA();
+  GS.marioDFA.fromJSON({
+    nodes: {
+      "Standing": { x: 500, y: 300, style: extraNodeStyle },
+      "Sweeping": { x: 250, y: 150, style: extraNodeStyle },
+      "Punching": { x: 500, y: 150, style: extraNodeStyle },
+      "Crouching": { x: 250, y: 300, style: extraNodeStyle },
+      "Running": { x: 750, y: 300, style: extraNodeStyle },
+      "Pounding": { x: 250, y: 450, style: extraNodeStyle },
+      "Jumping": { x: 500, y: 450, style: extraNodeStyle },
+      "Diving": { x: 750, y: 450, style: extraNodeStyle },
+    },
+    edges: [
+      { from: "Standing", to: "Punching", label: "b", style: { edgeAnchor: { x: +50, y: 0 } } },
+      { from: "Punching", to: "Standing", label: "_", style: { edgeAnchor: { x: -50, y: 0 } } },
+      { from: "Standing", to: "Crouching", label: "⬇️", style: { edgeAnchor: { x: 0, y: -15 } } },
+      { from: "Crouching", to: "Standing", label: "_", style: { edgeAnchor: { x: 0, y: 15 } } },
+      { from: "Crouching", to: "Sweeping", label: "b" },
+      { from: "Sweeping", to: "Standing", label: "_" },
+      { from: "Standing", to: "Running", label: "➡️", style: { edgeAnchor: { x: 0, y: -15 } } },
+      { from: "Running", to: "Standing", label: "_", style: { edgeAnchor: { x: 0, y: 15 } } },
+      { from: "Pounding", to: "Standing", label: "_" },
+      { from: "Standing", to: "Jumping", label: "a", style: { edgeAnchor: { x: +30, y: 0 } } },
+      { from: "Running", to: "Jumping", label: "a" },
+      { from: "Jumping", to: "Standing", label: "_", style: { edgeAnchor: { x: -30, y: 0 } } },
+      { from: "Diving", to: "Standing", label: "_" },
+      { from: "Running", to: "Diving", label: "b" },
+      { from: "Jumping", to: "Pounding", label: "z" },
+    ]
+  });
+
+
+  Object.keys(GS.marioDFA.nodes).forEach(key => {
+    const n = GS.marioDFA.nodes[key];
+    n.separatedGraphic.visible = false;
+    n.graphic.removeChild(n.labelText);
+    const sprite = new PIXI.Sprite(PIXI.Assets.get(key));
+    sprite.anchor.set(0.5, 0.5);
+    sprite.scale.set(70 / Math.max(sprite.height, sprite.width));
+    n.graphic.addChild(sprite);
+  });
+  GS.marioDFA.edges.forEach(e => {
+    e.graphic.removeChild(e.labelText);
+    let sprite;
+    if (e.style.edgeLabel === "a") {
+      sprite = new PIXI.Sprite(PIXI.Assets.get("ButtonA"));
+    } else if (e.style.edgeLabel === "b") {
+      sprite = new PIXI.Sprite(PIXI.Assets.get("ButtonB"));
+    } else if (e.style.edgeLabel === "z") {
+      sprite = new PIXI.Sprite(PIXI.Assets.get("ButtonZ"));
+    } else if (e.style.edgeLabel === "⬇️") {
+      sprite = new PIXI.Sprite(PIXI.Assets.get("Down"));
+    } else if (e.style.edgeLabel === "➡️") {
+      sprite = new PIXI.Sprite(PIXI.Assets.get("Right"));
+    } else { return; }
+    sprite.anchor.set(0.5, 0.5);
+    sprite.scale.set(40 / Math.max(sprite.height, sprite.width));
+    const transform = e.getLabelTransform();
+    sprite.position.set(transform.position.x, transform.position.y);
+    e.graphic.addChild(sprite);
+    e.sprite = sprite;
+  });
+  const standPunch = GS.marioDFA.edgeMap["Standing->Punching"];
+  standPunch.sprite.position.set(standPunch.sprite.position.x + 60, standPunch.sprite.position.y);
+  const runJump = GS.marioDFA.edgeMap["Running->Jumping"];
+  runJump.sprite.position.set(runJump.sprite.position.x + 100, runJump.sprite.position.y);
+
+  const graphCover = new RectangleCover(GS.marioDFA.graph, {points: 18, randMult: 0.1});
+  graphCover.position.set(500, 300);
+  GS.marioContainer.addChild(graphCover);
+  GS.marioContainer.addChild(GS.marioDFA.graph);
+  GS.marioContainer.alpha = 0;
+  GS.marioContainer.pivot.set(500, 300);
+  GS.marioContainer.position.set(500, 300);
+
+  return new ValueTween(0, 1, 60, GS.easings.linear, (v) => {
+    GS.marioContainer.alpha = GS.easings.easeOutCubic(v);
+    GS.marioContainer.scale = GS.easings.easeOutElastic(v);
+  }).then(delay(100)).then(new ValueTween(1, 0, 60, GS.easings.linear, (v) => {
+    GS.marioContainer.alpha = GS.easings.easeOutCubic(v);
+    GS.marioContainer.scale = GS.easings.easeOutElastic(v);
+  }));
 }
 
 const loader = (app, easings, onSuccess, onFailure, opts) => {
@@ -768,6 +858,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   const e1 = example1();
   const e2 = example2();
   const comp = comparison();
+  const marioFade = mario();
 
   const skipTime = 0;
 
@@ -790,7 +881,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         .then(...edgeLabels) // 60
         .then(delay(60))
         .then(delay(120))
-        .then(delay(520))
+        .then(marioFade)
+        .then(delay(300))
         .then(...vertColorTweens) // 60
         .then(delay(60))
         .then(...edgeColorTweens) // 60
