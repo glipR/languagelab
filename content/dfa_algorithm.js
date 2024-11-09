@@ -47,8 +47,9 @@ const addContent = () => {
   addScene('dfa_test', document.querySelector('.articleBodyCenter'));
   const algorithmContainer = document.querySelector('#dfa_test');
   const algorithmSteps = new StepScenes(algorithmContainer, "dfa_test", [{}], () => {
-    console.log("Finished!");
     markComplete('dfaAlgorithm');
+    // Redirect to next page
+    window.location.href = "/pages/dfa_code_modify";
   }, true);
 
   registerScene(dfaTest.loader, dfaTest.unloader, 'dfa_test', {}, algorithmSteps.makeOnSuccess(), algorithmSteps.makeOnFailure());

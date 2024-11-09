@@ -31,6 +31,8 @@ const addContent = () => {
     allowSkipping: true,
     onSuccess: () => {
       markComplete('dfaCreate');
+      // Redirect to next page
+      window.location.href = "/pages/dfa_match";
     }
   }
   addScene('dfa_create', document.querySelector('.articleBodyCenter'));

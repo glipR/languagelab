@@ -45,6 +45,9 @@ const addContent = () => {
   const creationContainer = document.querySelector('#dfa_match');
   const t4Steps = new StepScenes(creationContainer, "dfa_match", t4Tasks, () => {
     markComplete('dfaMatch');
+    // Redirect to next page
+    window.location.href = "/pages/dfa_code_execute";
+
   }, false, t4Tasks.map((task) => task.description), {
     progressContainer: document.getElementById("dfaMatchProgressBorder"),
     progress: document.getElementById("dfaMatchProgressBar"),
