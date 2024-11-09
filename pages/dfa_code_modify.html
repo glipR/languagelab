@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>DFA - Implementing the algorithm</title>
+  <title>DFA - Modifying DFAs</title>
   <script>var exports = {};</script>
   <script src="https://pixijs.download/release/pixi.js"></script>
   <script src="https://unpkg.com/@pixi/sound/dist/pixi-sound.js"></script>
@@ -26,15 +26,14 @@
   <script type="module">
     import { TweenManager } from '/tween.js';
     import { Scene, SceneManager } from '/scene.js';
-    import addContent from '/content/dfa_algorithm.js';
+    import addContent from '/content/dfa_modify.js';
     import addNextButton from '/templates/next.js';
     import addNav from '/templates/nav.js';
     import load from '/tools/loading.js';
 
     // Content
-    addNav('Implementing the algorithm');
+    addNav('Modifying DFAs');
     addContent();
-    addNextButton('/pages/dfa_code_modify')
 
     load();
 

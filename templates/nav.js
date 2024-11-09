@@ -38,6 +38,9 @@ const navContent = (title) => `
           <a class="iconCode pageDropdownItem ${isComplete(`dfaAlgorithm`) && `complete` }" href="/pages/dfa_code_execute">
             Implementing the algorithm
           </a>
+          <a class="iconCode pageDropdownItem ${isComplete(`dfaModify`) && `complete` }" href="/pages/dfa_code_modify">
+            Modifying DFAs
+          </a>
         </div>
         <div class="pageDropdownSection smallSection">
           <h4 class="iconWIP pageDropdownSectionTitle"> NFA</h4>

@@ -529,6 +529,11 @@ class Graph {
     });
   }
 
+  clear() {
+    this.edges.forEach((edge) => this.removeEdge(edge));
+    Object.keys(this.nodes).forEach((label) => this.removeNode(this.nodes[label]));
+  }
+
   addNode(node) {
     this.nodes[node.label] = node;
     this.nodeContainer.addChild(node.graphic);

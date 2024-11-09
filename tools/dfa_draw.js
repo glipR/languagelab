@@ -197,11 +197,43 @@ class DFADraw {
     }
   }
 
-  createNode (x, y) {
-    const node = new Node(this._findNodeLabel(), { x, y }, {
+  import (data) {
+    this.dfa.clear();
+    data.states.forEach((state) => {
+      this.createNode(
+        state.position?.x ?? 500,
+        state.position?.y ?? 300,
+        state.name,
+        {
+          isEntry: !!state.starting,
+          doubleBorder: !!state.accepting,
+        }
+      )
+    });
+    data.transitions.forEach((transition) => {
+      const e = {
+        from: this.dfa.nodes[transition.from],
+        to:  this.dfa.nodes[transition.to],
+        style: {
+          edgeLabel: transition.label,
+        }
+      };
+      if (transition.style?.loopOffset) {
+        e.style.loopOffset = transition.style.loopOffset;
+      }
+      if (transition.style?.edgeAnchor) {
+        e.style.edgeAnchor = transition.style.edgeAnchor;
+      }
+      this.createEdge(e.from, e.to, e.style);
+    });
+  }
+
+  createNode (x, y, forceName, extraStyle) {
+    const node = new Node(forceName ?? this._findNodeLabel(), { x, y }, {
       ...DFADraw.baseStyle,
       ...this.opts.nodeStyle ?? {},
       isEntry: Object.keys(this.dfa.nodes).length === 0, // Auto set first node as the entry node
+      ...extraStyle ?? {}
     });
     node.subscribe('pointerdown', () => {
       // This also fires for clicks but we can safely update the curState here

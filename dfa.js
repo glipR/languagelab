@@ -7,7 +7,7 @@ class DFA extends Graph {
   static baseEdgeStyle = (lab) => ({ edgeLabel: lab });
 
   fromJSON(json) {
-    console.log(json);
+    // console.log(json);
     const nodeStyle = DFA.baseNodeStyle ?? {};
     const edgeStyle = DFA.baseEdgeStyle ?? {};
     const newObj = {};
@@ -31,6 +31,64 @@ class DFA extends Graph {
       }),
     }));
     return super.fromJSON(newObj);
+  }
+
+  export() {
+    return {
+      states: Object.values(this.nodes).map((node) => ({
+        name: node.label,
+        position: { x: node.position.x, y: node.position.y },
+        accepting: !!node.style.doubleBorder,
+        starting: !!node.style.isEntry,
+      })),
+      alphabet: this.collectAlphabet(),
+      transitions: this.edges.map((edge) => {
+        const e = {
+          from: edge.from.label,
+          to: edge.to.label,
+          label: edge.style.edgeLabel,
+          style: {},
+        }
+        if (edge.style.edgeAnchor) {
+          e.style.edgeAnchor = edge.style.edgeAnchor;
+        }
+        if (edge.style.loopOffset) {
+          e.style.loopOffset = edge.style.loopOffset;
+        }
+        return e;
+      }),
+    }
+  }
+
+  import(data) {
+    const json = {
+      nodes: {},
+      edges: [],
+    }
+    data.states.forEach((state) => {
+      json.nodes[state.name] = {
+        x: state.position?.x ?? 0,
+        y: state.position?.y ?? 0,
+        start: state.starting,
+        final: state.accepting,
+      }
+    });
+    data.transitions.forEach((transition) => {
+      const e = {
+        from: transition.from,
+        to: transition.to,
+        label: transition.label,
+        style: {},
+      };
+      if (transition.style?.edgeAnchor) {
+        e.style.edgeAnchor = transition.style.edgeAnchor;
+      }
+      if (transition.style?.loopOffset) {
+        e.style.loopOffset = transition.style.loopOffset;
+      }
+      json.edges.push(e);
+    });
+    this.fromJSON(json);
   }
 
   validate(fixedAlphabet) {
@@ -100,7 +158,7 @@ class DFA extends Graph {
     const alphabet = new Set();
     const node = Object.values(this.nodes)[0];
     const edges = this.edges.filter((edge) => edge.from.label === node.label);
-    edges.forEach((edge) => edge.style.edgeLabel.split(",").forEach((char) => alphabet.add(char)));
+    edges.forEach((edge) => edge.style.edgeLabel.split(",").forEach((char) => alphabet.add(char.trim())));
     return Array.from(alphabet);
   }
 
@@ -354,7 +412,6 @@ class DFA extends Graph {
       to: other.nodes['OTHER_DEATH'],
       style: { edgeLabel: `${otherAlphabet.join(`, `)}, ${otherMissing}` }
     }])
-    console.log(this.edges, other.edges);
     Object.values(this.nodes).forEach((node) => {
       Object.values(other.nodes).forEach((otherNode) => {
         json.nodes[`${node.label},${otherNode.label}`] = {

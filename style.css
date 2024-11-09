@@ -177,9 +177,8 @@ a.pageDropdownItem {
   padding: 18px 50px;
 }
 
-.nextButton {
+.button {
   display: block;
-  float: right;
   width: 50px;
   height: 30px;
 
@@ -194,8 +193,19 @@ a.pageDropdownItem {
 
   text-decoration: none;
   color: white;
+  cursor: pointer;
+}
 
+.nextButton {
+  float: right;
   margin-bottom: 20px;
+}
+
+.runButton {
+  margin: auto;
+  width: 150px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .lockedScene {
@@ -389,4 +399,8 @@ li.locked::before {
 #editor {
   width: 100%;
   min-height: 200px;
+}
+
+#editor.editor-long {
+  min-height: min(90vh, 800px);
 }
