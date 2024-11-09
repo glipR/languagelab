@@ -29,9 +29,10 @@ class DFADraw {
     this.curState = DFADraw.SELECT_EMPTY;
     this.nodeLabelModal = new KeyEntryModal("Enter a label for the node", 1);
     this.transitionLabelModal = new KeyEntryModal("Enter a label for the transition (or delete)", 20, "abcdefghijklmnopqrstuvwxyz123456789, ");
-    this.fakeTargetNode = new Node("A", { x: 0, y: 0 }, {...DFADraw.baseStyle});
+    this.fakeTargetNode = new Node("ABCDEF", { x: 0, y: 0 }, {...DFADraw.baseStyle});
     this.fakeTargetNode.graphic.visible = false;
     this.fakeEdge = AbstractEdge.decide(this.fakeTargetNode, this.fakeTargetNode, {...DFADraw.baseEdgeStyle});
+    this.fakeEdge.edgeLine.interactive = false;
     this.nodeLabelModal.textMap = (text) => text.toUpperCase();
     this.transitionLabelModal.validation = (text) => {
       // TODO: Ensure valid transition label
@@ -64,6 +65,7 @@ class DFADraw {
           // Was a loop, reupdate the fake edge
           this.removeFakeEdge();
           this.fakeEdge = AbstractEdge.decide(this.selectedNode, this.fakeTargetNode, {...DFADraw.baseEdgeStyle});
+          this.fakeEdge.edgeLine.interactive = false;
           this.dfa.edgeContainer.addChild(this.fakeEdge.graphic);
         }
         const pos = this.screen.globalToLocal(e.data.global.x, e.data.global.y);
@@ -87,7 +89,7 @@ class DFADraw {
         this.dfa.updateEdges(this.selectedNode);
       }
     });
-    this.bg_rect.on("pointerup", (e) => {
+    this.genericMouseUp = (e) => {
       if (this.curState === DFADraw.DRAW_EDGE) {
         this.removeFakeEdge();
         this.curState = DFADraw.SELECT_EMPTY;
@@ -106,7 +108,8 @@ class DFADraw {
         this.curState = DFADraw.SELECT_EMPTY;
         this.onNodeStateChange?.(this.selectedNode, this.dfa);
       }
-    });
+    }
+    this.bg_rect.on("pointerup", this.genericMouseUp);
 
     this.screen.addChild(this.bg_rect);
     this.screen.addChild(this.dfa.graph);
@@ -224,6 +227,7 @@ class DFADraw {
             if (this.selectedNode === node) {
               this.removeFakeEdge();
               this.fakeEdge = AbstractEdge.decide(node, node, {...DFADraw.baseEdgeStyle});
+              this.fakeEdge.edgeLine.interactive = false;
               this.dfa.edgeContainer.addChild(this.fakeEdge.graphic);
             }
             this.fakeEdge.to = node;
@@ -265,7 +269,7 @@ class DFADraw {
         this.startDraggingEdge(edge, this.screen.globalToLocal(e.data.global.x, e.data.global.y));
       }
     });
-    edge.subscribe('pointerup', () => {
+    edge.subscribe('pointerup', (e) => {
       if (this.curState === DFADraw.DRAG_EDGE) {
         if (this.draggingEdgeMaxDist < 10) {
           this.removeFakeEdge();
@@ -281,6 +285,8 @@ class DFADraw {
           this.transitionLabelModal.activate();
           this.curState = DFADraw.SELECT_EMPTY;
         }
+      } else {
+        this.genericMouseUp(e);
       }
     })
     this.dfa.addEdge(edge);
