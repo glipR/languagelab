@@ -194,7 +194,15 @@ class AbstractEdge {
     this.edgeLine.buttonMode = true;
     this.edgeLine.hitArea = {
       contains: (x, y) => {
-        return this.clickableEdge.containsPoint({x, y});
+        const labelTransform = this.getLabelTransform();
+        const fgLocal = {
+          x: (x - labelTransform.position.x) * Math.cos(-labelTransform.angle) - (y - labelTransform.position.y) * Math.sin(-labelTransform.angle),
+          y: (x - labelTransform.position.x) * Math.sin(-labelTransform.angle) + (y - labelTransform.position.y) * Math.cos(-labelTransform.angle),
+        }
+        return (
+          this.clickableEdge.containsPoint({x, y}) ||
+          (this.style.edgeLabel && this.labelBG.fg.containsPoint(fgLocal))
+        );
       }
     }
   }
