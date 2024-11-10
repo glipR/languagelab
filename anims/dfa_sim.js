@@ -175,12 +175,17 @@ const pointerUp = () => {
   GS.positionPointer.dragging = false;
 }
 
-const pointerMove = () => {
+const pointerMove = (e) => {
   if (GS.positionPointer.dragging) {
+
+    var screenCssPixelRatio = (window.outerWidth - 8) / window.innerWidth + 0.006;
 
     GS.positionPointer.wantedPoint = vectorCombine(
       GS.positionPointer.wantedPoint,
-      GS.positionPointer.data.movement
+      {
+        x: GS.positionPointer.data.movement.x / screenCssPixelRatio,
+        y: GS.positionPointer.data.movement.y / screenCssPixelRatio,
+      },
     );
 
     let newPosition = GS.screen.globalToLocal(GS.positionPointer.wantedPoint.x, GS.positionPointer.wantedPoint.y);
