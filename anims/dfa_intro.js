@@ -109,6 +109,31 @@ const example1 = () => {
     e.updateGraphic();
   });
 
+  const problemHeading = new PIXI.Text({ text: "Example 1", style: {...baseStyle}});
+  const problemText = new PIXI.Text({ text: "Words not starting with b.", style: {...baseStyle}});
+  problemHeading.anchor.set(0.5, 0.5);
+  problemHeading.scale.set(2);
+  problemText.anchor.set(0.5, 0.5);
+  problemHeading.position.set(500, 250);
+  problemText.position.set(500, 350);
+  problemHeading.alpha = 0;
+  problemText.alpha = 0;
+  GS.example1Container.addChild(problemHeading);
+  GS.example1Container.addChild(problemText);
+
+  // Needed for the comparison fn.
+  GS.example1ProblemText = problemText;
+
+  const textFadeIn = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+    problemHeading.alpha = v;
+    problemText.alpha = v;
+  });
+  const fadeOutAndShift = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+    problemHeading.alpha = 1 - v;
+    const newPos = interpValue({x: 500, y: 350}, {x: 500, y: 50}, v);
+    problemText.position.set(newPos.x, newPos.y);
+  });
+
   // Show S node
   // Show A and B node staggered
   // Show start and final states (S and A respectively)
@@ -165,7 +190,11 @@ const example1 = () => {
     nodePointer.alpha = v;
   });
 
-  return delay(0)
+  return delay(10)
+    .then(textFadeIn)
+    .then(delay(120))
+    .then(fadeOutAndShift)
+    .then(delay(30))
     .then(nodeFadeIns['S'])
     .then(delay(150))
     .then(nodeFadeIns['A'], delay(180).then(nodeFadeIns['B']))
@@ -224,6 +253,31 @@ const example2 = () => {
     e.updateGraphic();
   });
 
+  const problemHeading = new PIXI.Text({ text: "Example 2", style: {...baseStyle}});
+  const problemText = new PIXI.Text({ text: "Words with an even amount of 'a's.", style: {...baseStyle}});
+  problemHeading.anchor.set(0.5, 0.5);
+  problemHeading.scale.set(2);
+  problemText.anchor.set(0.5, 0.5);
+  problemHeading.position.set(500, 250);
+  problemText.position.set(500, 350);
+  problemHeading.alpha = 0;
+  problemText.alpha = 0;
+  GS.example2Container.addChild(problemHeading);
+  GS.example2Container.addChild(problemText);
+
+  const textFadeIn = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+    problemHeading.alpha = v;
+    problemText.alpha = v;
+  });
+  const fadeOutAndShift = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+    problemHeading.alpha = 1 - v;
+    const newPos = interpValue({x: 500, y: 350}, {x: 500, y: 50}, v);
+    problemText.position.set(newPos.x, newPos.y);
+  });
+
+  // Needed for the comparison fn.
+  GS.example2ProblemText = problemText;
+
   // Show E and O node staggered, include entry
   // Show a transitions
   // Show b transitions
@@ -277,7 +331,11 @@ const example2 = () => {
     nodePointer.alpha = v;
   });
 
-  return delay(0)
+  return delay(30)
+    .then(textFadeIn)
+    .then(delay(20))
+    .then(fadeOutAndShift)
+    .then(delay(30))
     .then(nodeFadeIns['E'], delay(20).then(nodeFadeIns['O']))
     .then(delay(820))
     // Edges from S
@@ -304,10 +362,12 @@ const comparison = () => {
 
   const fadeExample1Tween = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
     GS.example1Container.alpha = v;
+    GS.example2ProblemText.alpha = 1 - v;
   }, () => {
     // On start of this, scale and set postition.
     GS.example1Container.scale.set(0.5);
     GS.example1Container.position.set(750, 200);
+    GS.example1ProblemText.alpha = 0;
   });
   const shiftExample2Tween = new ValueTween(1, 0.5, 60, GS.easings.easeInOutQuad, (v) => {
     GS.example2Container.scale.set(v);
@@ -877,7 +937,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   const comp = comparison();
   const marioFade = mario();
 
-  const skipTime = 65;
+  const skipTime = 0;
 
   PIXI.sound.Sound.from({
     url: '/audio/dfaIntro.mp3',
@@ -923,8 +983,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         .then(...fadeSuccessColours)
         .then(delay(220))
         .then(fadeAll)
-        .then(delay(700))
-        .then(e1).then(delay(180))
+        .then(delay(400))
+        .then(e1)
         .then(e2).then(delay(30))
         .then(new Tween(1, easings.easeInOutQuad, ()=>{}, ()=>{}, onSuccess))
         .then(comp));
