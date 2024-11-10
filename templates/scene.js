@@ -6,6 +6,7 @@ const sceneHTML = (id) => `
     <span class="playTriangle"></span>
   </button>
   <div class="modal successModal">
+    <div class="imprint"></div>
     <div class="modalContent">
       <h2>Success!</h2>
       <p class="successMsg">You did the thing</p>
@@ -15,6 +16,7 @@ const sceneHTML = (id) => `
     </div>
   </div>
   <div class="modal failureModal">
+    <div class="imprint"></div>
     <div class="modalContent">
       <h2>Failed!</h2>
       <p class="failureMsg">You did the thing</p>
