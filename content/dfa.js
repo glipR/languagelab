@@ -90,7 +90,7 @@ The transitions for the 'b' character are simple - if we read a 'b', the number 
 <img src="/img/e2-p1.png" />
 
 The transitions for the 'a' character aren't that much more complicated - if we read an 'a', the number of 'a's read changes <span class='highlight highlight-blue'>parity</span> (Even + 1 = Odd, Odd + 1 = Even), so we transition from E to O and vice versa.
-Are start state is the same as our only accepting state - E.
+Our start state is the same as our only accepting state - E.
 
 <img src="/img/e2-p2.png" />
 `
