@@ -1,6 +1,8 @@
+import { bg_dark } from "../colours.js";
 import Screen from "../screen.js";
 import DFADraw from "../tools/dfa_draw.js";
 import Progress from "../tools/progress.js";
+import { FloatingButton } from "../ui.js";
 
 const GS = {
   instructions: [
@@ -26,8 +28,25 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   screen.setScreenSize(app.renderer.width, app.renderer.height);
   screen.setGameSize(1000, 600);
   screen.scaleToFit();
+  GS.screen = screen;
   GS.dfa = new DFADraw(screen, opts);
   GS.progress = new Progress(GS.instructions, opts);
+
+  const clearButton = new FloatingButton({
+    label: {
+      text: "Clear",
+    },
+    bg: {
+      fill: bg_dark,
+    },
+    width: 100,
+    height: 50,
+  });
+  clearButton.position.set(10, GS.screen.gameHeight - 10 - 50);
+  clearButton.onClick = () => {
+    GS.dfa.dfa.clear();
+  };
+  GS.screen.addChild(clearButton);
 
   const resetNodeStates = () => {
     GS.oldNodeStates = {};

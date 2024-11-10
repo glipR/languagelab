@@ -9,6 +9,7 @@ import DFA from "../dfa.js";
 import Screen from "../screen.js";
 import { bg_dark, black } from "../colours.js";
 import { mergeDeep } from "../utils.js";
+import { FloatingButton } from "../ui.js";
 
 const GS = {
   checkingDFA: new DFA(),
@@ -41,35 +42,35 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.checkingDFA = new DFA();
   GS.checkingDFA.fromJSON(opts.checkingDFA);
 
-  const button = new PIXI.Container();
-  const buttonBG = new PIXI.Graphics();
-  const buttonOpts = mergeDeep({
+  const clearButton = new FloatingButton({
+    label: {
+      text: "Clear",
+    },
+    bg: {
+      fill: bg_dark,
+    },
     width: 100,
     height: 50,
+  });
+  clearButton.position.set(10, GS.screen.gameHeight - 10 - 50);
+  clearButton.onClick = () => {
+    GS.dfa.dfa.clear();
+  };
+  GS.screen.addChild(clearButton);
+
+  const checkButton = new FloatingButton({
+    label: {
+      text: "Check",
+    },
     bg: {
-      fill: {color: bg_dark},
-      stroke: {color: black, width: 3},
+      fill: bg_dark,
     },
-    text: {
-      fill: black,
-      fontSize: 24,
-    },
-  }, opts?.button);
-  buttonBG
-    .rect(0, 0, buttonOpts.width, buttonOpts.height)
-    .fill({...buttonOpts.bg?.fill})
-    .stroke({...buttonOpts.bg?.stroke});
-  buttonBG.pivot.set(buttonOpts.width/2, buttonOpts.height/2);
-  button.addChild(buttonBG);
-  const buttonText = new PIXI.Text({ text: "Check", style: {...buttonOpts.text}});
-  buttonText.anchor.set(0.5, 0.5);
-  button.addChild(buttonText);
-  button.pivot.set(buttonOpts.width, buttonOpts.height);
-  button.position.set(GS.screen.gameWidth, GS.screen.gameHeight);
-  button.interactive = true;
-  button.buttonMode = true;
-  button.on("pointerdown", check);
-  GS.screen.addChild(button);
+    width: 100,
+    height: 50,
+  });
+  checkButton.position.set(GS.screen.gameWidth - 110, GS.screen.gameHeight - 10 - 50);
+  checkButton.onClick = check;
+  GS.screen.addChild(checkButton);
 }
 
 const unloader = () => {

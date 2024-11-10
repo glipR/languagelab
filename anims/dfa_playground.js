@@ -18,6 +18,22 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.onSuccess = onSuccess;
   GS.onFailure = onFailure;
 
+  const clearButton = new FloatingButton({
+    label: {
+      text: "Clear",
+    },
+    bg: {
+      fill: bg_dark,
+    },
+    width: 100,
+    height: 50,
+  });
+  clearButton.position.set(GS.screen.gameWidth - 110, GS.screen.gameHeight - 10 - 50);
+  clearButton.onClick = () => {
+    GS.dfa.dfa.clear();
+  };
+  GS.screen.addChild(clearButton);
+
   const importButton = new FloatingButton({
     label: {
       text: "Import",
@@ -48,7 +64,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     width: 100,
     height: 50,
   });
-  exportButton.position.set(GS.screen.gameWidth - 10 - 100, GS.screen.gameHeight - 10 - 50);
+  exportButton.position.set(120, GS.screen.gameHeight - 10 - 50);
   exportButton.onClick = () => {
     const errorMsg = GS.dfa.dfa.validate();
     if (errorMsg) {
