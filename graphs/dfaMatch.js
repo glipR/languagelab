@@ -11,7 +11,7 @@ export const t1 = {
       { from: 'B', to: 'B', label: 'b' },
     ],
   },
-  description: "Accepts letters ending with a."
+  description: "Accepts words ending with a (Alphabet: a, b)."
 }
 
 export const t2 = {
@@ -40,7 +40,7 @@ export const t2 = {
       { from: 'X', to: 'X', label: 'a, b, c, d' },
     ],
   },
-  description: "In alphabetic order (allows characters a, b, c, d)."
+  description: "Accepts words in alphabetic order (Alphabet: a, b, c, d)."
 }
 
 export const t3 = {
@@ -73,7 +73,7 @@ export const t3 = {
       { from: 'END', to: 'END', label: 'a, b' },
     ]
   },
-  description: "Accepts any string which starts with ab and ends with ba.",
+  description: "Accepts words which start with ab and end with ba (Alphabet: a, b).",
 }
 
 export const t4 = {
@@ -103,9 +103,7 @@ export const t4 = {
       { from: 'P4', to: 'S', label: 'b' },
     ]
   },
-  description: "Accepts words ending with aaba",
+  description: "Accepts words ending with aaba (Alphabet: a, b)",
 }
 
 export default { t1, t2, t3, t4 };
-
-// TODO: Add more from whiteboard.
