@@ -448,7 +448,7 @@ const mario = () => {
   return new ValueTween(0, 1, 60, GS.easings.linear, (v) => {
     GS.marioContainer.alpha = GS.easings.easeOutCubic(v);
     GS.marioContainer.scale = GS.easings.easeOutElastic(v);
-  }).then(delay(100)).then(new ValueTween(1, 0, 60, GS.easings.linear, (v) => {
+  }).then(delay(220)).then(new ValueTween(1, 0, 60, GS.easings.linear, (v) => {
     GS.marioContainer.alpha = GS.easings.easeOutCubic(v);
     GS.marioContainer.scale = GS.easings.easeOutElastic(v);
   }));
@@ -856,6 +856,13 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     .then(delay(20))
     .then(moveBetween('A', 'D', 30, GS.graph, nodePointer, wordPointer, word))
 
+  const fadeSuccessColours = Object.values(GS.graph.nodes).map(n => {
+    return new ValueTween(0, 1, 60, easings.easeInOutQuad, (v) => {
+      n.style.fill = interpValue(bg_dark, n.style.doubleBorder ? green : red, v);
+      n.updateGraphic();
+    });
+  });
+
   const fadeAll = new ValueTween(1, 0, 60, easings.easeInOutQuad, (v) => {
     GS.graph.graph.alpha = v;
     wordContainer.alpha = v;
@@ -870,7 +877,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   const comp = comparison();
   const marioFade = mario();
 
-  const skipTime = 0;
+  const skipTime = 65;
 
   PIXI.sound.Sound.from({
     url: '/audio/dfaIntro.mp3',
@@ -892,7 +899,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         .then(delay(60))
         .then(delay(120))
         .then(marioFade)
-        .then(delay(300))
+        .then(delay(180))
         .then(...vertColorTweens) // 60
         .then(delay(60))
         .then(...edgeColorTweens) // 60
@@ -912,9 +919,11 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         .then(pointerFade) // 60
         .then(delay(340))
         .then(algorithmExecution)
-        .then(delay(240))
+        .then(delay(160))
+        .then(...fadeSuccessColours)
+        .then(delay(220))
         .then(fadeAll)
-        .then(delay(900))
+        .then(delay(700))
         .then(e1).then(delay(180))
         .then(e2).then(delay(30))
         .then(new Tween(1, easings.easeInOutQuad, ()=>{}, ()=>{}, onSuccess))
