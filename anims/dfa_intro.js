@@ -797,7 +797,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   // T: A DFA needs two more things before we can use it, a
   // T: starting state and
   const vertStartTweens = Object.values(GS.graph.nodes).map(n => {
-    return new ValueTween(0, 1, 90, easings.easeInOutQuad, (v) => {
+    return new ValueTween(0, 1, 60, easings.easeInOutQuad, (v) => {
       n.entry.alpha = v;
       if (n.style.isEntry) {
         n.style.fill = interpValue(n.curFill, green, v);
@@ -805,11 +805,16 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       }
     }, () => {
       n.curFill = n.style.fill;
-    });
+    }).then(new ValueTween(green, bg_dark, 30, easings.easeInOutQuad, (v) => {
+      if (n.style.isEntry) {
+        n.style.fill = v;
+        n.updateGraphic();
+      }
+    }));
   });
   // T: some final states.
   const vertEndTweens = Object.values(GS.graph.nodes).map(n => {
-    return new ValueTween(0, 1, 90, easings.easeInOutQuad, (v) => {
+    return new ValueTween(0, 1, 60, easings.easeInOutQuad, (v) => {
       n.innerCircle.alpha = v;
       if (n.style.doubleBorder) {
         n.style.fill = interpValue(n.curFill, red, v);
@@ -817,7 +822,12 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       }
     }, () => {
       n.curFill = n.style.fill;
-    });
+    }).then(new ValueTween(red, bg_dark, 30, easings.easeInOutQuad, (v) => {
+      if (n.style.doubleBorder) {
+        n.style.fill = v;
+        n.updateGraphic();
+      }
+    }));
   });
   // T: We can then place a
   // T: pointer on the start state
