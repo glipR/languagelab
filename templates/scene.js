@@ -11,6 +11,7 @@ const sceneHTML = (id) => `
       <h2>Success!</h2>
       <p class="successMsg">You did the thing</p>
     </div>
+    <img src="/img/pin.png" class="iconPin"></img>
     <div class="modalActions">
       <button class="modalButton">Next</button>
     </div>
@@ -21,6 +22,7 @@ const sceneHTML = (id) => `
       <h2>Failed!</h2>
       <p class="failureMsg">You did the thing</p>
     </div>
+    <img src="/img/pin.png" class="iconPin"></img>
     <div class="modalActions">
       <button class="modalButton">Retry</button>
     </div>
