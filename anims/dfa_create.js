@@ -16,16 +16,18 @@ const GS = {
 };
 
 const check = () => {
+  console.log(GS.opts);
+  const hintDetails = GS.opts.hints.map((hint, i) => `<details><summary>Hint ${i + 1}</summary><p>${hint}</p></details>`).join('');
   if (GS.dfa.dfa.validate()) {
-    GS.onFailure(`Your DFA is not valid: ${GS.dfa.dfa.validate()}`);
+    GS.onFailure(`<div><p>Your DFA is not valid: ${GS.dfa.dfa.validate()}</p>${hintDetails}</div>`);
     return;
   }
   const word = GS.checkingDFA.combine(GS.dfa.dfa, (me, other) => me ^ other).findAcceptingString()
   const checkingAccepts = word !== null && GS.checkingDFA.simulateWord(word) === "Accept";
   if (word === null) {
-    GS.onSuccess('You DFA is correct!');
+    GS.onSuccess(`<div><p>You DFA is correct! One possible solution is the following:</p> <img src="${GS.opts.solution_image}" /></div>`);
   } else {
-    GS.onFailure(`Your DFA ${checkingAccepts ? 'rejects' : 'accepts'} the string "${word}", but it shouldn't.`);
+    GS.onFailure(`<div><p>Your DFA ${checkingAccepts ? 'rejects' : 'accepts'} the string "${word}", but it shouldn't.</p>${hintDetails}</div>`);
   }
 }
 

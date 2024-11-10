@@ -9,18 +9,26 @@ const t4Tasks = [
   {
     checkingDFA: DFACreateTasks.t1.graph,
     description: DFACreateTasks.t1.description,
+    solution_image: DFACreateTasks.t1.solution_image,
+    hints: DFACreateTasks.t1.hints,
   },
   {
     checkingDFA: DFACreateTasks.t2.graph,
     description: DFACreateTasks.t2.description,
+    solution_image: DFACreateTasks.t2.solution_image,
+    hints: DFACreateTasks.t2.hints,
   },
   {
     checkingDFA: DFACreateTasks.t3.graph,
     description: DFACreateTasks.t3.description,
+    solution_image: DFACreateTasks.t3.solution_image,
+    hints: DFACreateTasks.t3.hints,
   },
   {
     checkingDFA: DFACreateTasks.t4.graph,
     description: DFACreateTasks.t4.description,
+    solution_image: DFACreateTasks.t4.solution_image,
+    hints: DFACreateTasks.t4.hints,
   },
 ];
 

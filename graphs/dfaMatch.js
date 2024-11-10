@@ -11,7 +11,14 @@ export const t1 = {
       { from: 'B', to: 'B', label: 'b' },
     ],
   },
-  description: "Accepts words ending with a (Alphabet: a, b)."
+  description: "Accepts words ending with a (Alphabet: a, b).",
+  solution_image: "/img/match/sol1.png",
+  hints: [
+    "We can start by making two states - One if we're currently ending with an a, and one if we're not.",
+    "In either state, reading an a should take us to the state where we're ending with an a.",
+    "In either state, reading a b should take us to the state where we're not ending with an a.",
+    "Make sure you've marked your starting and final states correctly.",
+  ]
 }
 
 export const t2 = {
@@ -40,7 +47,13 @@ export const t2 = {
       { from: 'X', to: 'X', label: 'a, b, c, d' },
     ],
   },
-  description: "Accepts words in alphabetic order (Alphabet: a, b, c, d)."
+  description: "Accepts words in alphabetic order (Alphabet: a, b, c, d).",
+  solution_image: "/img/match/sol2.png",
+  hints: [
+    "You'll find it helpful with this task and future ones to define a 'sink state', which is not accepting, and the only transition is to itself, accepting all letters.",
+    "The solution uses 5 states - one sink state and one representing the last read letter - this determines what next letters are valid and what aren't (and should send you to the sink state). A should be the start state, since the empty string is in alphabetic order, and can have any starting character.",
+    "Let's consider the transitions for state B. If we read an a, we should go to the sink state, as we're not in alphabetic order. If we read a B, we can stay in state B. Reading a c or d should take us to states C and D respectively.",
+  ]
 }
 
 export const t3 = {
@@ -74,6 +87,10 @@ export const t3 = {
     ]
   },
   description: "Accepts words which start with ab and end with ba (Alphabet: a, b).",
+  solution_image: "/img/match/sol3.png",
+  hints: [
+    "The provided solution use 6 states. You need a sink state for words with the wrong prefix, two states for partially matching the correct prefix (starts with nothing, starts with a), and three states for partially matching the correct suffix (ends with a, ends with ab, ends with something else).",
+  ]
 }
 
 export const t4 = {
@@ -104,6 +121,11 @@ export const t4 = {
     ]
   },
   description: "Accepts words ending with aaba (Alphabet: a, b)",
+  solution_image: "/img/match/sol4.png",
+  hints: [
+    "The provided solution uses 5 states. The first few transitions are easy enough to define - your DFA might look like: 1 -[a]> 2 -[a]> 3 -[b]> 4 -[a]> 5, where 1 is the start state and 5 is the end state.",
+    "Using the previous example, we should have the transition 5 -[a]-> 3, why?"
+  ]
 }
 
 export default { t1, t2, t3, t4 };

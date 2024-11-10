@@ -345,11 +345,19 @@ li.locked::before {
 }
 
 .modal .modalContent {
-  width: 80%;
+  width: 100%;
+  max-height: 90%;
+  overflow-y: scroll;
+}
+
+.modalContent img {
+  width: 100%;
+  margin: auto;
+  display: block;
 }
 
 .modal .modalActions {
-  width: 80%;
+  width: 100%;
 }
 
 .modal .modalActions .modalButton {

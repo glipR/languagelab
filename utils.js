@@ -159,14 +159,14 @@ export class StepScenes {
   }
 
   onSuccess (msg) {
-    this.successModal.getElementsByClassName("successMsg")[0].innerText = msg;
+    this.successModal.getElementsByClassName("successMsg")[0].innerHTML = msg;
     this.successModal.style.display = "flex";
     this.progress.markCompleted(this.index);
     console.log(this.index, this.progress);
   }
 
   onFailure (msg) {
-    this.failureModal.getElementsByClassName("failureMsg")[0].innerText = msg;
+    this.failureModal.getElementsByClassName("failureMsg")[0].innerHTML = msg;
     this.failureModal.style.display = "flex";
   }
 }
