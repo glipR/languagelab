@@ -993,12 +993,14 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         TweenManager.instance = sound.play({
           start: Math.max(skipTime - 111.8, 0) + 121,
         });
+        TweenManager.instance.speed = TweenManager.curSpeed;
       }
       const playThirdSection = () => {
         TweenManager.instance = sound.play({
           start: Math.max(skipTime - 71, 0) + 76.6,
           end: 117.4,
         });
+        TweenManager.instance.speed = TweenManager.curSpeed;
         TweenManager.instance.on('end', () => {
           playFourthSection();
         });
@@ -1008,6 +1010,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
           start: Math.max(skipTime - 61, 0) + 64.2,
           end: 74.2
         });
+        TweenManager.instance.speed = TweenManager.curSpeed;
         TweenManager.instance.on('end', () => {
           playThirdSection();
         });
@@ -1017,6 +1020,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
           start: skipTime,
           end: 61,
         });
+        TweenManager.instance.speed = TweenManager.curSpeed;
         TweenManager.instance.on('end', () => {
           playSecondSection();
         });
