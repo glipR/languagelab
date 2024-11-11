@@ -990,34 +990,34 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         .then(comp));
       TweenManager.skipSeconds(skipTime);
       const playFourthSection = () => {
-        const instance = sound.play({
+        TweenManager.instance = sound.play({
           start: Math.max(skipTime - 111.8, 0) + 121,
         });
       }
       const playThirdSection = () => {
-        const instance = sound.play({
+        TweenManager.instance = sound.play({
           start: Math.max(skipTime - 71, 0) + 76.6,
           end: 117.4,
         });
-        instance.on('end', () => {
+        TweenManager.instance.on('end', () => {
           playFourthSection();
         });
       }
       const playSecondSection = () => {
-        const instance = sound.play({
+        TweenManager.instance = sound.play({
           start: Math.max(skipTime - 61, 0) + 64.2,
           end: 74.2
         });
-        instance.on('end', () => {
+        TweenManager.instance.on('end', () => {
           playThirdSection();
         });
       }
       if (skipTime < 61) {
-        const instance = sound.play({
+        TweenManager.instance = sound.play({
           start: skipTime,
           end: 61,
         });
-        instance.on('end', () => {
+        TweenManager.instance.on('end', () => {
           playSecondSection();
         });
       } else if (skipTime < 71) {

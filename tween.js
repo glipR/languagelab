@@ -3,6 +3,24 @@ class TweenManager {
   static paused = false;
 
   static tweens = [];
+  static instance = null;
+
+  static togglePause () {
+    TweenManager.paused = !TweenManager.paused;
+    if (TweenManager.instance !== null) {
+      if (TweenManager.paused) {
+        TweenManager.instance.speed = 0;
+      } else {
+        TweenManager.instance.speed = TweenManager.curSpeed;
+      }
+    }
+  }
+
+  static setSpeed(speed) {
+    TweenManager.curSpeed = speed;
+    if (TweenManager.instance !== null)
+      TweenManager.instance.speed = speed;
+  }
 
   static add(tween) {
     this.tweens.push(tween);

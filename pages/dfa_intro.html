@@ -34,11 +34,11 @@
     window.addEventListener("keypress",  (e) => {
       // Check for left/right arrows
       if (e.key === "a") {
-        TweenManager.curSpeed /= 1.5;
+        TweenManager.setSpeed(TweenManager.curSpeed / 1.5);
       } else if (e.key === "d") {
-        TweenManager.curSpeed *= 1.5;
+        TweenManager.setSpeed(TweenManager.curSpeed * 1.5);
       } else if (e.key === "p") {
-        TweenManager.paused = !TweenManager.paused;
+        TweenManager.togglePause();
       } else {
         return true;
       }
