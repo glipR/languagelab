@@ -170,3 +170,9 @@ export class StepScenes {
     this.failureModal.style.display = "flex";
   }
 }
+
+export const trueOnce = (key) => {
+  const res = localStorage.getItem(key);
+  localStorage.setItem(key, "true");
+  return res === null;
+}
