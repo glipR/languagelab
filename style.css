@@ -337,11 +337,21 @@ li.locked::before {
   top: 20%;
   left: 20%;
   background-color: #b388ebC0;
+  background-image: linear-gradient(-5deg, #d5bff2c0 3%, #a57fd6c0 7%, #a57fd6c0 50%, #b388ebC0 70%, #9961e1c0 85%);
   /*border: 1px solid #aaaaaab0;*/
   justify-content: space-around;
   flex-direction: column;
   /* Gets set to flex */
   display: none;
+}
+
+.modal.modalFixed {
+  position: fixed;
+  width: calc(min(60%, 400px));
+  height: calc(min(40%, 300px));
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
 }
 
 .modal.successModal {
