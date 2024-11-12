@@ -50,10 +50,10 @@ class TweenManager {
     let curT = 0;
     const endT = seconds * 60;
     while (curT < endT - fixedDT) {
-      this.update(fixedDT);
+      this.update(fixedDT / TweenManager.curSpeed);
       curT += fixedDT;
     }
-    this.update(endT - curT);
+    this.update((endT - curT) / TweenManager.curSpeed);
   }
 
   static clear() {
