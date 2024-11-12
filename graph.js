@@ -220,15 +220,7 @@ class AbstractEdge {
   }
 
   edgeInterp(t) {
-    const points = this.edgeLine.getDrawnPoints(t);
-    const finalPoints = this.edgeLine.getDrawnPoints(1);
-    return points.length === 1 ? {
-      position: points[0],
-      angle: bezier(0.5, points[0], finalPoints[1]).angle,
-    } : {
-      position: points[points.length-1],
-      angle: bezier(0.5, points[points.length-2], points[points.length-1]).angle,
-    };
+    return this.edgeLine.edgeInterp(t);
   }
 
   bezierEdgeInterp(t) {
@@ -245,15 +237,13 @@ class AbstractEdge {
     if (position === "middle") {
       return this.edgeInterp(0.5);
     } else if (position === "end") {
+      const interp = this.findRadiusRatio(false, this.to.style.radius);
       const t = Math.min(
         this.drawnAmount,
-        this.findRadiusRatio(false, this.to.style.radius)
+        // Only consider this interp if it's actually in the second half of the edge.
+        interp > 0.5 ? interp : 1
       );
-      return {
-        // Use the line position, but the pure bezier angle.
-        position: this.edgeInterp(t).position,
-        angle: this.bezierEdgeInterp(t).angle,
-      }
+      return this.edgeInterp(t);
     }
     throw new Error('Invalid position');
   }
@@ -289,10 +279,10 @@ class AbstractEdge {
     const comp = (v) => magnitude(vectorCombine(this.edgeInterp(v).position, negate((start ? this.from : this.to).position))) < radius;
     if (start) {
       lo = 0;
-      hi = 0.5;
+      hi = 0.5 * this.drawnAmount;
     } else {
-      lo = 0.5;
-      hi = 1;
+      lo = 0.5 * this.drawnAmount;
+      hi = 1 * this.drawnAmount;
     }
     while (hi - lo > 1e-6) {
       const mid = (lo + hi) / 2;
@@ -428,7 +418,7 @@ class CurveEdge extends AbstractEdge {
     return {
       ...super.baseStyle(),
       edgeAnchor: { x: 0, y: -75 },
-      smooth: false,
+      smooth: true,
     }
   }
 
@@ -458,9 +448,9 @@ class LoopEdge extends AbstractEdge {
       loopOffset: { x: 0, y: -75 },
       loopAnchorMult: 0.8,
       points: 10,
-      maxLineDist: 1.5,
-      forcedDistance: 1,
-      smoothScaling: 3,
+      maxLineDist: 0.7,
+      forcedDistance: 0.8,
+      smoothScaling: 0.1,
     }
   }
 

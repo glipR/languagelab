@@ -26,6 +26,7 @@ export const bezier = (t, ...points) => {
     return {
       position: points[0],
       angle: 0,
+      tangent: { x: 0, y: 0 },
     }
   }
   else if (points.length === 2) {
@@ -35,6 +36,10 @@ export const bezier = (t, ...points) => {
         y: points[0].y + (points[1].y - points[0].y) * t,
       },
       angle: Math.atan2(points[1].y - points[0].y, points[1].x - points[0].x),
+      tangent: {
+        x: points[1].x - points[0].x,
+        y: points[1].y - points[0].y,
+      },
     }
   }
 
@@ -47,6 +52,40 @@ export const bezier = (t, ...points) => {
   }
 
   return bezier(t, ...nextPoints);
+}
+
+export const bezierLength = (...points) => {
+  const steps = 100;
+  let totalLength = 0;
+  for (let i=1; i<=steps; i++) {
+    totalLength += magnitude(bezier(i / steps, ...points).tangent)
+  }
+  return totalLength;
+}
+
+export const inverseBezierRateFunction = (...points) => {
+  // Generates a function which takes a time t, and will try to then return a time t such that the partial distance covered over the bexier function is t.
+  const steps = 300;
+  const lengths = [0];
+  for (let i=1; i<=steps; i++) {
+    lengths.push(lengths[i-1] + magnitude(bezier(i / steps, ...points).tangent));
+  }
+  return (t) => {
+    const targetLength = Math.max(t * lengths[lengths.length-1], 1e-9);
+    // Binary search for the correct index, then linearly interpolate between the two indices.
+    let left = 0;
+    let right = steps;
+    while (left < right) {
+      const mid = Math.floor((left + right) / 2);
+      if (lengths[mid] < targetLength) {
+        left = mid + 1;
+      } else {
+        right = mid;
+      }
+    }
+    const ratio = (targetLength - lengths[left-1]) / (lengths[left] - lengths[left-1]);
+    return (left - 1 + ratio) / steps;
+  }
 }
 
 export const partialBezier = (t, ...points) => {
