@@ -1,4 +1,4 @@
-import {black, bg_dark, highlightColours, green, red} from '../colours.js';
+import {black, bg_dark, highlightColours, green, red, purple} from '../colours.js';
 import Graph, { Node, AbstractEdge } from '../graph.js';
 import { Tween, TweenManager, ValueTween, interpValue, delay, randomDelay } from '../tween.js';
 import { combineEasing, mergeDeep, reverseEasing } from '../utils.js';
@@ -61,17 +61,17 @@ const moveBetween = (l1, l2, duration, graph, nodePointer, wordPointer, word) =>
     const pos = edge.edgeInterp(v).position;
     if (nodePointer) nodePointer.position.set(pos.x, pos.y - 60);
   })
-    .during(edge.colorEdgeTween(red, duration, flashEasing(), false));
+    .during(edge.colorEdgeTween(purple, duration, flashEasing(), false));
 
   if (oldWordIndex != newWordIndex) {
     if (wordPointer) tween.during(new ValueTween(curWordPos, newWordPos, duration, GS.easings.easeInOutQuad, (v) => {
       wordPointer.position.set(v.x, v.y);
     }));
-    if (word) tween.during(new ValueTween(black, red, duration, GS.easings.easeInOutQuad, (v) => {
+    if (word) tween.during(new ValueTween(black, purple, duration, GS.easings.easeInOutQuad, (v) => {
       word[newWordIndex].style.fill = v;
     }));
   }
-  if (word) tween.during(new ValueTween(red, bg_dark, duration, GS.easings.easeInOutQuad, (v) => {
+  if (word) tween.during(new ValueTween(purple, bg_dark, duration, GS.easings.easeInOutQuad, (v) => {
     word[oldWordIndex].style.fill = v;
   }));
   return tween;
@@ -111,15 +111,20 @@ const example1 = () => {
 
   const problemHeading = new PIXI.Text({ text: "Example 1", style: {...baseStyle}});
   const problemText = new PIXI.Text({ text: "Words not starting with b.", style: {...baseStyle}});
+  const alphabetText = new PIXI.Text({ text: "Alphabet: {a, b}", style: {...baseStyle}});
   problemHeading.anchor.set(0.5, 0.5);
   problemHeading.scale.set(2);
   problemText.anchor.set(0.5, 0.5);
+  alphabetText.anchor.set(0.5, 0.5);
   problemHeading.position.set(500, 250);
   problemText.position.set(500, 350);
+  alphabetText.position.set(500, 400);
   problemHeading.alpha = 0;
   problemText.alpha = 0;
+  alphabetText.alpha = 0;
   GS.example1Container.addChild(problemHeading);
   GS.example1Container.addChild(problemText);
+  GS.example1Container.addChild(alphabetText);
 
   // Needed for the comparison fn.
   GS.example1ProblemText = problemText;
@@ -127,9 +132,11 @@ const example1 = () => {
   const textFadeIn = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
     problemHeading.alpha = v;
     problemText.alpha = v;
+    alphabetText.alpha = v;
   });
   const fadeOutAndShift = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
     problemHeading.alpha = 1 - v;
+    alphabetText.alpha = 1 - v;
     const newPos = interpValue({x: 500, y: 350}, {x: 500, y: 50}, v);
     problemText.position.set(newPos.x, newPos.y);
   });
@@ -255,22 +262,29 @@ const example2 = () => {
 
   const problemHeading = new PIXI.Text({ text: "Example 2", style: {...baseStyle}});
   const problemText = new PIXI.Text({ text: "Words with an even amount of 'a's.", style: {...baseStyle}});
+  const alphabetText = new PIXI.Text({ text: "Alphabet: {a, b}", style: {...baseStyle}});
   problemHeading.anchor.set(0.5, 0.5);
   problemHeading.scale.set(2);
   problemText.anchor.set(0.5, 0.5);
+  alphabetText.anchor.set(0.5, 0.5);
   problemHeading.position.set(500, 250);
   problemText.position.set(500, 350);
+  alphabetText.position.set(500, 400);
   problemHeading.alpha = 0;
   problemText.alpha = 0;
+  alphabetText.alpha = 0;
   GS.example2Container.addChild(problemHeading);
   GS.example2Container.addChild(problemText);
+  GS.example2Container.addChild(alphabetText);
 
   const textFadeIn = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
     problemHeading.alpha = v;
     problemText.alpha = v;
+    alphabetText.alpha = v;
   });
   const fadeOutAndShift = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
     problemHeading.alpha = 1 - v;
+    alphabetText.alpha = 1 - v;
     const newPos = interpValue({x: 500, y: 350}, {x: 500, y: 50}, v);
     problemText.position.set(newPos.x, newPos.y);
   });
@@ -618,7 +632,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.screen.addChild(nodePointer);
 
   const wordPointer = new PIXI.Graphics();
-  wordPointer.rect(1, 0, 11, 3).fill(highlightColours[2]);
+  wordPointer.rect(1, 0, 11, 3).fill(purple);
   wordPointer.position.set(wordIndexPosition(0, word).x, wordIndexPosition(0, word).y);
   GS.screen.addChild(wordPointer);
 
@@ -894,7 +908,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   const pointerFade = new ValueTween(0, 1, 60, easings.easeInOutQuad, (v) => {
     nodePointer.alpha = v;
     wordPointer.alpha = v;
-  }).during(new ValueTween(black, red, 60, easings.easeInOutQuad, (v) => {
+  }).during(new ValueTween(black, purple, 60, easings.easeInOutQuad, (v) => {
     word[0].style.fill = v;
   }));
   // T: and begin to execute the algorithm
