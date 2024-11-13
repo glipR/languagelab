@@ -45,6 +45,11 @@ h1, h2, h3 {
 .articleBodyCenter img {
   margin: auto;
   display: block;
+  max-width: 80%;
+}
+
+.articleBodyCenter img.small {
+  max-height: 400px;
 }
 
 .split-page {

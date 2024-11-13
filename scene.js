@@ -101,7 +101,7 @@ class Scene {
       width: this.parent.clientWidth,
       height: this.parent.clientHeight,
       antialias: true,
-      backgroundColor: bg,
+      backgroundColor: new PIXI.Color(0xb2916b),
     });
     app.ticker.add(({deltaTime}) => {
       TweenManager.update(deltaTime);

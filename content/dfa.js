@@ -5,37 +5,45 @@ import { markComplete } from '../tools/completion.js';
 const contentText = `
 <h2>Deterministic Finite Automaton (DFA)</h2>
 
-<img src="/img/basic-dfa.png" />
+<img src="/img/dfaIntro/graph1.png" />
 
-<p>
-A deterministic finite automaton is an algorithm for determining if a particular word is in a language.
+Much like Regular Expressions, a DFA is a way to represent a language, but this representation is much closer to an algorithm, than it is a description of the language.
 It's made up of <span class='highlight highlight-blue'>states</span>, and those states are connected by <span class='highlight highlight-blue'>transitions</span>, which have labels containing letters from the alphabet.
 <br>
-In a DFA, every state has exactly one transition for each letter in the alphabet of words you are considering.</p>
+You've probably seen something similar when playing video games, and interacting with characters with a few basic behaviours.
 
-<img src="/img/table.png" />
+<img src="/img/dfaIntro/mario.png" />
 
-<p>A DFA needs two more things to be complete: a single <span class='highlight highlight-green'>start state</span> and a set of <span class='highlight highlight-red'>accepting states</span>.</p>
+But DFAs have some particular rules that must be followed. <br>
+In a DFA, for every state and every letter in the alphabet, there is exactly one transition that begins at that state, and includes that letter in it's label.
 
-<img src="/img/start-accept.png" />
+<img src="/img/dfaIntro/copy.png" />
+
+A DFA needs two more things to be complete: a single <span class='highlight highlight-green'>start state</span> and a set of <span class='highlight highlight-red'>accepting states</span>.
+
+<img src="/img/dfaIntro/start_final.png" />
 
 <h2>How to use a DFA</h2>
 
-To use the DFA, you provide a word, and place a pointer at the start state.
-You then take the first letter in the word, and <span class='highlight highlight-purple'>move</span> the pointer along the transition that starts in our current state and has that letter as its label.
+To use the DFA, we provide a word, and place a pointer at the start state.
+We then take the first letter in the word, and <span class='highlight highlight-purple'>move</span> the pointer along the transition that starts at our current state and whose label includes that first letter.
 
 <div class="split-page">
-<div class="split-img"><img src="/img/1st-move.png" /></div>
-<div class="split-img"><img src="/img/2nd-move.png" /></div>
+<div class="split-img"><img src="/img/dfaIntro/move1.png" /></div>
+<div class="split-img"><img src="/img/dfaIntro/move2.png" /></div>
 </div>
 
-Repeating this for all letters in the word, you'll end up in a state. If that state is an <span class='highlight highlight-red'>accepting</span> state, the word is in the language. Otherwise, it is not.
+We know that exactly one such transition exists because of the rule we stated earlier. This is why it's called a <span class='highlight highlight-blue'><b>Deterministic</b></span> Finite Automaton - the next state is determined entirely by the current state and the letter we're reading, so we always end up in the same spot, for the same word.
+<br>
+Repeating this for all letters in the word, we'll end up in a state. If that state is an <span class='highlight highlight-red'>accepting</span> state, the word is in the language. Otherwise, it is not.
 
-<img src="/img/final-location.png" />
+<img src="/img/dfaIntro/moveFinal.png" />
 
 <h2>Formal Definition</h2>
 
-While everything I said above is true, we can be a bit mathematically clearer in our definition, and you might find this useful for proving things about DFAs:
+While everything I said above is true, we can be a bit mathematically clearer in our definition, and you might find this useful for proving things about DFAs.
+
+You definitely won't need to memorize this for anything else on this site, but it's good to know.
 
 A DFA is a collection of 5 things:
 
@@ -47,14 +55,20 @@ A DFA is a collection of 5 things:
   <li>A set of accepting states, $F \\subseteq Q$</li>
 </ul>
 
+<img src="/img/dfaIntro/formal.png" class="small" />
+
 The transition function enforces the requirement that <span class='highlight highlight-blue-long'>every state/letter pair has exactly one transition</span>.
-Essentially an arrow from X to Y with letter a would be represented as $\\delta(X, a) = Y$.
+Essentially a transition from X to Y with label a would be represented as $\\delta(X, a) = Y$.
+
+You could also represent the transition function as a table, similar to the one we showed earlier, except rather than the entires being the transitions, the entries are the states that those transitions point to:
+
+<img src="/img/dfaIntro/transition_map.png" />
 
 <h2>Examples</h2>
 
 Let's look at some basic languages and how we can represent them with a DFA.
 
-<h3>Language 1: Words not starting with 'b'</h3>
+<h3>Language 1: Words not starting with 'b' (Alphabet: {a, b})</h3>
 
 We can represent this language with 3 states:
 
@@ -66,33 +80,43 @@ We can represent this language with 3 states:
 
 The transitions from S are relatively straight-forward, as we can transition to A on an 'a' and to B on a 'b'.
 
-<img src="/img/e1-p1.png" />
+This is because these first transitions from S are reading the first character of the word, and this first character determines whether we go to state A or state B.
+
+<img src="/img/dfaIntro/e1p1.png" class="small" />
 
 The transitions from A and B are also super-simple. If we read any more characters, that doesn't change the fact that the first character was an 'a' or 'b', so we can just stay in the same state.
 
 Our starting state is S, and our accepting states are S and A, since neither of these represent words starting with 'b'.
 
-<img src="/img/e1-p2.png" />
+<img src="/img/dfaIntro/e1p2.png" class="small" />
 
-<h3>Language 2: Words with an even number of 'a's</h3>
+<h3>Language 2: Words with an even number of 'a's (Alphabet: {a, b})</h3>
 
-This language is a bit more complex to identify as humans, but the DFA representation is actually quite simple.
+This language is maybe a bit more complex to identify as humans, but the DFA representation is actually quite simple.
 
 We can represent this language with just 2 states:
 
 <ul>
-  <li>$E$: A state to represent the number of 'a's read so far is even</li>
-  <li>$O$: A state to represent the number of 'a's read so far is odd</li>
+  <li>$E$: A state to represent that the number of 'a's read so far is even</li>
+  <li>$O$: A state to represent that the number of 'a's read so far is odd</li>
 </ul>
 
 The transitions for the 'b' character are simple - if we read a 'b', the number of 'a's read doesn't change, so we stay in the same state.
 
-<img src="/img/e2-p1.png" />
+<img src="/img/dfaIntro/e2p1.png" class="small" />
 
 The transitions for the 'a' character aren't that much more complicated - if we read an 'a', the number of 'a's read changes <span class='highlight highlight-blue'>parity</span> (Even + 1 = Odd, Odd + 1 = Even), so we transition from E to O and vice versa.
 Our start state is the same as our only accepting state - E.
 
-<img src="/img/e2-p2.png" />
+<img src="/img/dfaIntro/e2p2.png" class="small" />
+
+<h2>What's next?</h2>
+
+As you can see, some languages are much easier to define with regular expressions, whereas in other cases they're easier to define as Deterministic Finite Automata.
+
+<img src="/img/dfaIntro/compare.png" />
+
+In these next few worksheets, let's explore the limits of Deterministic Finite Automata, how to use them, and how to create them ourselves.
 `
 
 const addContent = () => {
