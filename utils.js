@@ -65,7 +65,7 @@ export const bezierLength = (...points) => {
 
 export const inverseBezierRateFunction = (...points) => {
   // Generates a function which takes a time t, and will try to then return a time t such that the partial distance covered over the bexier function is t.
-  const steps = 300;
+  const steps = 50;
   const lengths = [0];
   for (let i=1; i<=steps; i++) {
     lengths.push(lengths[i-1] + magnitude(bezier(i / steps, ...points).tangent));

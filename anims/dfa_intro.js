@@ -1,8 +1,7 @@
-import {black, bg_dark, highlightColours, green, red, purple} from '../colours.js';
+import {black, bg_dark, highlightColours, green, red, purple, white} from '../colours.js';
 import Graph, { Node, AbstractEdge } from '../graph.js';
 import { Tween, TweenManager, ValueTween, interpValue, delay, randomDelay } from '../tween.js';
-import { combineEasing, mergeDeep, reverseEasing } from '../utils.js';
-import StyledText from '../text.js';
+import { bezier, combineEasing, inverseBezierRateFunction, mergeDeep, reverseEasing, vectorCombine } from '../utils.js';
 import Screen from '../screen.js';
 import DFA from '../dfa.js';
 import { RectangleCover } from '../tools/paper_cover.js';
@@ -201,25 +200,24 @@ const example1 = () => {
     .then(textFadeIn)
     .then(delay(120))
     .then(fadeOutAndShift)
-    .then(delay(30))
+    .then(delay(90))
     .then(nodeFadeIns['S'])
-    .then(delay(150))
-    .then(nodeFadeIns['A'], delay(180).then(nodeFadeIns['B']))
-    .then(delay(120))
+    .then(delay(180))
+    .then(nodeFadeIns['A'], delay(225).then(nodeFadeIns['B']))
+    .then(delay(85))
     .then(startFade, delay(40).then(finalFades['A']))
-    .then(delay(170))
+    .then(delay(130))
     // Edges from S
     .then(...edgeDrags.filter(e => e[0].from.label === 'S').map(e => e.slice(1)).flat())
-    .then(delay(380))
+    .then(delay(740))
     // All other edges
     .then(...edgeDrags.filter(e => e[0].from.label !== 'S').map(e => e.slice(1)).flat())
-    .then(delay(280))
+    .then(delay(80))
     // Make S final
     .then(finalFades['S'])
-    .then(delay(200))
+    .then(delay(60))
     .then(nodeFadeIn)
     .then(moveMovement)
-    .then(nodeFadeOut)
     .then(fadeAll);
 }
 
@@ -345,25 +343,25 @@ const example2 = () => {
     nodePointer.alpha = v;
   });
 
-  return delay(30)
+  return delay(10)
     .then(textFadeIn)
     .then(delay(20))
     .then(fadeOutAndShift)
-    .then(delay(30))
-    .then(nodeFadeIns['E'], delay(20).then(nodeFadeIns['O']))
-    .then(delay(820))
+    .then(delay(230))
+    .then(nodeFadeIns['E'], delay(120).then(nodeFadeIns['O']))
+    .then(delay(540))
     // Edges from S
     .then(...edgeDrags.filter(e => e[0].from.label !== e[0].to.label).map(e => e.slice(1)).flat())
-    .then(delay(320))
+    .then(delay(290))
     // All other edges
     .then(...edgeDrags.filter(e => e[0].from.label === e[0].to.label).map(e => e.slice(1)).flat())
-    .then(delay(80))
+    .then(delay(140))
     // Make E start
     .then(startFades['E'])
-    .then(delay(60))
+    .then(delay(45))
     // Make E final
     .then(finalFades['E'])
-    .then(delay(60))
+    .then(delay(15))
     .then(nodeFadeIn)
     .then(moveMovement)
     .then(nodeFadeOut)
@@ -522,10 +520,167 @@ const mario = () => {
   return new ValueTween(0, 1, 60, GS.easings.linear, (v) => {
     GS.marioContainer.alpha = GS.easings.easeOutCubic(v);
     GS.marioContainer.scale = GS.easings.easeOutElastic(v);
-  }).then(delay(220)).then(new ValueTween(1, 0, 60, GS.easings.linear, (v) => {
+  }).then(delay(240)).then(new ValueTween(1, 0, 60, GS.easings.linear, (v) => {
     GS.marioContainer.alpha = GS.easings.easeOutCubic(v);
     GS.marioContainer.scale = GS.easings.easeOutElastic(v);
   }));
+}
+
+const formalDefinition = () => {
+  const definitionContainer = new PIXI.Container();
+  GS.screen.addChild(definitionContainer);
+
+  const heading = new PIXI.Text("Formal Definition", {...baseStyle});
+  heading.anchor.set(0.5, 0.5);
+  heading.position.set(500, 300);
+  heading.scale.set(2);
+  heading.alpha = 0;
+  definitionContainer.addChild(heading);
+
+  const showHeading = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+    heading.alpha = v;
+  });
+  const shiftHeading = new ValueTween({x: 500, y: 300}, {x: 500, y: 50}, 60, GS.easings.easeInOutQuad, (v) => {
+    heading.position.set(v.x, v.y);
+  });
+
+  const properties = document.createElement('div');
+  properties.classList.add('properties');
+  const nodesContainer = new PIXI.Container();
+  const allNodes = Object.values(GS.graph.nodes);
+  const copyNodes = allNodes.map((n, i) => new Node(n.label, { x: i * 50, y: 0}, {strokeWidth: 3, stroke: black, showLabel: true, radius: 20, fill: colorMap[n.label] }));
+  copyNodes.forEach(n => {
+    nodesContainer.addChild(n.graphic);
+  });
+  nodesContainer.position.set(170, 145);
+  nodesContainer.alpha = 0;
+  definitionContainer.addChild(nodesContainer);
+  const nodeText = document.createElement('div');
+  nodeText.innerHTML = "<span>$Q$: {</span><div style='display: inline-block; min-width: 215px;'></div><span>}</span>"
+  nodeText.style.opacity = 0;
+  properties.appendChild(nodeText);
+
+  const alphabet = document.createElement('div');
+  alphabet.innerHTML = "<span>$\\Sigma$: { a, b }</span>";
+  alphabet.style.opacity = 0;
+  properties.appendChild(alphabet);
+
+  const transInputA = new Node('A', { x: 410, y: 303}, { radius: 20, strokeWidth: 3, stroke: black, fill: colorMap['A'], showLabel: true});
+  const transOutputD = new Node('D', { x: 566, y: 303}, { radius: 20, strokeWidth: 3, stroke: black, fill: colorMap['D'], showLabel: true});
+  transInputA.graphic.alpha = 0;
+  transOutputD.graphic.alpha = 0;
+  definitionContainer.addChild(transInputA.graphic);
+  definitionContainer.addChild(transOutputD.graphic);
+
+  const transition = document.createElement('div');
+  transition.innerHTML = "<span>$\\delta$: $Q \\times \\Sigma \\rightarrow Q \\Big[\\delta($</span><div style='display: inline-block; min-width: 40px;'></div><span>$, b) = $</span><div style='display: inline-block; min-width: 45px;'></div><span>$\\Big]$</span>";
+  transition.style.opacity = 0;
+  properties.appendChild(transition);
+
+  const start = document.createElement('div');
+  start.innerHTML = "<span>$q_0 \\in Q :$</span>";
+  start.style.opacity = 0;
+  properties.appendChild(start);
+
+  const startNode = new Node('A', { x: 290, y: 388}, { radius: 20, isEntry: true, strokeWidth: 3, stroke: black, fill: colorMap['A'], showLabel: true});
+  startNode.graphic.alpha = 0;
+  definitionContainer.addChild(startNode.graphic);
+
+  const final = document.createElement('div');
+  final.innerHTML = "<span>$F \\subset Q :$ {</span><div style='display: inline-block; min-width: 90px;'></div><span>}</span>";
+  final.style.opacity = 0;
+  properties.appendChild(final);
+
+  const finalNodes = allNodes.filter(n => n.style.doubleBorder).map(n => new Node(n.label, { x: 700, y: 400}, { radius: 20, doubleBorder: black, strokeWidth: 3, stroke: black, fill: colorMap[n.label], showLabel: true }));
+  const finalNodeContainer = new PIXI.Container();
+  finalNodes.forEach((n, i) => {
+    n.graphic.position.set(i*50, 0);
+    finalNodeContainer.addChild(n.graphic);
+  });
+  finalNodeContainer.position.set(275, 457);
+  finalNodeContainer.alpha = 0;
+  definitionContainer.addChild(finalNodeContainer);
+
+
+
+  return delay(0)
+    .then(showHeading)
+    .then(delay(680))
+    .then(shiftHeading)
+    .then(delay(300))
+    .then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+      nodesContainer.alpha = v;
+      nodeText.style.opacity = v;
+    }, () => {
+      document.querySelector('.scene').appendChild(properties);
+      MathJax.typeset();
+    }))
+    .then(delay(120))
+    .then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+      alphabet.style.opacity = v;
+    }))
+    .then(delay(120))
+    .then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+      transition.style.opacity = v;
+      transInputA.graphic.alpha = v;
+      transOutputD.graphic.alpha = v;
+    }))
+    .then(delay(460))
+    .then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+      start.style.opacity = v;
+      startNode.graphic.alpha = v;
+    }))
+    .then(delay(150))
+    .then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+      final.style.opacity = v;
+      finalNodeContainer.alpha = v;
+    }))
+    .then(delay(800))
+    .then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+      GS.tableContainer.alpha = v;
+      GS.graphContainer.alpha = v;
+      properties.style.opacity = 1-v;
+      definitionContainer.alpha = 1-v;
+    }, () => {
+      GS.tableContainer.position.set(-500, 0)
+      GS.graphContainer.position.set(750, 300);
+      GS.graphContainer.scale.set(0.8);
+      Object.values(GS.graph.nodes).forEach(n => {
+        n.style.fill = colorMap[n.label];
+        n.updateGraphic();
+      });
+    }, () => {
+      properties.remove();
+    }))
+    .then(delay(300))
+    .then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+      Object.values(GS.copyEdges).forEach(e => {
+        e.graphic.alpha = 1-v;
+        GS.tableNodeFormal.forEach(n => {
+          n.graphic.alpha = v;
+        });
+      });
+    }, () => {
+      // On start - add nodes in place of edges.
+      GS.tableNodeFormal = Object.values(GS.copyEdges).map(e => {
+        let pos = interpValue(e.from.position, e.to.position, 0.5);
+        if (e.to.label === e.from.label) {
+          pos = vectorCombine(pos, {x: 0, y: -25})
+        } else {
+          pos = vectorCombine(pos, {x: 0, y: -10})
+        }
+        const n = new Node(e.to.label, pos, { radius: 20, strokeWidth: 3, stroke: black, fill: colorMap[e.to.label], showLabel: true });
+        GS.tableContainer.addChild(n.graphic);
+        return n;
+      });
+    }))
+    .then(delay(490))
+    .then(new ValueTween(1, 0, 60, GS.easings.easeInOutQuad, (v) => {
+      GS.tableContainer.alpha = v;
+      GS.graphContainer.alpha = v;
+    }));
+
+
 }
 
 const loader = (app, easings, onSuccess, onFailure, opts) => {
@@ -570,6 +725,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   graphContainer.pivot.set(500, 300);
   graphContainer.position.set(500, 300);
   GS.screen.addChild(graphContainer);
+  GS.graphContainer = graphContainer;
 
 
   const tableContainer = new PIXI.Container();
@@ -604,6 +760,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   });
   tableContainer.addChild(tableLines);
   tableContainer.alpha = 0;
+  GS.tableContainer = tableContainer;
+
 
   GS.screen.addChild(tableContainer);
 
@@ -785,6 +943,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     tableContainer.addChild(copy.graphic);
   })});
   const copyEdges = {};
+  GS.copyEdges = copyEdges;
   const copyEdgesMove = new ValueTween(0, 1, 160, easings.easeInOutQuad, (v) => {
     Object.values(copyEdges).forEach(e => {
       e.from.position = interpValue(e.from.startPosition, e.from.desiredPosition, v);
@@ -830,24 +989,9 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     });
   });
 
-  const removeAll = new ValueTween(1, 0, 60, easings.easeInOutQuad, (v) => {
-    copyNodes.forEach(n => {
-      n.graphic.alpha = v;
-    });
-    Object.values(copyEdges).forEach(e => {
-      e.graphic.alpha = v;
-    });
+  const removeContainerAndScale = new ValueTween(1, 0, 60, easings.easeInOutQuad, (v) => {
     tableContainer.alpha = v;
-  }, () => {}, () => {
-    copyNodes.forEach(n => {
-      tableContainer.removeChild(n.graphic);
-      n.graphic.destroy();
-    });
-    Object.values(copyEdges).forEach(e => {
-      tableContainer.removeChild(e.graphic);
-      e.graphic.destroy();
-    });
-  }).during(new ValueTween(0.8, 1, 60, easings.easeInOutQuad, (v) => {
+  }, () => {}).during(new ValueTween(0.8, 1, 60, easings.easeInOutQuad, (v) => {
     graphContainer.scale.set(v);
   })).during(new ValueTween({ x: 300, y: 300 }, { x: 500, y: 300 }, 60, easings.easeInOutQuad, (v) => {
     graphContainer.position.set(v.x, v.y);
@@ -911,12 +1055,50 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   }).during(new ValueTween(black, purple, 60, easings.easeInOutQuad, (v) => {
     word[0].style.fill = v;
   }));
+
+  const startColorFade = GS.graph.nodes['A'].tweenColor(colorMap['A'], 60, easings.easeInOutQuad);
+  const startTransitionsFade = GS.graph.edges.filter(e => e.from.label === 'A').map(e => {
+    return e.colorEdgeTween(colorMap['A'], 60, easings.easeInOutQuad);
+  });
+  const fadeBack = GS.graph.edges.filter(e => e.from.label === 'A').map(e => {
+    if (e.style.edgeLabel.includes('b'))
+      return new ValueTween(black, purple, 60, flashEasing(), (value) => {
+        e.updateStyle({ labelStyle: { fill: value } });
+      });
+    return e.colorEdgeTween(black, 60, easings.easeInOutQuad);
+  });
+  const firstMove = moveBetween('A', 'D', 120, GS.graph, nodePointer, wordPointer, word).during(GS.graph.nodes['A'].tweenColor(bg_dark, 120, easings.easeInOutQuad));
+  const stateCover = new PIXI.Graphics();
+  stateCover.rect(595, 225, 65, 50).fill(purple);
+  stateCover.alpha = 0;
+  tableContainer.addChild(stateCover);
+  const letterCover = new PIXI.Graphics();
+  letterCover.rect(800, 165, 87.5, 50).fill(purple);
+  letterCover.alpha = 0;
+  tableContainer.addChild(letterCover);
+  const flashContainer = new ValueTween(0, 1, 30, easings.easeInOutQuad, (v) => {
+    tableContainer.alpha = v;
+  }).then(delay(400))
+  .then(new ValueTween(0, 1, 30, easings.easeInOutQuad, (v) => {
+    stateCover.alpha = v * 0.4;
+  }))
+  .then(delay(20))
+  .then(new ValueTween(0, 1, 30, easings.easeInOutQuad, (v) => {
+    letterCover.alpha = v * 0.4;
+  }))
+  .then(delay(100))
+  .then(new ValueTween(1, 0, 30, easings.easeInOutQuad, (v) => {
+    tableContainer.alpha = v;
+    stateCover.alpha = v * 0.4;
+    letterCover.alpha = v * 0.4;
+  })).during(...GS.graph.edges.filter(e => e.from.label === 'A' && e.style.edgeLabel.includes('b')).map(e => {
+    return e.colorEdgeTween(black, 30, easings.easeInOutQuad);
+  }));
+
   // T: and begin to execute the algorithm
   // T: We do this by taking each letter in the [word], and moving along the [associated transition] to a [new state].
   // Line up the [] with elements of the first movement.
-  const algorithmExecution = moveBetween('A', 'D', 120, GS.graph, nodePointer, wordPointer, word)
-    .then(delay(160))
-    .then(moveBetween('D', 'D', 120, GS.graph, nodePointer, wordPointer, word))
+  const algorithmExecution = moveBetween('D', 'D', 120, GS.graph, nodePointer, wordPointer, word)
     .then(delay(45))
     .then(moveBetween('D', 'E', 90, GS.graph, nodePointer, wordPointer, word))
     .then(delay(30))
@@ -938,7 +1120,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   });
 
   const fadeAll = new ValueTween(1, 0, 60, easings.easeInOutQuad, (v) => {
-    GS.graph.graph.alpha = v;
+    graphContainer.alpha = v;
     wordContainer.alpha = v;
     wordCover.alpha = v;
     nodePointer.alpha = v;
@@ -946,6 +1128,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   });
 
   //
+  const def = formalDefinition();
   const e1 = example1();
   const e2 = example2();
   const comp = comparison();
@@ -954,7 +1137,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   const skipTime = 0;
 
   PIXI.sound.Sound.from({
-    url: '/audio/dfaIntro.mp3',
+    url: '/audio/dfaFinal.mp3',
     preload: true,
     loaded: (err, sound) => {
       TweenManager.add(delay(100) // was 510
@@ -971,9 +1154,9 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         .then(...edgeDrags) // 120
         .then(...edgeLabels) // 60
         .then(delay(60))
-        .then(delay(120))
+        .then(delay(110))
         .then(marioFade)
-        .then(delay(180))
+        .then(delay(170))
         .then(...vertColorTweens) // 60
         .then(delay(60))
         .then(...edgeColorTweens) // 60
@@ -981,23 +1164,32 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         .then(copyNodesMove) // 60
         .then(copyEdgesMove) // 160
         .then(delay(240))
-        .then(removeAll)
+        .then(removeContainerAndScale)
         .then(...fadeVertColorTweens, ...fadeEdgeColorTweens) // 60
-        .then(delay(60))
+        .then(delay(30))
         .then(...vertStartTweens) // 90
-        .then(delay(60))
+        .then(delay(40))
         .then(...vertEndTweens) // 90
         .then(delay(120))
         .then(fadeWordTween) // 60
         .then(delay(40))
         .then(pointerFade) // 60
-        .then(delay(340))
+        .then(delay(250))
+        .then(startColorFade, ...startTransitionsFade)
+        .then(delay(140))
+        .then(...fadeBack)
+        .then(delay(30))
+        .then(firstMove)
+        .then(delay(80))
+        .then(flashContainer)
+        .then(delay(80))
         .then(algorithmExecution)
         .then(delay(160))
         .then(...fadeSuccessColours)
         .then(delay(220))
         .then(fadeAll)
-        .then(delay(400))
+        .then(def)
+        .then(delay(0))
         .then(e1)
         .then(e2).then(delay(30))
         .then(new Tween(1, easings.easeInOutQuad, ()=>{}, ()=>{}, onSuccess))
@@ -1029,22 +1221,13 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
           playThirdSection();
         });
       }
-      if (skipTime < 61) {
-        TweenManager.instance = sound.play({
-          start: skipTime,
-          end: 61,
-        });
-        TweenManager.instance.speed = TweenManager.curSpeed;
-        TweenManager.instance.on('end', () => {
-          playSecondSection();
-        });
-      } else if (skipTime < 71) {
+      TweenManager.instance = sound.play({
+        start: skipTime,
+      });
+      TweenManager.instance.speed = TweenManager.curSpeed;
+      /*TweenManager.instance.on('end', () => {
         playSecondSection();
-      } else if (skipTime < 111.8) {
-        playThirdSection();
-      } else {
-        playFourthSection();
-      }
+      });*/
     }
   });
 

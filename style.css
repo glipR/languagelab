@@ -474,3 +474,16 @@ li.locked::before {
 #editor.editor-long {
   min-height: min(90vh, 800px);
 }
+
+/* DFA Intro HTML Elements */
+
+.properties {
+  font-size: 32px;
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
