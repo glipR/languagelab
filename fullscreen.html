@@ -6,6 +6,15 @@
   <script>var exports = {};</script>
   <script src="https://pixijs.download/release/pixi.js"></script>
   <script src="https://unpkg.com/@pixi/sound/dist/pixi-sound.js"></script>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+    gameScaling = 4;
+  </script>
+  <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <link rel="stylesheet" type="text/css" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,49 +34,30 @@
     import { TweenManager } from './tween.js';
     import { Scene, SceneManager } from './scene.js';
     import { bg_dark, black } from './colours.js';
-    import dfaIntro from './anims/dfa_intro_fullscreen.js'
+    import { registerScene } from './templates/scene.js';
+    import dfaIntro from './anims/dfa_intro.js'
+    import load from '/tools/loading.js';
 
-    // Tween setup
+    // Tween setup - not needed for other scenes.
     window.addEventListener("keypress",  (e) => {
       // Check for left/right arrows
       if (e.key === "a") {
-        TweenManager.curSpeed /= 1.5;
+        TweenManager.setSpeed(TweenManager.curSpeed / 1.5);
       } else if (e.key === "d") {
-        TweenManager.curSpeed *= 1.5;
+        TweenManager.setSpeed(TweenManager.curSpeed * 1.5);
+      } else if (e.key === "p") {
+        TweenManager.togglePause();
       } else {
         return true;
       }
       console.log("Speed: ", TweenManager.curSpeed);
     });
 
-    // Font manifest
-    const manifest = {
-      bundles: [
-        {
-          name: "fontBundle",
-          assets: {
-            "FiraSans-Regular": "./firasans/FiraSans-Regular.ttf",
-            "FiraSans-Bold": "./firasans/FiraSans-Bold.ttf",
-            "FiraSans-Italic": "./firasans/FiraSans-Italic.ttf",
-            "FiraSans-BoldItalic": "./firasans/FiraSans-BoldItalic.ttf",
-            "FiraSans-Thin": "./firasans/FiraSans-Thin.ttf",
-            "ShiftNotes-Regular": "./shiftynotes/ShiftyNotesRegular.ttf",
-            // TODO: Move elsewhere
-            "bg": "./brown-paper.jpg",
-            "Ittybittynotebook": "./itty-bitty-notebook-font/IttyBittyNotebook.ttf"
-          }
-        }
-      ]
-    }
-
-    PIXI.Assets.init({ manifest }).then(() => {
-      PIXI.Assets.loadBundle("fontBundle").then(() => {
-        SceneManager.registerScene(new Scene("video", dfaIntro.loader, dfaIntro.unloader, "video"));
-
-        SceneManager.attachButton("video", "videoPlay", {});
-      });
+    registerScene(dfaIntro.loader, dfaIntro.unloader, 'video', undefined, () => {
+      // markComplete('dfaIntro');
     });
 
+    load();
 
   </script>
 </body>

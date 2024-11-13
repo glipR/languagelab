@@ -2,8 +2,10 @@ import Graph from "./graph.js";
 import { bg_dark, black } from "./colours.js";
 import { mergeDeep } from "./utils.js";
 
+const gsc = window.gameScaling ?? 1;
+
 class DFA extends Graph {
-  static baseNodeStyle = { radius: 30, fill: bg_dark, strokeWidth: 3, stroke: black, showLabel: true, entryWidth: 5 };
+  static baseNodeStyle = { radius: 30 * gsc, fill: bg_dark, strokeWidth: 3 * gsc, stroke: black, showLabel: true, entryWidth: 5 * gsc };
   static baseEdgeStyle = (lab) => ({ edgeLabel: lab });
 
   fromJSON(json) {

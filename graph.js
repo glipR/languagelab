@@ -3,18 +3,32 @@ import { magnitude, vectorCombine, negate, bezier, partialBezier, mergeDeep } fr
 import { CircleCover, RectangleCover } from './tools/paper_cover.js';
 import easings from 'https://cdn.jsdelivr.net/npm/easings.net@1.0.3/+esm';
 import { DrawnBezier } from './tools/drawnBezier.js';
-import { black } from './colours.js';
+import { bg_dark, black } from './colours.js';
+
+const gsc = window.gameScaling ?? 1;
 
 const labelFontStyle = {
   fontFamily: 'Ittybittynotebook',
-  fontSize: 32,
+  fontSize: 32 * gsc,
 }
 
 class Node {
+
+  baseStyle() {
+    return {
+      radius: 30 * gsc,
+      fill: bg_dark,
+      strokeWidth: 3 * gsc,
+      stroke: black,
+      showLabel: true,
+      entryWidth: 5 * gsc
+    };
+  }
+
   constructor(label, position, style) {
     this.label = label;
     this.position = position;
-    this.style = {...style};
+    this.style = {...this.baseStyle(), ...style};
 
     this.graphic = new PIXI.Container();
     this.circle = new PIXI.Graphics();
@@ -78,8 +92,8 @@ class Node {
       this.innerCircle.stroke({ color: this.style.stroke, width: this.style.strokeWidth});
     }
     if (this.style.isEntry) {
-      const entryScale = this.style.entryScale ?? 1;
-      const entryWidth = (this.style.entryWidth ?? this.style.strokeWidth) * entryScale;
+      const entryScale = (this.style.entryScale ?? 1) * gsc;
+      const entryWidth = (this.style.entryWidth ?? this.style.strokeWidth) * entryScale / gsc;
       this.entry.setStrokeStyle({
         color: this.style.entryStroke ?? this.style.stroke,
         width: entryWidth
@@ -138,19 +152,20 @@ class AbstractEdge {
   baseStyle() {
     return {
       points: 6,
-      maxLineDist: 6,
+      maxLineDist: 6 * gsc,
       forcedDistance: 0.8,
       stroke: {
-        width: 5,
+        width: 5 * gsc,
         color: black,
       },
       arrow: {
         direction: 'forward',
         position: 'end',
-        size: 20,
-        width: 5,
-        endOffset: 30,
-      }
+        size: 20 * gsc,
+        width: 5 * gsc,
+      },
+      edgeLabelOffset: 6,
+      labelRatio: 0.5,
     }
   }
 
@@ -249,13 +264,13 @@ class AbstractEdge {
   }
 
   getLabelTransform() {
-    const midTransform = this.bezierEdgeInterp(this.style.labelRatio ?? 0.5);
+    const midTransform = this.bezierEdgeInterp(this.style.labelRatio);
     const upsideDown = midTransform.angle > Math.PI / 2 || midTransform.angle < -Math.PI / 2;
     // Upside down? Flip it 180
     if (upsideDown) {
       midTransform.angle += midTransform.angle > 0 ? Math.PI : -Math.PI;
     }
-    const normalOff = this.style.stroke.width * (this.style.edgeLabelOffset ?? 6);
+    const normalOff = this.style.stroke.width * (this.style.edgeLabelOffset);
     const offsetAngle = midTransform.angle + Math.PI / 2;
     return {
       position: {
@@ -417,8 +432,7 @@ class CurveEdge extends AbstractEdge {
   baseStyle() {
     return {
       ...super.baseStyle(),
-      edgeAnchor: { x: 0, y: -75 },
-      smooth: true,
+      edgeAnchor: { x: 0, y: -75 * gsc },
     }
   }
 
@@ -445,10 +459,10 @@ class LoopEdge extends AbstractEdge {
   baseStyle() {
     return {
       ...super.baseStyle(),
-      loopOffset: { x: 0, y: -75 },
+      loopOffset: { x: 0, y: -75 * gsc },
       loopAnchorMult: 0.8,
       points: 10,
-      maxLineDist: 0.7,
+      maxLineDist: 0.7 * gsc,
       forcedDistance: 0.8,
       smoothScaling: 0.1,
     }

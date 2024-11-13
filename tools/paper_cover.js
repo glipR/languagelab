@@ -1,3 +1,5 @@
+const gsc = window.gameScaling ?? 1;
+
 class Cover extends PIXI.Container {
   static covers = [];
   static generateCovers() {
@@ -13,7 +15,7 @@ class Cover extends PIXI.Container {
     this.style = {...style};
     Cover.covers.push(this);
     this.bg = new PIXI.Graphics();
-    this.bg.position.set(style.shadowOffset?.x ?? 3, style.shadowOffset?.y ?? 3);
+    this.bg.position.set(style.shadowOffset?.x ?? (3 * gsc), style.shadowOffset?.y ?? (3 * gsc));
     this.bg.alpha = style.shadowAlpha ?? 0.3;
     this.fg = new PIXI.Graphics();
     this.addChild(this.bg);
@@ -72,7 +74,7 @@ export class RectangleCover extends Cover {
 
   updateGraphic(extraStyle = {}) {
     this.style = {...this.style, ...extraStyle};
-    const width = this.style?.width ?? this.object.width * 1.2 + 10;
+    const width = this.style?.width ?? this.object.width * 1.2 + 10 * gsc;
     const height = this.style?.height ?? this.object.height * 1.2;
     const randMult = this.style?.randMult ?? 0.2;
     this.bg.clear();
