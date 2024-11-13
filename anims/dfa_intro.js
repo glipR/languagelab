@@ -57,7 +57,7 @@ const moveBetween = (l1, l2, duration, graph, nodePointer, wordPointer, word) =>
   const newWordIndex = GS.curWordIndex;
   const newWordPos = word ? wordIndexPosition(GS.curWordIndex, word) : 0;
   const tween = new ValueTween(0, 1, duration, GS.easings.easeInOutQuad, (v) => {
-    const pos = edge.edgeInterp(v).position;
+    const pos = edge.bezierEdgeInterp(v).position;
     if (nodePointer) nodePointer.position.set(pos.x, pos.y - 60);
   })
     .during(edge.colorEdgeTween(purple, duration, flashEasing(), false));
@@ -387,7 +387,7 @@ const comparison = () => {
     GS.example2Container.position.set(v.x, v.y);
   }));
 
-  const regexText1 = new PIXI.Text("a(a|b)*", {...baseStyle, fontSize: 64});
+  const regexText1 = new PIXI.Text("(a(a|b)*)?", {...baseStyle, fontSize: 64});
   const regexText2 = new PIXI.Text("b*(ab*ab*)*", {...baseStyle, fontSize: 64});
   regexText1.anchor.set(0.5, 0.5);
   regexText2.anchor.set(0.5, 0.5);
@@ -976,6 +976,12 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
           } : {},
         );
         const copy = AbstractEdge.decide(fakeSource, fakeDest, edgeStyleCopy);
+        copy.oldArrowTransform = copy.getArrowTransform;
+        copy.getArrowTransform = (position) => {
+          const transform = copy.oldArrowTransform(position);
+          transform.angle = copy.bezierEdgeInterp(1).angle;
+          return transform;
+        };
         tableContainer.addChild(copy.graphic);
         if (e.from.label === e.to.label) {
           fakeSource.desiredPosition = {x: 675 + 112.5*0.4 + "ab".indexOf(char) * 112.5, y: 275 + 60 * "ABCDE".indexOf(e.from.label)};
