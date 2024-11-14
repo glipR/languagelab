@@ -1,4 +1,4 @@
-import { black, bg_dark, green, red, blue } from '../colours.js';
+import { black, bg_dark, green, purple, blue } from '../colours.js';
 import { TweenManager, ValueTween } from '../tween.js';
 import { magnitude, negate, vectorCombine } from '../utils.js';
 import DFA from '../dfa.js';
@@ -144,7 +144,7 @@ const moveAlongEdge = (edge) => {
     const nextChar = GS.letters[GS.curWordIndex + 1]?.text;
     GS.graph.edges.forEach(e => {
       if (nextChar && e.from.label === edge.to.label && e.labelText.text.includes(nextChar)) {
-        TweenManager.add(e.colorEdgeTween(red, 60, GS.easings.easeInOutQuad));
+        TweenManager.add(e.colorEdgeTween(purple, 60, GS.easings.easeInOutQuad));
       }
     })
   }
@@ -288,7 +288,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
 
   // Word Pointer
   GS.wordPointer = new PIXI.Graphics();
-  GS.wordPointer.rect(1, 0, 11, 3).fill(red);
+  GS.wordPointer.rect(1, 0, 11, 3).fill(purple);
   GS.wordPointer.position.set(GS.letters[0].x, GS.letters[0].y + GS.letters[0].height);
   GS.curWordIndex = 0;
   GS.wordContainer.addChild(GS.wordPointer);
@@ -305,16 +305,16 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     const nextChar = GS.letters[GS.curWordIndex]?.text;
     GS.graph.edges.forEach(edge => {
       if (edge.from.label === GS.startNodeKey && edge.labelText.text.includes(nextChar)) {
-        TweenManager.add(edge.colorEdgeTween(red, 60, GS.easings.easeInOutQuad));
+        TweenManager.add(edge.colorEdgeTween(purple, 60, GS.easings.easeInOutQuad));
       }
     });
   }
 
   // Red Circle for current position
   GS.positionPointer = new PIXI.Graphics();
-  GS.positionPointer.circle(0, 0, GS.graph.nodes[GS.startNodeKey].style.radius / 2).fill(new PIXI.Color(0xff0000));
+  GS.positionPointer.circle(0, 0, GS.graph.nodes[GS.startNodeKey].style.radius / 2).fill(purple);
   GS.positionPointer.position.set(GS.graph.nodes[GS.startNodeKey].graphic.x, GS.graph.nodes[GS.startNodeKey].graphic.y);
-  GS.positionPointer.alpha = 0.4;
+  GS.positionPointer.alpha = 0.7;
   // Make the pointer draggable
   GS.positionPointer.interactive = true;
   GS.positionPointer.buttonMode = true;
