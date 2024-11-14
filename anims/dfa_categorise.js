@@ -29,7 +29,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.screen.addChild(GS.graph.graph);
 
   const checkDisabled = () => {
-    if (GS.text.curText) {
+    if (GS.textInput.value) {
       if (!GS.categories.state.assigned.includes(-1)) {
         GS.verify.setDisabled(false);
         GS.verifyIcon.tint = green;
@@ -40,12 +40,20 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     GS.verifyIcon.tint = darkGrey;
   }
 
-  GS.text = new TextEntry(0, "", { bg: {width: 700, height: 35 } });
-  GS.text.position.set(150, 560);
-  GS.text.onChange = () => {
+
+  GS.textInput = document.createElement("input");
+  GS.textInput.style.position = "absolute";
+  GS.textInput.style.width = "80%";
+  GS.textInput.style.height = "40px";
+  GS.textInput.style.left = "50%";
+  GS.textInput.style.top = "50%";
+  GS.textInput.style.transform = "translate(-50%, -65%)";
+  GS.textInput.style.fontSize = "20px";
+  GS.textInput.addEventListener("input", () => {
+    console.log('inp')
     checkDisabled();
-  }
-  GS.screen.addChild(GS.text);
+  });
+  document.querySelector('.scene').appendChild(GS.textInput);
 
   GS.categories = new Categories(GS.opts.categories, GS.opts.data, 800, 400, GS.screen, {showIncorrect: true});
   GS.categories.graphic.position.set(100, 600);

@@ -348,6 +348,7 @@ li.locked::before {
   flex-direction: column;
   /* Gets set to flex */
   display: none;
+  z-index: 100;
 }
 
 .modal.modalFixed {
