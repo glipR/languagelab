@@ -3,6 +3,10 @@ import dfaIntro from '../anims/dfa_intro.js'
 import { markComplete } from '../tools/completion.js';
 
 const contentText = `
+<div class="aspect-ratio">
+<iframe src="https://www.youtube.com/embed/k9LmFzXPcYM?si=3AQBjp0p4NXKk07L" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+
 <h2>Deterministic Finite Automaton (DFA)</h2>
 
 <img src="/img/dfaIntro/graph1.png" />
@@ -120,10 +124,10 @@ In these next few worksheets, let's explore the limits of Deterministic Finite A
 `
 
 const addContent = () => {
-  addScene('video', document.querySelector('.articleBodyCenter'));
+  /*addScene('video', document.querySelector('.articleBodyCenter'));
   registerScene(dfaIntro.loader, dfaIntro.unloader, 'video', undefined, () => {
     markComplete('dfaIntro');
-  });
+  });*/
   const div = document.createElement("div");
   div.innerHTML = contentText;
   document.querySelector('.articleBodyCenter').appendChild(div);
