@@ -49,7 +49,7 @@ const addContent = () => {
   document.querySelector('.articleBodyCenter').appendChild(div);
   document.querySelector('.articleBodyCenter').insertAdjacentHTML('beforeend', progress);
   MathJax.typeset();
-  addScene('dfa_match', document.querySelector('.articleBodyCenter'));
+  addScene('dfa_match', document.querySelector('.articleBodyCenter'), ['sceneFill']);
   const creationContainer = document.querySelector('#dfa_match');
   const t4Steps = new StepScenes(creationContainer, "dfa_match", t4Tasks, () => {
     markComplete('dfaMatch');

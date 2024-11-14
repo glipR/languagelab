@@ -309,6 +309,11 @@ li.locked::before {
   min-height: 800px;
 }
 
+.sceneFill {
+  min-height: calc(100vh - 140px);
+  width: 100%;
+}
+
 .playScene {
   position: absolute;
   width: 60%;

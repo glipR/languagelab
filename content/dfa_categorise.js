@@ -58,7 +58,7 @@ const addContent = () => {
   div.innerHTML = contentText;
   document.querySelector('.articleBodyCenter').appendChild(div);
   MathJax.typeset();
-  addScene('dfa_validate', document.querySelector('.articleBodyCenter'));
+  addScene('dfa_validate', document.querySelector('.articleBodyCenter'), ['sceneFill']);
   const categoryContainer = document.querySelector('#dfa_validate');
   const t2Steps = new StepScenes(categoryContainer, "dfa_validate", t2Tasks, () => {
     markComplete('dfaCategorise');

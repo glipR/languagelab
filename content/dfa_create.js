@@ -35,7 +35,7 @@ const addContent = () => {
       window.location.href = "/pages/dfa_match";
     }
   }
-  addScene('dfa_create', document.querySelector('.articleBodyCenter'));
+  addScene('dfa_create', document.querySelector('.articleBodyCenter'), ['sceneFill']);
   registerScene(dfaDraw.loader, dfaDraw.unloader, 'dfa_create', task3Opts);
 }
 

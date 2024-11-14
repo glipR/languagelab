@@ -1,7 +1,7 @@
 import { Scene, SceneManager } from "../scene.js";
 
-const sceneHTML = (id) => `
-<div class="scene" id="${id}">
+const sceneHTML = (id, classes=[]) => `
+<div class="scene ${classes.join(' ')}" id="${id}">
   <button class="playScene" id="${id}Play">
     <span class="playTriangle"></span>
   </button>
@@ -30,8 +30,8 @@ const sceneHTML = (id) => `
 </div>
 `
 
-export const addScene = (id, div) => {
-  div.insertAdjacentHTML('beforeend', sceneHTML(id));
+export const addScene = (id, div, classes=[]) => {
+  div.insertAdjacentHTML('beforeend', sceneHTML(id, classes));
 }
 
 export const registerScene = (loader, unloader, id, sceneOpts, onSuccess, onFailure) => {

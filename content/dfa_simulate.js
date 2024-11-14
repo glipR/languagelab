@@ -32,7 +32,7 @@ const addContent = () => {
   div.innerHTML = contentText;
   document.querySelector('.articleBodyCenter').appendChild(div);
   MathJax.typeset();
-  addScene('dfa_sim', document.querySelector('.articleBodyCenter'));
+  addScene('dfa_sim', document.querySelector('.articleBodyCenter'), ['sceneFill']);
   const simContainer = document.querySelector('#dfa_sim');
   const t1Steps = new StepScenes(simContainer, 'dfa_sim', t1Tasks, () => {
     markComplete('dfaExecute');
