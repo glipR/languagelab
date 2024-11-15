@@ -343,7 +343,7 @@ class DFADraw {
     this.stateContextMakeStartLabel.position.set(10, 90);
     this.stateContextMakeStartCheck = new Checkbox(false);
     this.stateContextMakeStartCheck.position.set(120, 80);
-    this.stateContextMakeFinalLabel = new PIXI.Text({ text: "Final State:", style: { fill: black, fontSize: 18 } });
+    this.stateContextMakeFinalLabel = new PIXI.Text({ text: "Accepting:", style: { fill: black, fontSize: 18 } });
     this.stateContextMakeFinalLabel.anchor.set(0, 0.5);
     this.stateContextMakeFinalLabel.position.set(10, 120);
     this.stateContextMakeFinalCheck = new Checkbox(false);

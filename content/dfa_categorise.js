@@ -13,7 +13,7 @@ const t2Tasks = [{
     { value: "abbbaaab", category: "Accepted" },
     { value: "baa", category: "Rejected" },
   ],
-  exampleDescription: "Words ending with a b",
+  exampleDescription: "Words ending with 'b'",
 }, {
   graph: t2JSON,
   categories: ["Accepted", "Rejected"],

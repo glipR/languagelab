@@ -129,7 +129,7 @@ const makeModal = (content) => {
 }
 
 const updateNavHeightWithScroll = () => {
-  if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+  if (document.body.scrollTop > 30 || document.documentElement.scrollTop > 30) {
     document.querySelector('.navHeader').classList.add('scrolled');
   } else {
     document.querySelector('.navHeader').classList.remove('scrolled');

@@ -22,7 +22,7 @@ class DFA extends Graph {
         },
         style: mergeDeep({...DFA.baseNodeStyle}, nodeStyle, json.nodes[key].style ?? {}, {
           isEntry: json.nodes[key].start,
-          doubleBorder: json.nodes[key].final,
+          doubleBorder: json.nodes[key].accepting,
         }),
       }
     });
@@ -72,7 +72,7 @@ class DFA extends Graph {
         x: state.position?.x ?? 0,
         y: state.position?.y ?? 0,
         start: state.starting,
-        final: state.accepting,
+        accepting: state.accepting,
       }
     });
     data.transitions.forEach((transition) => {
@@ -215,7 +215,7 @@ class DFA extends Graph {
     }
 
 
-    // Separate final and non-final states
+    // Separate accepting and non-accepting states
     let newStates = [
       Object.values(this.nodes).filter((node) => !node.style.doubleBorder && marked[node.label]),
       Object.values(this.nodes).filter((node) => node.style.doubleBorder && marked[node.label]),
@@ -268,7 +268,7 @@ class DFA extends Graph {
         x: state.reduce((acc, cur) => acc + cur.position.x, 0) / state.length,
         y: state.reduce((acc, cur) => acc + cur.position.y, 0) / state.length,
         start: state.some((node) => node.style.isEntry),
-        final: state.some((node) => node.style.doubleBorder),
+        accepting: state.some((node) => node.style.doubleBorder),
       }))),
       edges: newStates
         .map((state, i) =>
@@ -359,7 +359,7 @@ class DFA extends Graph {
         x: node.position.x,
         y: node.position.y,
         start: !!node.style.isEntry,
-        final: !node.style.doubleBorder,
+        accepting: !node.style.doubleBorder,
       }
     });
     newDFA.fromJSON(json);
@@ -420,7 +420,7 @@ class DFA extends Graph {
           x: node.position.x,
           y: node.position.y,
           start: node.style.isEntry && otherNode.style.isEntry,
-          final: accepts(node.style.doubleBorder, otherNode.style.doubleBorder),
+          accepting: accepts(node.style.doubleBorder, otherNode.style.doubleBorder),
         }
       });
     });

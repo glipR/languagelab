@@ -14,7 +14,7 @@ const simple = new DFA();
 simple.fromJSON({
   nodes: {
     A: { x: 0, y: 0 },
-    B: { x: 0, y: 0, start: true, final: true },
+    B: { x: 0, y: 0, start: true, accepting: true },
   },
   edges: [
     { from: 'A', to: 'A', label: 'a' },

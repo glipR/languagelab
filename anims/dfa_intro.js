@@ -87,8 +87,8 @@ const example1 = () => {
   const g = new DFA();
   g.fromJSON({
     nodes: {
-      S: { x: 300 * gsc, y: 300 * gsc, start: true, final: true },
-      A: { x: 700 * gsc, y: 150 * gsc, final: true },
+      S: { x: 300 * gsc, y: 300 * gsc, start: true, accepting: true },
+      A: { x: 700 * gsc, y: 150 * gsc, accepting: true },
       B: { x: 700 * gsc, y: 450 * gsc },
     },
     edges: [
@@ -147,10 +147,10 @@ const example1 = () => {
 
   // Show S node
   // Show A and B node staggered
-  // Show start and final states (S and A respectively)
+  // Show start and accepting states (S and A respectively)
   // Show edges from S to A and B
   // Show edges from A and B to themselves
-  // Make S the final state too
+  // Make S the accepting state too
   // Simulate word starting with b
   // Simulate word starting with a
   // Fade all
@@ -164,7 +164,7 @@ const example1 = () => {
     g.nodes['S'].entry.alpha = v;
     g.nodes['S'].updateGraphic();
   });
-  const finalFades = Object.values(g.nodes).reduce((o, n) => ({
+  const acceptingFades = Object.values(g.nodes).reduce((o, n) => ({
     ...o,
     [n.label]: new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
       n.innerCircle.alpha = v;
@@ -210,7 +210,7 @@ const example1 = () => {
     .then(delay(180))
     .then(nodeFadeIns['A'], delay(225).then(nodeFadeIns['B']))
     .then(delay(85))
-    .then(startFade, delay(40).then(finalFades['A']))
+    .then(startFade, delay(40).then(acceptingFades['A']))
     .then(delay(130))
     // Edges from S
     .then(...edgeDrags.filter(e => e[0].from.label === 'S').map(e => e.slice(1)).flat())
@@ -218,8 +218,8 @@ const example1 = () => {
     // All other edges
     .then(...edgeDrags.filter(e => e[0].from.label !== 'S').map(e => e.slice(1)).flat())
     .then(delay(80))
-    // Make S final
-    .then(finalFades['S'])
+    // Make S accepting
+    .then(acceptingFades['S'])
     .then(delay(60))
     .then(nodeFadeIn)
     .then(moveMovement)
@@ -234,7 +234,7 @@ const example2 = () => {
   const g = new DFA();
   g.fromJSON({
     nodes: {
-      E: { x: 300 * gsc, y: 300 * gsc, start: true, final: true },
+      E: { x: 300 * gsc, y: 300 * gsc, start: true, accepting: true },
       O: { x: 700 * gsc, y: 300 * gsc },
     },
     edges: [
@@ -298,7 +298,7 @@ const example2 = () => {
   // Show E and O node staggered, include entry
   // Show a transitions
   // Show b transitions
-  // Make E final state
+  // Make E accepting state
   // Simulate
   // Fade all
 
@@ -314,7 +314,7 @@ const example2 = () => {
       n.updateGraphic();
     })
   }), {});
-  const finalFades = Object.values(g.nodes).reduce((o, n) => ({
+  const acceptingFades = Object.values(g.nodes).reduce((o, n) => ({
     ...o,
     [n.label]: new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
       n.innerCircle.alpha = v;
@@ -364,8 +364,8 @@ const example2 = () => {
     // Make E start
     .then(startFades['E'])
     .then(delay(45))
-    // Make E final
-    .then(finalFades['E'])
+    // Make E accepting
+    .then(acceptingFades['E'])
     .then(delay(15))
     .then(nodeFadeIn)
     .then(moveMovement)
@@ -598,21 +598,21 @@ const formalDefinition = () => {
   startNode.graphic.alpha = 0;
   definitionContainer.addChild(startNode.graphic);
 
-  const finalWidth = Math.ceil(90 * formalScaling);
-  const final = document.createElement('div');
-  final.innerHTML = `<span>$F \\subset Q :$ {</span><div style='display: inline-block; min-width: ${finalWidth}px;'></div><span>}</span>`;
-  final.style.opacity = 0;
-  properties.appendChild(final);
+  const acceptingWidth = Math.ceil(90 * formalScaling);
+  const accepting = document.createElement('div');
+  accepting.innerHTML = `<span>$F \\subset Q :$ {</span><div style='display: inline-block; min-width: ${acceptingWidth}px;'></div><span>}</span>`;
+  accepting.style.opacity = 0;
+  properties.appendChild(accepting);
 
-  const finalNodes = allNodes.filter(n => n.style.doubleBorder).map(n => new Node(n.label, { x: 700 * gsc, y: 400 * gsc}, { radius: 20 * gsc, doubleBorder: black, strokeWidth: 3 * gsc, stroke: black, fill: colorMap[n.label], showLabel: true }));
-  const finalNodeContainer = new PIXI.Container();
-  finalNodes.forEach((n, i) => {
+  const acceptingNodes = allNodes.filter(n => n.style.doubleBorder).map(n => new Node(n.label, { x: 700 * gsc, y: 400 * gsc}, { radius: 20 * gsc, doubleBorder: black, strokeWidth: 3 * gsc, stroke: black, fill: colorMap[n.label], showLabel: true }));
+  const acceptingNodeContainer = new PIXI.Container();
+  acceptingNodes.forEach((n, i) => {
     n.graphic.position.set(i*50 * gsc, 0);
-    finalNodeContainer.addChild(n.graphic);
+    acceptingNodeContainer.addChild(n.graphic);
   });
-  finalNodeContainer.position.set(293 * gsc, 455 * gsc);
-  finalNodeContainer.alpha = 0;
-  definitionContainer.addChild(finalNodeContainer);
+  acceptingNodeContainer.position.set(293 * gsc, 455 * gsc);
+  acceptingNodeContainer.alpha = 0;
+  definitionContainer.addChild(acceptingNodeContainer);
 
 
 
@@ -645,8 +645,8 @@ const formalDefinition = () => {
     }))
     .then(delay(150))
     .then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
-      final.style.opacity = v;
-      finalNodeContainer.alpha = v;
+      accepting.style.opacity = v;
+      acceptingNodeContainer.alpha = v;
     }))
     .then(delay(800))
     .then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
@@ -1050,7 +1050,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       }
     }));
   });
-  // T: some final states.
+  // T: some accepting states.
   const vertEndTweens = Object.values(GS.graph.nodes).map(n => {
     return new ValueTween(0, 1, 60, easings.easeInOutQuad, (v) => {
       n.innerCircle.alpha = v;

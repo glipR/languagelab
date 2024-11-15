@@ -11,7 +11,7 @@ const contentText = `
 
 <img src="/img/dfaIntro/graph1.png" />
 
-Much like Regular Expressions, a DFA is a way to represent a language, but this representation is much closer to an algorithm, than it is a description of the language.
+Much like Regular Expressions, a DFA is a way to represent a language, but this representation is much closer to an algorithm than it is a description of the language.
 It's made up of <span class='highlight highlight-blue'>states</span>, and those states are connected by <span class='highlight highlight-blue'>transitions</span>, which have labels containing letters from the alphabet.
 <br>
 You've probably seen something similar when playing video games, and interacting with characters with a few basic behaviours.
@@ -19,7 +19,7 @@ You've probably seen something similar when playing video games, and interacting
 <img src="/img/dfaIntro/mario.png" />
 
 But DFAs have some particular rules that must be followed. <br>
-In a DFA, for every state and every letter in the alphabet, there is exactly one transition that begins at that state, and includes that letter in it's label.
+In a DFA, for every state and every letter in the alphabet, there is exactly one transition that begins at that state, and includes that letter in its label.
 
 <img src="/img/dfaIntro/copy.png" />
 
@@ -37,7 +37,7 @@ We then take the first letter in the word, and <span class='highlight highlight-
 <div class="split-img"><img src="/img/dfaIntro/move2.png" /></div>
 </div>
 
-We know that exactly one such transition exists because of the rule we stated earlier. This is why it's called a <span class='highlight highlight-blue'><b>Deterministic</b></span> Finite Automaton - the next state is determined entirely by the current state and the letter we're reading, so we always end up in the same spot, for the same word.
+We know that exactly one such transition exists because of the rule we stated earlier. This is why it's called a <span class='highlight highlight-blue'><b>Deterministic</b></span> Finite Automaton - the next state is determined entirely by the current state and the letter we're reading, so we always end up in the <span class='highlight highlight-purple'>same spot</span>, for the <span class='highlight highlight-purple'>same word</span>.
 <br>
 Repeating this for all letters in the word, we'll end up in a state. If that state is an <span class='highlight highlight-red'>accepting</span> state, the word is in the language. Otherwise, it is not.
 

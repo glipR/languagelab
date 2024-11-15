@@ -1,8 +1,8 @@
 export const t1 = {
   graph: {
     nodes: {
-      A: { x: 0, y: 0, start: false, final: true },
-      B: { x: 0, y: 0, start: true, final: false },
+      A: { x: 0, y: 0, start: false, accepting: true },
+      B: { x: 0, y: 0, start: true, accepting: false },
     },
     edges: [
       { from: 'A', to: 'A', label: 'a' },
@@ -17,18 +17,18 @@ export const t1 = {
     "We can start by making two states - One if we're currently ending with an a, and one if we're not.",
     "In either state, reading an a should take us to the state where we're ending with an a.",
     "In either state, reading a b should take us to the state where we're not ending with an a.",
-    "Make sure you've marked your starting and final states correctly.",
+    "Make sure you've marked your starting and accepting states correctly.",
   ]
 }
 
 export const t2 = {
   graph: {
     nodes: {
-      A: { x: 0, y: 0, start: true , final: true },
-      B: { x: 0, y: 0, start: false, final: true },
-      C: { x: 0, y: 0, start: false, final: true },
-      D: { x: 0, y: 0, start: false, final: true },
-      X: { x: 0, y: 0, start: false, final: false },
+      A: { x: 0, y: 0, start: true , accepting: true },
+      B: { x: 0, y: 0, start: false, accepting: true },
+      C: { x: 0, y: 0, start: false, accepting: true },
+      D: { x: 0, y: 0, start: false, accepting: true },
+      X: { x: 0, y: 0, start: false, accepting: false },
     },
     edges: [
       { from: 'A', to: 'A', label: 'a' },
@@ -59,12 +59,12 @@ export const t2 = {
 export const t3 = {
   graph: {
     nodes: {
-      X1: { x: 0, y: 0, start: true , final: false },
-      X2: { x: 0, y: 0, start: false , final: false },
-      M: { x: 0, y: 0, start: false , final: false },
-      Y1: { x: 0, y: 0, start: false, final: false },
-      Y2: { x: 0, y: 0, start: false, final: true },
-      END: { x: 0, y: 0, start: false, final: false },
+      X1: { x: 0, y: 0, start: true , accepting: false },
+      X2: { x: 0, y: 0, start: false , accepting: false },
+      M: { x: 0, y: 0, start: false , accepting: false },
+      Y1: { x: 0, y: 0, start: false, accepting: false },
+      Y2: { x: 0, y: 0, start: false, accepting: true },
+      END: { x: 0, y: 0, start: false, accepting: false },
     },
     edges: [
       // X1
@@ -96,11 +96,11 @@ export const t3 = {
 export const t4 = {
   graph: {
     nodes: {
-      S: { x: 0, y: 0, start: true , final: false },
-      P1: { x: 0, y: 0, start: false , final: false },
-      P2: { x: 0, y: 0, start: false , final: false },
-      P3: { x: 0, y: 0, start: false , final: false },
-      P4: { x: 0, y: 0, start: false , final: true },
+      S: { x: 0, y: 0, start: true , accepting: false },
+      P1: { x: 0, y: 0, start: false , accepting: false },
+      P2: { x: 0, y: 0, start: false , accepting: false },
+      P3: { x: 0, y: 0, start: false , accepting: false },
+      P4: { x: 0, y: 0, start: false , accepting: true },
     },
     edges: [
       // S

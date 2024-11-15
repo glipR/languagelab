@@ -135,7 +135,7 @@ const moveAlongEdge = (edge) => {
     const accepted = edge.to.style.doubleBorder;
     GS.onSuccess(
       "Successfully executed the algorithm! " +
-      `Since we ended on a state that is ${accepted ? 'a final state' : 'not a final state'}, the word is${accepted ? '' : ' not'} accepted.`
+      `Since we ended on a state that is ${accepted ? 'an accepting state' : 'not an accepting state'}, the word is${accepted ? '' : ' not'} accepted.`
     );
   }
 
@@ -262,7 +262,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
 
   // Only load the fonts you need, otherwise you get lag.
   const baseStyle = new PIXI.TextStyle({
-    fontFamily: "Firasans Regular",
+    fontFamily: "Ittybittynotebook",
     fontSize: 24,
     fill: black,
     align: 'center',

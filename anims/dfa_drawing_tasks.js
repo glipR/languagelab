@@ -8,7 +8,7 @@ const GS = {
   instructions: [
     "Tap anywhere on the screen to add a new state!",
     "Create 3 states",
-    "Tap one of the states, and make it a final state",
+    "Tap one of the states, and make it an accepting state",
     "Drag from one state to another to create a transition",
     "Create a loop transition by dragging from a state to itself (your finger must exit the state)",
     "Tap a transition to edit it's label",
@@ -53,7 +53,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     Object.values(GS.dfa.dfa.nodes).forEach((n) => {
       GS.oldNodeStates[n.label] = {
         label: n.label,
-        final: n.style.doubleBorder,
+        accepting: n.style.doubleBorder,
         start: n.style.isEntry,
         position: n.position,
       };

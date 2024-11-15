@@ -1,9 +1,9 @@
 export const t1JSON = {
   nodes: {
-    A: { x: 300, y: 400, start: true, final: true },
+    A: { x: 300, y: 400, start: true, accepting: true },
     B: { x: 500, y: 250 },
     C: { x: 500, y: 550 },
-    D: { x: 700, y: 250, final: true },
+    D: { x: 700, y: 250, accepting: true },
     E: { x: 700, y: 550 },
   },
   edges: [
@@ -20,7 +20,7 @@ export const t1JSON = {
 
 export const t2JSON = {
   nodes: {
-    A: {x: 300, y: 400, start: true, final: true},
+    A: {x: 300, y: 400, start: true, accepting: true},
     B: {x: 700, y: 400},
   },
   edges: [
@@ -35,8 +35,8 @@ export const t3JSON = {
   nodes: {
     A: { x: 300, y: 400},
     B: { x: 450, y: 250, start: true },
-    C: { x: 600, y: 400, final: true },
-    D: { x: 750, y: 250, final: true },
+    C: { x: 600, y: 400, accepting: true },
+    D: { x: 750, y: 250, accepting: true },
   },
   edges: [
     { from: 'A', to: 'B', label: 'a,b', style: { edgeAnchor: { x: 30, y: 30 }} },

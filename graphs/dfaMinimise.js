@@ -1,7 +1,7 @@
 export const t1JSON = {
   nodes: {
     X: { x: 0, y: 0, start: true },
-    A: { x: 100, y: -100, final: true },
+    A: { x: 100, y: -100, accepting: true },
     B: { x: 100, y: 100 },
   },
   edges: [
