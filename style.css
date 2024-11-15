@@ -62,7 +62,7 @@ h1, h2, h3 {
 }
 
 .articleBodyCenter img {
-  margin: auto;
+  margin: 15px auto;
   display: block;
   max-width: 80%;
 }
