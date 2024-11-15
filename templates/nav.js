@@ -128,6 +128,14 @@ const makeModal = (content) => {
   return modalHTML;
 }
 
+const updateNavHeightWithScroll = () => {
+  if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+    document.querySelector('.navHeader').classList.add('scrolled');
+  } else {
+    document.querySelector('.navHeader').classList.remove('scrolled');
+  }
+}
+
 const addNav = (key) => {
   document.body.insertAdjacentHTML('afterbegin', navContent(key));
 
@@ -147,6 +155,7 @@ const addNav = (key) => {
       dropdownResults.classList.remove("active");
     }
   });
+  window.addEventListener("scroll", updateNavHeightWithScroll);
 }
 
 export default addNav;
