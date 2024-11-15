@@ -40,17 +40,18 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     GS.verifyIcon.tint = darkGrey;
   }
 
+  const TL = GS.screen.localToGlobal(200, 475);
+  const BR = GS.screen.localToGlobal(800, 525);
 
   GS.textInput = document.createElement("input");
   GS.textInput.style.position = "absolute";
-  GS.textInput.style.width = "80%";
-  GS.textInput.style.height = "40px";
-  GS.textInput.style.left = "50%";
-  GS.textInput.style.top = "50%";
-  GS.textInput.style.transform = "translate(-50%, -65%)";
+  GS.textInput.style.width = `${BR.x - TL.x}px`;
+  GS.textInput.style.height = `${BR.y - TL.y}px`;
+  GS.textInput.style.left = `${TL.x}px`;
+  GS.textInput.style.top = `${TL.y}px`;
+  // GS.textInput.style.transform = "translate(-50%, -65%)";
   GS.textInput.style.fontSize = "20px";
   GS.textInput.addEventListener("input", () => {
-    console.log('inp')
     checkDisabled();
   });
   document.querySelector('.scene').appendChild(GS.textInput);
