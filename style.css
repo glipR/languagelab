@@ -41,6 +41,7 @@ h1, h2, h3 {
   max-width: calc(min(1100px, 100% - 20px));
   margin: auto;
   margin-bottom: 50px;
+  min-height: calc(100vh - 120px);
 }
 
 .articleBodyCenter h2 {
