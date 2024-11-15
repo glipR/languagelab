@@ -28,6 +28,7 @@
     import addContent from '/content/dfa.js';
     import addNextButton from '/templates/next.js';
     import addNav from '/templates/nav.js';
+    import addFooter from '/templates/footer.js';
     import load from '/tools/loading.js';
 
     // Tween setup - not needed for other scenes.
@@ -49,6 +50,7 @@
     addNav('dfaIntro');
     addContent();
     addNextButton('/pages/dfa_sim')
+    addFooter();
 
     load();
 

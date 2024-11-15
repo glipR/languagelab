@@ -29,12 +29,14 @@
     import addContent from '/content/dfa_algorithm.js';
     import addNextButton from '/templates/next.js';
     import addNav from '/templates/nav.js';
+    import addFooter from '/templates/footer.js';
     import load from '/tools/loading.js';
 
     // Content
     addNav('dfaAlgorithm');
     addContent();
     addNextButton('/pages/dfa_code_modify')
+    addFooter();
 
     load();
 

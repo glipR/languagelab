@@ -113,6 +113,14 @@ footer {
   justify-content: space-between;
 }
 
+.footer-container a {
+  color: white;
+}
+
+.footer-container p {
+  margin: 5px 0px;
+}
+
 .navHeader {
   background-color: #4a4a4a;
   background: url('/img/backgrounds/paperboard.jpg');
@@ -167,7 +175,7 @@ footer {
 }
 
 .pageDropdownPreview {
-  background-image: url('/img/backgroungs/cardboard-small.png');
+  background-image: url('/img/backgrounds/cardboard-small.png');
   background-size: 100%;
   width: 190px;
   height: 30px;
@@ -242,13 +250,13 @@ a.pageDropdownItem {
 }
 
 .dfaSection {
-  background: url('/img/backgroungs/cardboard-resize.png');
+  background: url('/img/backgrounds/cardboard-resize.png');
   background-size: cover;
   padding: 20px 45px 45px 45px;
 }
 
 .smallSection {
-  background: url('/img/backgroungs/cardboard-small.png');
+  background: url('/img/backgrounds/cardboard-small.png');
   background-size: cover;
   padding: 18px 50px;
 }
