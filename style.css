@@ -21,7 +21,7 @@
 body {
   margin: 0;
   background-color: #ffe0b5;
-  background-image: url('/brown-paper.jpg');
+  background-image: url('/img/backgrounds/brown-paper.jpg');
   background-size: 20%;
   font-family: ittyBitty;
   font-size: 15pt;
@@ -40,6 +40,7 @@ h1, h2, h3 {
   padding-top: 120px;
   max-width: calc(min(1100px, 100% - 20px));
   margin: auto;
+  margin-bottom: 50px;
 }
 
 .articleBodyCenter h2 {
@@ -94,9 +95,27 @@ h1, h2, h3 {
   width: 80%;
 }
 
+footer {
+  background-color: #4a4a4a;
+  background: url('/img/backgrounds/paperboard.jpg');
+  background-size: 20%;
+  color: white;
+  padding: 10px 20px;
+  width: calc(100% - 40px);
+  min-height: 80px;
+  z-index: 100;
+  border-top: #4a4a4a90 solid 5px;
+}
+
+.footer-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .navHeader {
   background-color: #4a4a4a;
-  background: url('/paperboard.jpg');
+  background: url('/img/backgrounds/paperboard.jpg');
   background-size: 20%;
   color: white;
   padding: 10px 0px;
@@ -148,7 +167,7 @@ h1, h2, h3 {
 }
 
 .pageDropdownPreview {
-  background-image: url('/cardboard-small.png');
+  background-image: url('/img/backgroungs/cardboard-small.png');
   background-size: 100%;
   width: 190px;
   height: 30px;
@@ -182,7 +201,6 @@ h1, h2, h3 {
 
 .pageDropdownSection {
   padding: 10px 20px;
-  background-image: url('/pink-concrete.jpg');
   background-size: 100%;
   border-radius: 10px;
   margin-block-start: 20px;
@@ -224,13 +242,13 @@ a.pageDropdownItem {
 }
 
 .dfaSection {
-  background: url('/cardboard-resize.png');
+  background: url('/img/backgroungs/cardboard-resize.png');
   background-size: cover;
   padding: 20px 45px 45px 45px;
 }
 
 .smallSection {
-  background: url('/cardboard-small.png');
+  background: url('/img/backgroungs/cardboard-small.png');
   background-size: cover;
   padding: 18px 50px;
 }
@@ -245,7 +263,7 @@ a.pageDropdownItem {
 
   padding: 5px 10px;
 
-  background: url('/paperboard.jpg');
+  background: url('/img/backgrounds/paperboard.jpg');
   background-size: 1000%;
   border-radius: 10px;
 
@@ -454,7 +472,7 @@ li.locked::before {
   left: 30px;
   width: calc(100% - 60px);
   max-height: 90%;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .modalContent h2 {

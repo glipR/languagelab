@@ -14,7 +14,7 @@ const manifest = {
         "FiraSans-Thin": "/firasans/FiraSans-Thin.ttf",
         "ShiftNotes-Regular": "/shiftynotes/ShiftyNotesRegular.ttf",
         // TODO: Move elsewhere
-        "bg": "/brown-paper.jpg",
+        "bg": "/img/backgrounds/brown-paper.jpg",
         "pick": "/pick_trim.m4a",
         "Ittybittynotebook": "/itty-bitty-notebook-font/IttyBittyNotebook.ttf",
         "Standing": "/mario/standing.webp",
