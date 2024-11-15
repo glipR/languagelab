@@ -37,7 +37,7 @@ h1, h2, h3 {
 }
 
 .articleBodyCenter {
-  padding-top: 110px;
+  padding-top: 120px;
   max-width: calc(min(1100px, 100% - 20px));
   margin: auto;
 }
@@ -354,7 +354,7 @@ li.locked::before {
 }
 
 .sceneFill {
-  min-height: calc(100vh - 140px);
+  min-height: calc(100vh - 180px);
   width: 100%;
 }
 
