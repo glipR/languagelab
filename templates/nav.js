@@ -76,7 +76,7 @@ const navContent = (key) => `
           </h4>
         </div>
         <div class="pageDropdownSection dfaSection">
-          <h4 class="pageDropdownSectionTitle">DFA</h4>
+          <h4 class="iconSection pageDropdownSectionTitle"> DFA</h4>
           <hr />
           ${renderItem('dfaIntro')}
           ${renderItem('dfaExecute')}

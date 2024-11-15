@@ -204,6 +204,9 @@ a.pageDropdownItem {
 .iconCode::before {
   content: "💽";
 }
+.iconSection::before {
+  content: "📚";
+}
 
 .pageDropdownItem.complete::after {
   content: "✅";
