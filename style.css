@@ -407,6 +407,7 @@ li.locked::before {
   /* Gets set to flex */
   display: none;
   z-index: 100;
+  user-select: none;
 }
 
 .modal.modalFixed {
