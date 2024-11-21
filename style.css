@@ -581,6 +581,10 @@ li.locked::before {
   background-blend-mode: lighten;
 }
 
+code {
+  font-size: 16px;
+}
+
 .editor {
   width: 100%;
   min-height: max(200px, 50vh);

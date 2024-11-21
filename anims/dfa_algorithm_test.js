@@ -255,7 +255,10 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       }
 
       const check = () => {
-        if (idx === GS.word.length && response === !!GS.graph.nodes[GS.currentState].style.doubleBorder) {
+        console.log(response, !!response, !!GS.graph.nodes[GS.currentState].style.doubleBorder);
+        if (idx === 0) {
+          GS.onFailure('Your DFA did not move to any states (make sure to call moveToState).');
+        } else if (idx === GS.word.length && !!response === !!GS.graph.nodes[GS.currentState].style.doubleBorder) {
           GS.onSuccess(`Your DFA correctly ${response ? 'accepted' : 'rejected'} the string!`);
         } else {
           GS.onFailure('Your DFA did not correctly accept the string.');
