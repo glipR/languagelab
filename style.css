@@ -559,12 +559,36 @@ li.locked::before {
   background: linear-gradient(105deg, #0000 1%, #b388eb 2%, #b388eb 98%, #0000 99%);
 }
 
-#editor {
-  width: 100%;
-  min-height: 200px;
+.tab-view {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  gap: 0px;
 }
 
-#editor.editor-long {
+.tab-view .tab {
+  padding: 10px 20px;
+  background: url('/img/backgrounds/paperboard.jpg');
+  border-radius: 10px 10px 0px 0px;
+  cursor: pointer;
+  font-family: ittyBitty;
+  color: white;
+  /*border: 1px solid ;*/
+}
+
+.tab-view .tab.active {
+  background-color: #ffffff40;
+  background-blend-mode: lighten;
+}
+
+.editor {
+  width: 100%;
+  min-height: max(200px, 50vh);
+  border-radius: 0px 10px 10px 10px;
+  border: 2px solid #4a4a4a
+}
+
+.editor-long .codes .editor {
   min-height: min(90vh, 800px);
 }
 

@@ -152,9 +152,16 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   button.position.set(800, 500);
   GS.screen.addChild(button);
 
+  window.onPyBeginLoading = () => {
+    button.setDisabled(true);
+  }
+  window.onPyDoneLoading = () => {
+    button.setDisabled(false);
+  }
+
   button.onClick = () => {
-    const userCode = window.editor.session.getValue();
-    const totalCode = `
+    const userCode = window.getCode['dfaAlgorithm']();
+
     let idx = 0;
     const delayFromTween = (func) => {
       if (TweenManager.tweens.length == 0) {
@@ -170,7 +177,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       const transitionEdge = GS.graph.edges.filter(e => e.from.label === oldState && e.to.label === state && e.style.edgeLabel.includes(curChar.text));
       GS.currentState = state;
       if (!transitionEdge.length) {
-        throw new Error(\`No transition found between states \${oldState} and \${state} with character \${curChar.text}\`);
+        throw new Error(`No transition found between states ${oldState} and ${state} with character ${curChar.text}`);
       }
       idx ++;
 
@@ -182,67 +189,88 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       }
     }
 
-    ${userCode}
-
-    let raised = false;
-    let response = null;
-    try {
-      response = evaluateDFA({
-        states: [{
-          name: 'A',
-          accepting: false,
-          starting: true,
-        }, {
-          name: 'B',
-          accepting: false,
-          starting: false,
-        }, {
-          name: 'C',
-          accepting: true,
-          starting: false,
-        }, {
-          name: 'D',
-          accepting: true,
-          starting: false,
-        }, {
-          name: 'E',
-          accepting: false,
-          starting: false,
-        }],
-        alphabet: 'ab',
-        transitions: [
-          { from: 'A', to: 'B', label: 'a' },
-          { from: 'A', to: 'D', label: 'b' },
-          { from: 'B', to: 'C', label: 'a, b' },
-          { from: 'C', to: 'A', label: 'b' },
-          { from: 'C', to: 'C', label: 'a' },
-          { from: 'D', to: 'D', label: 'b' },
-          { from: 'D', to: 'E', label: 'a' },
-          { from: 'E', to: 'B', label: 'b' },
-          { from: 'E', to: 'C', label: 'a' },
-        ]
-      }, "${word_text}");
-    } catch (e) {
-      delayFromTween(() => {
-        GS.onFailure('Your code threw an error: ' + e.message);
-        console.error(e);
-      });
-      raised = true;
+    async function testPy () {
+      window.onPyBeginLoading();
+      let pyodide = await loadPyodide();
+      pyodide.registerJsModule("dfa", { moveToState });
+      pyodide.runPython(userCode);
+      window.onPyDoneLoading();
+      return pyodide.globals.get('evaluate_dfa');
     }
 
-    const check = () => {
-      if (idx === GS.word.length && response === !!GS.graph.nodes[GS.currentState].style.doubleBorder) {
-        GS.onSuccess(\`Your DFA correctly \${response ? 'accepted' : 'rejected'} the string!\`);
-      } else {
-        GS.onFailure('Your DFA did not correctly accept the string.');
+    async function testJS () {
+      const evaluateDFA = eval(`\
+      (function() {
+        ${userCode}
+        return evaluateDFA;
+      }())`);
+      return Promise.resolve(evaluateDFA);
+    }
+
+    function testDFA (evaluateDFA) {
+      let raised = false;
+      let response = null;
+      try {
+        response = evaluateDFA({
+          states: [{
+            name: 'A',
+            accepting: false,
+            starting: true,
+          }, {
+            name: 'B',
+            accepting: false,
+            starting: false,
+          }, {
+            name: 'C',
+            accepting: true,
+            starting: false,
+          }, {
+            name: 'D',
+            accepting: true,
+            starting: false,
+          }, {
+            name: 'E',
+            accepting: false,
+            starting: false,
+          }],
+          alphabet: 'ab',
+          transitions: [
+            { from: 'A', to: 'B', label: 'a' },
+            { from: 'A', to: 'D', label: 'b' },
+            { from: 'B', to: 'C', label: 'a, b' },
+            { from: 'C', to: 'A', label: 'b' },
+            { from: 'C', to: 'C', label: 'a' },
+            { from: 'D', to: 'D', label: 'b' },
+            { from: 'D', to: 'E', label: 'a' },
+            { from: 'E', to: 'B', label: 'b' },
+            { from: 'E', to: 'C', label: 'a' },
+          ]
+        }, `${word_text}`);
+      } catch (e) {
+        delayFromTween(() => {
+          GS.onFailure('Your code threw an error: ' + e.message);
+          console.error(e);
+        });
+        raised = true;
+      }
+
+      const check = () => {
+        if (idx === GS.word.length && response === !!GS.graph.nodes[GS.currentState].style.doubleBorder) {
+          GS.onSuccess(`Your DFA correctly ${response ? 'accepted' : 'rejected'} the string!`);
+        } else {
+          GS.onFailure('Your DFA did not correctly accept the string.');
+        }
+      }
+
+      if (!raised) {
+        delayFromTween(check);
       }
     }
 
-    if (!raised) {
-      delayFromTween(check);
-    }
-    `;
-    eval(totalCode);
+    const test = window.currentTab['dfaAlgorithm'] === 'JS' ? testJS : testPy;
+    test().then((fn) => {
+      testDFA(fn);
+    });
   }
 };
 

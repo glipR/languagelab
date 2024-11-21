@@ -63,30 +63,31 @@ class DFA extends Graph {
   }
 
   import(data) {
+    const get = (obj, key) => obj[key] ?? obj.get(key);
     const json = {
       nodes: {},
       edges: [],
     }
     data.states.forEach((state) => {
-      json.nodes[state.name] = {
-        x: state.position?.x ?? 0,
-        y: state.position?.y ?? 0,
-        start: state.starting,
-        accepting: state.accepting,
+      json.nodes[get(state, 'name')] = {
+        x: get(state, 'position')?.x ?? 0,
+        y: get(state, 'position')?.y ?? 0,
+        start: get(state, 'starting'),
+        accepting: get(state, 'accepting'),
       }
     });
     data.transitions.forEach((transition) => {
       const e = {
-        from: transition.from,
-        to: transition.to,
-        label: transition.label,
+        from: get(transition, 'from'),
+        to: get(transition, 'to'),
+        label: get(transition, 'label'),
         style: {},
       };
-      if (transition.style?.edgeAnchor) {
-        e.style.edgeAnchor = transition.style.edgeAnchor;
+      if (get(transition, 'style')?.edgeAnchor) {
+        e.style.edgeAnchor = get(transition, 'style').edgeAnchor;
       }
       if (transition.style?.loopOffset) {
-        e.style.loopOffset = transition.style.loopOffset;
+        e.style.loopOffset = get(transition, 'style').loopOffset;
       }
       json.edges.push(e);
     });

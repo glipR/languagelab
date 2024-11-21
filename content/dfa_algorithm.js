@@ -2,6 +2,7 @@ import { addScene, registerScene } from '../templates/scene.js';
 import dfaTest from '../anims/dfa_algorithm_test.js';
 import { markComplete } from '../tools/completion.js';
 import { StepScenes } from '../utils.js';
+import addCode from '../templates/code.js';
 
 const baseCode = `/*
   Functions you can use:
@@ -23,12 +24,29 @@ function evaluateDFA(dfa, string) {
 }
 `;
 
+const baseCodePy = `
+from dfa import moveToState
+# moveToState(state: string) -> Moves the DFA to the given state
+
+def evaluate_dfa(dfa, string):
+    # dfa is an object, with the following properties:
+    # - 'dfa.states': a list of objects, representing the states of the DFA, each with the following properties:
+    #   - 'state.name': the name of the state
+    #   - 'state.accepting': a boolean, True if the state is accepting
+    #   - 'state.starting': a boolean, True if the state is the starting state
+    # - 'dfa.alphabet': a list of strings, representing the alphabet of the DFA
+    # - 'dfa.transitions': a list of dictionaries, each with the following keys:
+    #   - 'transition.from': the state the transition starts from
+    #   - 'transition.to': the state the transition goes to
+    #   - 'transition.label': the symbols that the transition reads, separated by commas
+    return False
+`
+
 const actualCode = localStorage.getItem('dfaAlgorithmCode') || baseCode;
+const actualCodePy = localStorage.getItem('dfaAlgorithmCodePy') || baseCodePy;
 
 const contentText = `
 <p>Add to the javascript code below to implement the algorithm for evaluating a DFA on a string.</p>
-
-<div id="editor">${actualCode}</div>
 `
 
 const addContent = () => {
@@ -36,12 +54,9 @@ const addContent = () => {
   div.innerHTML = contentText;
   document.querySelector('.articleBodyCenter').appendChild(div);
   MathJax.typeset();
-
-  window.editor = ace.edit("editor");
-  window.editor.setTheme("ace/theme/monokai");
-  window.editor.session.setMode("ace/mode/javascript");
-  window.editor.session.on('change', () => {
-    localStorage.setItem('dfaAlgorithmCode', window.editor.getValue());
+  addCode('dfaAlgorithm', {
+    'JS': baseCode,
+    'Py': baseCodePy,
   });
 
   addScene('dfa_test', document.querySelector('.articleBodyCenter'));
