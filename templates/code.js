@@ -46,8 +46,14 @@ const addCode = (id, templates) => {
 
   window.editors[id] = {};
 
+  window.langTools = ace.require("ace/ext/language_tools");
   Object.entries(templates).forEach(([lang, code]) => {
     window.editors[id][lang] = ace.edit(`${id}-code-${lang}`);
+    window.editors[id][lang].setOptions({
+      enableBasicAutocompletion: false,
+      enableSnippets: true,
+      enableLiveAutocompletion: true,
+  });
     window.editors[id][lang].setTheme("ace/theme/monokai");
     window.editors[id][lang].session.setMode(`ace/mode/${langName[lang]}`);
     window.editors[id][lang].session.on('change', () => {
