@@ -35,7 +35,6 @@ class DFADraw {
     this.fakeEdge.edgeLine.interactive = false;
     this.nodeLabelModal.textMap = (text) => text.toUpperCase();
     this.transitionLabelModal.validation = (text) => {
-      // TODO: Ensure valid transition label
       if (text === "ab")
         return "Bad transition label";
     };
@@ -158,7 +157,12 @@ class DFADraw {
   selectNode (node) {
     this.selectedNode = node;
     this.stateContext.visible = true;
-    this.stateContext.position.set(node.position.x + 50, node.position.y - 100);
+    // Set the context window.
+    let xpos = node.position.x + 50;
+    if (node.position.x + 50 + this.stateContext.width > this.screen.gameWidth) {
+      xpos = node.position.x - 50 - this.stateContext.width;
+    }
+    this.stateContext.position.set(xpos, node.position.y - 100);
     this.stateContextLabelBoxValue.text = node.label;
     this.stateContextMakeStartCheck.setChecked(node.style.isEntry);
     this.stateContextMakeFinalCheck.setChecked(node.style.doubleBorder);
