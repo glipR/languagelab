@@ -47,10 +47,15 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   importButton.position.set(10, GS.screen.gameHeight - 10 - 50);
   importButton.onClick = () => {
     navigator.clipboard.readText().then((text) => {
-      const data = JSON.parse(text);
-      if (data) {
-        GS.dfa.import(data);
-      } else alert("Invalid data. Be sure to copy the entire JSON object and only that!");
+      try {
+        const data = JSON.parse(text);
+        if (data) {
+          GS.dfa.import(data);
+        } else throw new Error();
+      }
+      catch (e) {
+        alert("Invalid data. Be sure to copy the entire JSON object and only that! Example: {\"states\":[...],\"alphabet\":[...],\"transitions\":[...]}");
+      }
     });
   };
   GS.screen.addChild(importButton);
