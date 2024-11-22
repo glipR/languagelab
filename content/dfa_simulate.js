@@ -24,7 +24,7 @@ const t3Opts = {
 const t1Tasks = [t1Opts, t2Opts, t3Opts];
 
 const contentText = `
-Execute the DFA algorithm by dragging the purple circle through the graph below, based on the word floating above.
+Execute the DFA algorithm by dragging the purple circle through the DFA, based on the word floating above it.
 `
 
 const addContent = () => {

@@ -64,7 +64,7 @@ The function <code>evaluateDFA</code> takes in a DFA object and a string, and sh
 </p>
 <ul>
   <li>Call the <code>moveToState</code> function to move the DFA to the correct state for each symbol in the string,</li>
-  <li>Returns a boolean to represent whether the word is accepted.</li>
+  <li>Return a boolean to represent whether the word is accepted.</li>
 </ul>
 <p>
 You can use the <code>console.log()/print()</code> function to help debug your code. The log will be visible in the console (F12).
