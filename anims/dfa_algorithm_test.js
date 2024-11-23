@@ -201,7 +201,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       try {
         pyodide.runPython(userCode);
       } catch (e) {
-        console.log(e);
+        newLog()(e);
       }
       window.onPyDoneLoading();
       return pyodide.globals.get('evaluate_dfa');
@@ -257,6 +257,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
           ]
         }, `${word_text}`);
       } catch (e) {
+        newLog()(e);
         delayFromTween(() => {
           GS.onFailure('Your code threw an error: ' + e.message);
           console.error(e);

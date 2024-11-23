@@ -60,7 +60,7 @@ def evaluate_dfa(dfa, string):
     moveToState('C')
     moveToState('C')
     # C is an accepting state, so we return True
-    print("Returning True)
+    print("Returning True")
     return True
 `
 

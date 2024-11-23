@@ -1,4 +1,5 @@
 export const pythonPreamble = `\
+import json
 def to_string(a):
   if "[object Object]" in str(a) and hasattr(a, "__iter__"):
       return "[" + ", ".join(to_string(o) for o in a) + "]"
