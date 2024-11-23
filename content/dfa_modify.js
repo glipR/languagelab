@@ -131,16 +131,16 @@ if (equivalentMessage) {
 const baseCodePy = `\
 # Feel free to use print to help debug your code - you can see the log on the screen or in the console (F12)
 
-# dfa is an object, with the following properties:
-# - 'dfa.states': a list of objects, representing the states of the DFA, each with the following properties:
-#   - 'state.name': the name of the state
-#   - 'state.accepting': a boolean, True if the state is accepting
-#   - 'state.starting': a boolean, True if the state is the starting state
-# - 'dfa.alphabet': a list of strings, representing the alphabet of the DFA
-# - 'dfa.transitions': a list of dictionaries, each with the following keys:
-#   - 'transition.from': the state the transition starts from
-#   - 'transition.to': the state the transition goes to
-#   - 'transition.label': the symbols that the transition reads, separated by commas
+# dfa is an dictionary, with the following keys:
+# - 'dfa["states"]': a list of dictionaries, representing the states of the DFA, each with the following keys:
+#   - 'state["name"]': the name of the state
+#   - 'state["accepting"]': a boolean, True if the state is accepting
+#   - 'state["starting"]': a boolean, True if the state is the starting state
+# - 'dfa["alphabet"]': a list of strings, representing the alphabet of the DFA
+# - 'dfa["transitions"]': a list of dictionaries, each with the following keys:
+#   - 'transition["from"]': the state the transition starts from
+#   - 'transition["to"]': the state the transition goes to
+#   - 'transition["label"]': the symbols that the transition reads, separated by commas
 
 # For your testing, you can use the following methods:
 # testInvert(dfa, result) - returns null if result is indeed the inverted form of dfa. Otherwise, a string with an error message if it is incorrect

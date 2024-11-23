@@ -221,41 +221,25 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       let raised = false;
       let response = null;
       try {
-        response = evaluateDFA({
-          states: [{
-            name: 'A',
-            accepting: false,
-            starting: true,
-          }, {
-            name: 'B',
-            accepting: false,
-            starting: false,
-          }, {
-            name: 'C',
-            accepting: true,
-            starting: false,
-          }, {
-            name: 'D',
-            accepting: true,
-            starting: false,
-          }, {
-            name: 'E',
-            accepting: false,
-            starting: false,
-          }],
-          alphabet: 'ab',
-          transitions: [
-            { from: 'A', to: 'B', label: 'a' },
-            { from: 'A', to: 'D', label: 'b' },
-            { from: 'B', to: 'C', label: 'a, b' },
-            { from: 'C', to: 'A', label: 'b' },
-            { from: 'C', to: 'C', label: 'a' },
-            { from: 'D', to: 'D', label: 'b' },
-            { from: 'D', to: 'E', label: 'a' },
-            { from: 'E', to: 'B', label: 'b' },
-            { from: 'E', to: 'C', label: 'a' },
-          ]
-        }, `${word_text}`);
+        const m = new Map();
+        const states = Array.from({ length: 5 }, (_, i) => {
+          const map = new Map();
+          map.set('name', ['A', 'B', 'C', 'D', 'E'][i]);
+          map.set('accepting', [false, false, true, true, false][i]);
+          map.set('starting', [true, false, false, false, false][i]);
+          return map;
+        });
+        m.set('states', states);
+        m.set('alphabet', 'ab');
+        const transitions = Array.from({ length: 9 }, (_, i) => {
+          const map = new Map();
+          map.set('from', ['A', 'A', 'B', 'C', 'C', 'D', 'D', 'E', 'E'][i]);
+          map.set('to', ['B', 'D', 'C', 'A', 'C', 'D', 'E', 'B', 'C'][i]);
+          map.set('label', ['a', 'b', 'a, b', 'b', 'a', 'b', 'a', 'b', 'a'][i]);
+          return map;
+        });
+        m.set('transitions', transitions);
+        response = evaluateDFA(m, `${word_text}`);
       } catch (e) {
         newLog()(e);
         delayFromTween(() => {

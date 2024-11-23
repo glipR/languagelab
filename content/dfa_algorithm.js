@@ -41,18 +41,18 @@ from dfa import moveToState
 # moveToState(state: string) -> Moves the DFA to the given state
 
 def evaluate_dfa(dfa, string):
-    # dfa is an object, with the following properties:
-    # - 'dfa.states': a list of objects, representing the states of the DFA, each with the following properties:
-    #   - 'state.name': the name of the state
-    #   - 'state.accepting': a boolean, True if the state is accepting
-    #   - 'state.starting': a boolean, True if the state is the starting state
-    # - 'dfa.alphabet': a list of strings, representing the alphabet of the DFA
-    # - 'dfa.transitions': a list of objects, each with the following properties:
-    #   - 'transition.from': the state name the transition starts from
-    #   - 'transition.to': the state name the transition goes to
-    #   - 'transition.label': the symbols that the transition reads, separated by commas
+    # dfa is an dictionary, with the following keys:
+    # - 'dfa["states"]': a list of dictionariess, representing the states of the DFA, each with the following keys:
+    #   - 'state["name"]': the name of the state
+    #   - 'state["accepting"]': a boolean, True if the state is accepting
+    #   - 'state["starting"]': a boolean, True if the state is the starting state
+    # - 'dfa["alphabet"]': a list of strings, representing the alphabet of the DFA
+    # - 'dfa["transitions"]': a list of dictionariess, each with the following keys:
+    #   - 'transition["from"]': the state name the transition starts from
+    #   - 'transition["to"]': the state name the transition goes to
+    #   - 'transition["label"]': the symbols that the transition reads, separated by commas
 
-    print(dfa.states)
+    print(dfa["states"])
     # Suppose the string was 'aba'
     print("string: " + string)
     moveToState('B')
