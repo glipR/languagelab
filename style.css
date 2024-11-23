@@ -596,6 +596,46 @@ code {
   min-height: min(90vh, 800px);
 }
 
+/* Terminal */
+
+.terminal {
+  position: fixed;
+  top: 110px;
+  right: 30px;
+  border: 1px solid white;
+  background: #00000070;
+  z-index: 50;
+  width: min(70vw, 350px);
+  color: white;
+  font-family: monospace;
+  font-size: 16px;
+  max-height: max(60vh, 400px);
+  overflow-y: auto;
+  transition: 0.4s;
+}
+
+.terminal.scrolled {
+  top: 80px;
+}
+
+.terminal-line {
+  padding: 5px 5px;
+}
+
+.terminal-clear {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  padding: 5px;
+  height: 36px;
+  width: 36px;
+  cursor: pointer;
+  background-image: url('/img/icon/delete-empty.svg');
+  background-size: cover;
+  background-color: transparent;
+  filter: invert(100%);
+  border: 0;
+}
 /* DFA Intro HTML Elements */
 
 .properties {

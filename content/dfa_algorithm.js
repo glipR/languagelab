@@ -8,7 +8,7 @@ const baseCode = `\
 /*
   Functions you can use:
   - moveToState(state): moves the DFA to the given state
-  Feel free to use console.log to help debug your code - you can see the log in the console (F12)
+  Feel free to use console.log to help debug your code - this will appear on the page and in the developer console.
 */
 
 function evaluateDFA(dfa, string) {
@@ -23,11 +23,15 @@ function evaluateDFA(dfa, string) {
   //   - to: the state name the transition goes to
   //   - label: the symbols that the transition reads, separated by commas
 
+  console.log(JSON.stringify(dfa.states))
   // Suppose the string was 'aba'
+  console.log("string: " + string)
   moveToState('B')
+  console.log("Moving to B")
   moveToState('C')
   moveToState('C')
   // C is an accepting state, so we return true
+  console.log("Returning true")
   return true;
 }
 `;
@@ -48,11 +52,15 @@ def evaluate_dfa(dfa, string):
     #   - 'transition.to': the state name the transition goes to
     #   - 'transition.label': the symbols that the transition reads, separated by commas
 
+    print(dfa.states)
     # Suppose the string was 'aba'
+    print("string: " + string)
     moveToState('B')
+    print("Moving to B")
     moveToState('C')
     moveToState('C')
     # C is an accepting state, so we return True
+    print("Returning True)
     return True
 `
 
@@ -67,7 +75,7 @@ The function <code>evaluateDFA</code> takes in a DFA object and a string, and sh
   <li>Return a boolean to represent whether the word is accepted.</li>
 </ul>
 <p>
-You can use the <code>console.log()/print()</code> function to help debug your code. The log will be visible in the console (F12).
+You can use the <code>console.log()/print()</code> function to help debug your code. The log will appear on the page and in the console (F12).
 </p>
 `
 
