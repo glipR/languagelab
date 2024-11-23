@@ -37,12 +37,14 @@
     import addContent from '/content/dfa_modify.js';
     import addNextButton from '/templates/next.js';
     import addNav from '/templates/nav.js';
+    import addTerminal from '/templates/terminal.js';
     import addFooter from '/templates/footer.js';
     import load from '/tools/loading.js';
 
     // Content
     addNav('dfaModify');
     addContent();
+    addTerminal();
     addFooter();
 
     load();

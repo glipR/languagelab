@@ -6,6 +6,7 @@ import { RectangleCover } from '../tools/paper_cover.js';
 import { FloatingButton } from '../ui.js';
 import { combineEasing, reverseEasing } from '../utils.js';
 import { newLog } from '../templates/terminal.js';
+import { pythonPreamble } from '../tools/code_execution.js';
 
 const GS = {
   currentState: 'A'
@@ -195,26 +196,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       let pyodide = await loadPyodide();
       pyodide.setStdout({batched: newLog()});
       pyodide.registerJsModule("dfa", { moveToState });
-      const finalCode = `\
-def to_string(a):
-  if "[object Object]" in str(a) and hasattr(a, "__iter__"):
-      return "[" + ", ".join(to_string(o) for o in a) + "]"
-  if hasattr(a, "object_entries"):
-      final = {}
-      for k, v in a.object_entries():
-          try:
-              final[str(k)] = json.loads(to_string(v))
-          except:
-              final[str(k)] = to_string(v)
-      return json.dumps(final)
-  return str(a)
-
-old_print = print
-def print(*args, sep=" ", end="\\n"):
-  old_print(sep.join(to_string(a) for a in args), end=end)
-${userCode}
-      `
-      pyodide.runPython(finalCode);
+      pyodide.runPython(pythonPreamble);
+      pyodide.runPython(userCode);
       window.onPyDoneLoading();
       return pyodide.globals.get('evaluate_dfa');
     }

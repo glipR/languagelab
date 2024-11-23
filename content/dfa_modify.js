@@ -4,9 +4,11 @@ import DFA from '../dfa.js';
 import { markComplete } from '../tools/completion.js';
 import { StepScenes } from '../utils.js';
 import addCode from '../templates/code.js';
+import { pythonPreamble } from '../tools/code_execution.js';
+import { newLog } from '../templates/terminal.js';
 
 const baseCode = `\
-// Feel free to use console.log to help debug your code - you can see the log in the console (F12)
+// Feel free to use console.log to help debug your code - you can see the log on the page or in the console (F12)
 
 // dfa is an object, with the following properties:
 // - states: an array of objects, representing the states of the DFA, each with the following properties:
@@ -78,7 +80,7 @@ function isEquivalent(dfa1, dfa2) {
   return false
 }
 
-console.log("inverted DFA: ", invertDFA(smallDFA));
+console.log("inverted DFA: ", JSON.stringify(invertDFA(smallDFA)));
 const inversionMessage = testInvert(smallDFA, invertDFA(smallDFA));
 if (inversionMessage) {
   console.error(inversionMessage);
@@ -86,7 +88,7 @@ if (inversionMessage) {
   console.log("Success on DFA inversion!")
 }
 
-console.log("intersected DFA: ", intersectDFA(smallDFA, DFA2));
+console.log("intersected DFA: ", JSON.stringify(intersectDFA(smallDFA, DFA2)));
 const intersectTest = testIntersect(smallDFA, DFA2, intersectDFA(smallDFA, DFA2));
 if (intersectTest) {
   console.error(intersectTest);
@@ -94,7 +96,7 @@ if (intersectTest) {
   console.log("Success on DFA intersection!")
 }
 
-console.log("unioned DFA: ", unionDFA(smallDFA, DFA2));
+console.log("unioned DFA: ", JSON.stringify(unionDFA(smallDFA, DFA2)));
 const unionTest = testUnion(smallDFA, DFA2, unionDFA(smallDFA, DFA2));
 if (unionTest) {
   console.error(unionTest);
@@ -127,7 +129,7 @@ if (equivalentMessage) {
 `;
 
 const baseCodePy = `\
-# Feel free to use print to help debug your code - you can see the log in the console (F12)
+# Feel free to use print to help debug your code - you can see the log on the screen or in the console (F12)
 
 # dfa is an object, with the following properties:
 # - 'dfa.states': a list of objects, representing the states of the DFA, each with the following properties:
@@ -150,44 +152,40 @@ const baseCodePy = `\
 import json
 from types import SimpleNamespace
 from dfa import testInvert, testIntersect, testUnion, testIsEmpty, testEquivalent
-def load_dfa(dfa):
-    if type(dfa) == str:
-        dfa = json.loads(dfa)
-    return SimpleNamespace(**dfa)
 
-smallDFA = load_dfa('{"states":[{"name":"A","position":{"x":319.746875,"y":166.79999999999995},"accepting":false,"starting":true},{"name":"B","position":{"x":708.1624999999999,"y":161.68593749999997},"accepting":false,"starting":false},{"name":"C","position":{"x":505.15156249999995,"y":411.2812499999999},"accepting":true,"starting":false}],"alphabet":["a","b","c"],"transitions":[{"from":"A","to":"A","label":"a","style":{"loopOffset":{"x":0,"y":-75}}},{"from":"A","to":"B","label":"b, c","style":{"edgeAnchor":{"x":-10.209375000000023,"y":-46.29374999999999}}},{"from":"B","to":"A","label":"a","style":{"edgeAnchor":{"x":-1.3218749999999773,"y":35.17499999999998}}},{"from":"B","to":"B","label":"b","style":{"loopOffset":{"x":0,"y":-75}}},{"from":"C","to":"A","label":"a","style":{}},{"from":"B","to":"C","label":"c","style":{"edgeAnchor":{"x":-22.59375,"y":-16.01249999999999}}},{"from":"C","to":"C","label":"b","style":{"loopOffset":{"x":-113.47031249999998,"y":-13.931249999999977}}},{"from":"C","to":"B","label":"c","style":{"edgeAnchor":{"x":34.284374999999955,"y":15.956250000000011}}}]}')
-largeDFA = load_dfa('{"states":[{"name":"A","position":{"x":286.578125,"y":57.243749999999984},"accepting":false,"starting":true},{"name":"B","position":{"x":78.884375,"y":222.18281249999995},"accepting":false,"starting":false},{"name":"C","position":{"x":869.3796874999998,"y":150.18749999999997},"accepting":false,"starting":false},{"name":"D","position":{"x":725.5015624999999,"y":56.13749999999999},"accepting":false,"starting":false},{"name":"E","position":{"x":424.54531249999997,"y":343.62187499999993},"accepting":false,"starting":false},{"name":"F","position":{"x":777.0031249999998,"y":355.26562499999994},"accepting":false,"starting":false},{"name":"G","position":{"x":189.18124999999998,"y":411.0703124999999},"accepting":true,"starting":false},{"name":"H","position":{"x":624.9124999999999,"y":452.9531249999999},"accepting":true,"starting":false}],"alphabet":["a","b","c"],"transitions":[{"from":"A","to":"B","label":"a","style":{}},{"from":"B","to":"B","label":"a","style":{"loopOffset":{"x":0,"y":-75}}},{"from":"B","to":"F","label":"b","style":{}},{"from":"B","to":"E","label":"c","style":{}},{"from":"D","to":"E","label":"b","style":{}},{"from":"D","to":"H","label":"c","style":{}},{"from":"E","to":"C","label":"a","style":{}},{"from":"E","to":"F","label":"b","style":{}},{"from":"E","to":"G","label":"c","style":{}},{"from":"F","to":"D","label":"b","style":{}},{"from":"F","to":"H","label":"c","style":{}},{"from":"G","to":"B","label":"a","style":{}},{"from":"G","to":"G","label":"b","style":{"loopOffset":{"x":0,"y":-75}}},{"from":"G","to":"D","label":"c","style":{}},{"from":"H","to":"A","label":"a","style":{}},{"from":"H","to":"G","label":"b","style":{}},{"from":"H","to":"E","label":"c","style":{}},{"from":"A","to":"D","label":"b, c","style":{"edgeAnchor":{"x":-0.009374999999977263,"y":-19.415625}}},{"from":"C","to":"F","label":"b, c","style":{"edgeAnchor":{"x":-7.078125,"y":8.057812500000011}}},{"from":"F","to":"C","label":"a","style":{"edgeAnchor":{"x":33.76875000000007,"y":90.74531249999998}}},{"from":"D","to":"A","label":"a","style":{"edgeAnchor":{"x":2.0437499999999886,"y":35.32499999999999}}},{"from":"C","to":"A","label":"a","style":{"edgeAnchor":{"x":-19.5234375,"y":53.79843749999998}}}]}')
-DFA2 = load_dfa('{"states":[{"name":"A","position":{"x":300.8328125,"y":203.64843749999994},"accepting":false,"starting":true},{"name":"B","position":{"x":653.2999999999998,"y":213.18281249999995},"accepting":true,"starting":false}],"alphabet":["a","b","c"],"transitions":[{"from":"A","to":"B","label":"a, b","style":{"edgeAnchor":{"x":0,"y":-59.64374999999998}}},{"from":"B","to":"A","label":"a, b","style":{"edgeAnchor":{"x":0.5578124999999545,"y":26.13749999999999}}},{"from":"A","to":"A","label":"c","style":{"loopOffset":{"x":0,"y":-75}}},{"from":"B","to":"B","label":"c","style":{"loopOffset":{"x":0,"y":-75}}}]}')
+smallDFA = json.loads('{"states":[{"name":"A","position":{"x":319.746875,"y":166.79999999999995},"accepting":false,"starting":true},{"name":"B","position":{"x":708.1624999999999,"y":161.68593749999997},"accepting":false,"starting":false},{"name":"C","position":{"x":505.15156249999995,"y":411.2812499999999},"accepting":true,"starting":false}],"alphabet":["a","b","c"],"transitions":[{"from":"A","to":"A","label":"a","style":{"loopOffset":{"x":0,"y":-75}}},{"from":"A","to":"B","label":"b, c","style":{"edgeAnchor":{"x":-10.209375000000023,"y":-46.29374999999999}}},{"from":"B","to":"A","label":"a","style":{"edgeAnchor":{"x":-1.3218749999999773,"y":35.17499999999998}}},{"from":"B","to":"B","label":"b","style":{"loopOffset":{"x":0,"y":-75}}},{"from":"C","to":"A","label":"a","style":{}},{"from":"B","to":"C","label":"c","style":{"edgeAnchor":{"x":-22.59375,"y":-16.01249999999999}}},{"from":"C","to":"C","label":"b","style":{"loopOffset":{"x":-113.47031249999998,"y":-13.931249999999977}}},{"from":"C","to":"B","label":"c","style":{"edgeAnchor":{"x":34.284374999999955,"y":15.956250000000011}}}]}')
+largeDFA = json.loads('{"states":[{"name":"A","position":{"x":286.578125,"y":57.243749999999984},"accepting":false,"starting":true},{"name":"B","position":{"x":78.884375,"y":222.18281249999995},"accepting":false,"starting":false},{"name":"C","position":{"x":869.3796874999998,"y":150.18749999999997},"accepting":false,"starting":false},{"name":"D","position":{"x":725.5015624999999,"y":56.13749999999999},"accepting":false,"starting":false},{"name":"E","position":{"x":424.54531249999997,"y":343.62187499999993},"accepting":false,"starting":false},{"name":"F","position":{"x":777.0031249999998,"y":355.26562499999994},"accepting":false,"starting":false},{"name":"G","position":{"x":189.18124999999998,"y":411.0703124999999},"accepting":true,"starting":false},{"name":"H","position":{"x":624.9124999999999,"y":452.9531249999999},"accepting":true,"starting":false}],"alphabet":["a","b","c"],"transitions":[{"from":"A","to":"B","label":"a","style":{}},{"from":"B","to":"B","label":"a","style":{"loopOffset":{"x":0,"y":-75}}},{"from":"B","to":"F","label":"b","style":{}},{"from":"B","to":"E","label":"c","style":{}},{"from":"D","to":"E","label":"b","style":{}},{"from":"D","to":"H","label":"c","style":{}},{"from":"E","to":"C","label":"a","style":{}},{"from":"E","to":"F","label":"b","style":{}},{"from":"E","to":"G","label":"c","style":{}},{"from":"F","to":"D","label":"b","style":{}},{"from":"F","to":"H","label":"c","style":{}},{"from":"G","to":"B","label":"a","style":{}},{"from":"G","to":"G","label":"b","style":{"loopOffset":{"x":0,"y":-75}}},{"from":"G","to":"D","label":"c","style":{}},{"from":"H","to":"A","label":"a","style":{}},{"from":"H","to":"G","label":"b","style":{}},{"from":"H","to":"E","label":"c","style":{}},{"from":"A","to":"D","label":"b, c","style":{"edgeAnchor":{"x":-0.009374999999977263,"y":-19.415625}}},{"from":"C","to":"F","label":"b, c","style":{"edgeAnchor":{"x":-7.078125,"y":8.057812500000011}}},{"from":"F","to":"C","label":"a","style":{"edgeAnchor":{"x":33.76875000000007,"y":90.74531249999998}}},{"from":"D","to":"A","label":"a","style":{"edgeAnchor":{"x":2.0437499999999886,"y":35.32499999999999}}},{"from":"C","to":"A","label":"a","style":{"edgeAnchor":{"x":-19.5234375,"y":53.79843749999998}}}]}')
+DFA2 = json.loads('{"states":[{"name":"A","position":{"x":300.8328125,"y":203.64843749999994},"accepting":false,"starting":true},{"name":"B","position":{"x":653.2999999999998,"y":213.18281249999995},"accepting":true,"starting":false}],"alphabet":["a","b","c"],"transitions":[{"from":"A","to":"B","label":"a, b","style":{"edgeAnchor":{"x":0,"y":-59.64374999999998}}},{"from":"B","to":"A","label":"a, b","style":{"edgeAnchor":{"x":0.5578124999999545,"y":26.13749999999999}}},{"from":"A","to":"A","label":"c","style":{"loopOffset":{"x":0,"y":-75}}},{"from":"B","to":"B","label":"c","style":{"loopOffset":{"x":0,"y":-75}}}]}')
 
 def invertDFA(dfa):
     # Given a DFA, return a new DFA that accepts all words that were rejected by the original DFA,
     # and rejects all words previously accepted.
     # You should return an object with the same format.
-    return load_dfa({
-        "states": dfa.states,
-        "alphabet": dfa.alphabet,
-        "transitions": dfa.transitions,
-    })
+    return {
+        "states": dfa["states"],
+        "alphabet": dfa["alphabet"],
+        "transitions": dfa["transitions"],
+    }
 
 def intersectDFA(dfa1, dfa2):
     # Given two DFAs, return a new DFA that accepts a word if it is accepted by both dfa1 *and* dfa2.
     # You should return an object with the same format.
 
-    return load_dfa({
-        "states": dfa1.states,
-        "alphabet": dfa1.alphabet,
-        "transitions": dfa1.transitions,
-    })
+    return {
+        "states": dfa1["states"],
+        "alphabet": dfa1["alphabet"],
+        "transitions": dfa1["transitions"],
+    }
 
 def unionDFA(dfa1, dfa2):
     # Given two DFAs, return a new DFA that accepts a word if it is accepted by either dfa1 *or* dfa2.
     # You should return an object with the same format.
 
-    return load_dfa({
-        "states": dfa1.states,
-        "alphabet": dfa1.alphabet,
-        "transitions": dfa1.transitions,
-    })
+    return {
+        "states": dfa1["states"],
+        "alphabet": dfa1["alphabet"],
+        "transitions": dfa1["transitions"],
+    }
 
 def isEmptyDFA(dfa):
     # Given a DFA, determines whether this DFA accepts any words.
@@ -254,7 +252,7 @@ You can then paste this into your code to test your functions.</p>
 <p>That being said, 3 DFAs have been provided. smallDFA and largeDFA are equivalent, but not equivalent to DFA2</p>
 
 <p>
-You can also console.log a DFA, copy the object, then press the "Import" button to view a DFA in the playground.
+You can also <code>console.log()/print()</code> a DFA, copy the object, then press the "Import" button to view a DFA in the playground.
 </p>
 
 <a id="runButton" class="button runButton">Run Code</a>
@@ -300,7 +298,7 @@ const addContent = () => {
       } else {
         const comb = original.invert().combine(inverted, ((me, other) => !!me !== !!other));
         const word = comb.findAcceptingString();
-        const originalAccepts = original.simulateWord(word) === "Accepted";
+        const originalAccepts = original.simulateWord(word) === "Accept";
         return "Inverted DFA is incorrect. Both dfa and result " + (originalAccepts ? "accept" : "reject") + " the word '" + word + "'";
       }
     }
@@ -319,9 +317,9 @@ const addContent = () => {
       } else {
         const comb = combined.combine(resultObj, ((me, other) => !!me !== !!other));
         const word = comb.findAcceptingString();
-        const dfa1Accepts = dfa1Obj.simulateWord(word) === "Accepted";
-        const dfa2Accepts = dfa2Obj.simulateWord(word) === "Accepted";
-        const resultAccepts = resultObj.simulateWord(word) === "Accepted";
+        const dfa1Accepts = dfa1Obj.simulateWord(word) === "Accept";
+        const dfa2Accepts = dfa2Obj.simulateWord(word) === "Accept";
+        const resultAccepts = resultObj.simulateWord(word) === "Accept";
         return "Result DFA is not equivalent to intersection of originals. The result dfa " + (resultAccepts ? "accepts" : "rejects") + " the word '" + word + "', while the original DFAs " + (dfa1Accepts ? "accept" : "reject") + " and " + (dfa2Accepts ? "accept" : "reject") + " it";
       }
     }
@@ -340,9 +338,9 @@ const addContent = () => {
       } else {
         const comb = combined.combine(resultObj, ((me, other) => !!me !== !!other));
         const word = comb.findAcceptingString();
-        const dfa1Accepts = dfa1Obj.simulateWord(word) === "Accepted";
-        const dfa2Accepts = dfa2Obj.simulateWord(word) === "Accepted";
-        const resultAccepts = resultObj.simulateWord(word) === "Accepted";
+        const dfa1Accepts = dfa1Obj.simulateWord(word) === "Accept";
+        const dfa2Accepts = dfa2Obj.simulateWord(word) === "Accept";
+        const resultAccepts = resultObj.simulateWord(word) === "Accept";
         return "Result DFA is not equivalent to union of originals. The result dfa " + (resultAccepts ? "accepts" : "rejects") + " the word '" + word + "', while the original DFAs " + (dfa1Accepts ? "accept" : "reject") + " and " + (dfa2Accepts ? "accept" : "reject") + " it";
       }
     }
@@ -370,8 +368,8 @@ const addContent = () => {
       } else if (!eq) {
         const comb = dfa1Obj.combine(dfa2Obj, ((me, other) => !!me !== !!other));
         const word = comb.findAcceptingString();
-        const dfa1Accepts = dfa1Obj.simulateWord(word) === "Accepted";
-        const dfa2Accepts = dfa2Obj.simulateWord(word) === "Accepted";
+        const dfa1Accepts = dfa1Obj.simulateWord(word) === "Accept";
+        const dfa2Accepts = dfa2Obj.simulateWord(word) === "Accept";
         return "Result is incorrect. The DFAs are not equivalent, as dfa1 " + (dfa1Accepts ? "accepts" : "rejects") + " the word '" + word + "', while dfa2 " + (dfa2Accepts ? "accepts" : "rejects") + " it";
       } else {
         return "Result is incorrect. The DFAs are equivalent, but result is false";
@@ -381,7 +379,9 @@ const addContent = () => {
     async function testPy (code) {
       window.onPyBeginLoading();
       let pyodide = await loadPyodide();
+      pyodide.setStdout({batched: newLog()});
       pyodide.registerJsModule("dfa", { testInvert, testIntersect, testUnion, testIsEmpty, testEquivalent });
+      pyodide.runPython(pythonPreamble);
       pyodide.runPython(code);
       window.onPyDoneLoading();
       return null;
@@ -389,6 +389,7 @@ const addContent = () => {
     }
 
     async function testJS (code) {
+      var console = console || {}; console.log = newLog();
       const evaluateDFA = eval(`\
       (function() {
         ${code}

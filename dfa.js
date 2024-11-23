@@ -63,12 +63,19 @@ class DFA extends Graph {
   }
 
   import(data) {
-    const get = (obj, key) => obj[key] ?? obj.get(key);
+    const get = (obj, key) => {
+      try {
+        return obj.get(key);
+      } catch (e) {
+        return obj[key];
+      }
+    }
     const json = {
       nodes: {},
       edges: [],
     }
-    data.states.forEach((state) => {
+    console.log(data)
+    get(data, "states").forEach((state) => {
       json.nodes[get(state, 'name')] = {
         x: get(state, 'position')?.x ?? 0,
         y: get(state, 'position')?.y ?? 0,
@@ -76,7 +83,7 @@ class DFA extends Graph {
         accepting: get(state, 'accepting'),
       }
     });
-    data.transitions.forEach((transition) => {
+    get(data, "transitions").forEach((transition) => {
       const e = {
         from: get(transition, 'from'),
         to: get(transition, 'to'),

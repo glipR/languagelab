@@ -48,7 +48,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   importButton.onClick = () => {
     navigator.clipboard.readText().then((text) => {
       try {
-        const data = JSON.parse(text);
+        // JS JSON parser doesn't like single quotes
+        const data = JSON.parse(text.replaceAll("'", "\"").replaceAll('\n', ''));
         if (data) {
           GS.dfa.import(data);
         } else throw new Error();
