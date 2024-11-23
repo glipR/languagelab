@@ -380,9 +380,14 @@ const addContent = () => {
       window.onPyBeginLoading();
       let pyodide = await loadPyodide();
       pyodide.setStdout({batched: newLog()});
+      pyodide.setStderr({batched: newLog()});
       pyodide.registerJsModule("dfa", { testInvert, testIntersect, testUnion, testIsEmpty, testEquivalent });
       pyodide.runPython(pythonPreamble);
-      pyodide.runPython(code);
+      try {
+        pyodide.runPython(code);
+      } catch (e) {
+        newLog()(e);
+      }
       window.onPyDoneLoading();
       return null;
       // return pyodide.globals.get('evaluate_dfa');

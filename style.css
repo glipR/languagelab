@@ -628,6 +628,7 @@ code {
 
 .terminal-line {
   padding: 5px 5px;
+  text-wrap: nowrap;
 }
 
 .terminal-clear {

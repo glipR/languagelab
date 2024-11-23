@@ -17,7 +17,7 @@ export function newLog() {
     const terminal = document.getElementById("terminal");
     const log = document.createElement("div");
     log.classList.add("terminal-line");
-    log.textContent = args.join(" ");
+    log.innerHTML = args.join(" ").replaceAll("\n", "<br>");
     terminal.appendChild(log);
     terminal.style.display = "block";
   }

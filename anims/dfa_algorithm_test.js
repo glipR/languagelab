@@ -195,9 +195,14 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       window.onPyBeginLoading();
       let pyodide = await loadPyodide();
       pyodide.setStdout({batched: newLog()});
+      pyodide.setStderr({batched: newLog()});
       pyodide.registerJsModule("dfa", { moveToState });
       pyodide.runPython(pythonPreamble);
-      pyodide.runPython(userCode);
+      try {
+        pyodide.runPython(userCode);
+      } catch (e) {
+        console.log(e);
+      }
       window.onPyDoneLoading();
       return pyodide.globals.get('evaluate_dfa');
     }

@@ -13,5 +13,6 @@ def to_string(a):
   return str(a).replace("True", "true").replace("False", "false")
 
 old_print = print
-def print(*args, sep=" ", end="\\n"):
-  old_print(sep.join(to_string(a) for a in args), end=end)`;
+import sys
+def print(*args, sep=" ", end="\\n", file=sys.stdout, flush=False):
+  old_print(sep.join(to_string(a) for a in args), end=end, file=file, flush=flush)`;
