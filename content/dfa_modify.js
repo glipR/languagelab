@@ -47,6 +47,7 @@ function invertDFA(dfa) {
 function intersectDFA(dfa1, dfa2) {
   // Given two DFAs, return a new DFA that accepts a word if it is accepted by both dfa1 *and* dfa2.
   // You should return an object with the same format.
+  // **You may assume that the alphabet of dfa1 and dfa2 are the same.**
 
   return {
     states: dfa1.states,
@@ -58,6 +59,7 @@ function intersectDFA(dfa1, dfa2) {
 function unionDFA(dfa1, dfa2) {
   // Given two DFAs, return a new DFA that accepts a word if it is accepted by either dfa1 *or* dfa2.
   // You should return an object with the same format.
+  // **You may assume that the alphabet of dfa1 and dfa2 are the same.**
 
   return {
     states: dfa1.states,
@@ -76,6 +78,7 @@ function isEmptyDFA(dfa) {
 function isEquivalent(dfa1, dfa2) {
   // Given two DFAs, determines whether they accept exactly the same language.
   // If the DFAs accept the same language, return true. Otherwise, return false.
+  // **You may assume that the alphabet of dfa1 and dfa2 are the same.**
 
   return false
 }
@@ -171,6 +174,7 @@ def invertDFA(dfa):
 def intersectDFA(dfa1, dfa2):
     # Given two DFAs, return a new DFA that accepts a word if it is accepted by both dfa1 *and* dfa2.
     # You should return an object with the same format.
+    # **You may assume that the alphabet of dfa1 and dfa2 are the same.**
 
     return {
         "states": dfa1["states"],
@@ -181,6 +185,7 @@ def intersectDFA(dfa1, dfa2):
 def unionDFA(dfa1, dfa2):
     # Given two DFAs, return a new DFA that accepts a word if it is accepted by either dfa1 *or* dfa2.
     # You should return an object with the same format.
+    # **You may assume that the alphabet of dfa1 and dfa2 are the same.**
 
     return {
         "states": dfa1["states"],
@@ -196,6 +201,7 @@ def isEmptyDFA(dfa):
 def isEquivalent(dfa1, dfa2):
     # Given two DFAs, determines whether they accept exactly the same language.
     # If the DFAs accept the same language, return true. Otherwise, return false.
+    # **You may assume that the alphabet of dfa1 and dfa2 are the same.**
     return True
 
 print("inverted DFA:", invertDFA(smallDFA))
