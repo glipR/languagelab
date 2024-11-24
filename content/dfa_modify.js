@@ -120,7 +120,7 @@ if (equivalentMessage) {
   console.log("Success on DFA equivalence!")
 }
   console.log("is equivalent: ", isEquivalent(smallDFA, DFA2));
-equivalentMessage = testEquivalent(smallDFA, largeDFA, isEquivalent(smallDFA, DFA2));
+equivalentMessage = testEquivalent(smallDFA, DFA2, isEquivalent(smallDFA, DFA2));
 if (equivalentMessage) {
   console.error(equivalentMessage);
 } else {
@@ -150,6 +150,7 @@ const baseCodePy = `\
 # testEquivalent(dfa1, dfa2, result) - returns null if result is indeed the correct answer to whether the DFAs are equivalent. Otherwise, a string with an error message if it is incorrect
 
 import json
+import sys
 from types import SimpleNamespace
 from dfa import testInvert, testIntersect, testUnion, testIsEmpty, testEquivalent
 
@@ -200,28 +201,28 @@ def isEquivalent(dfa1, dfa2):
 print("inverted DFA:", invertDFA(smallDFA))
 inversionMessage = testInvert(smallDFA, invertDFA(smallDFA))
 if inversionMessage:
-    print("ERROR", inversionMessage)
+    print("ERROR", inversionMessage, file=sys.stderr)
 else:
     print("Success on DFA inversion!")
 
 print("intersected DFA:", intersectDFA(smallDFA, DFA2))
 intersectTest = testIntersect(smallDFA, DFA2, intersectDFA(smallDFA, DFA2))
 if intersectTest:
-    print("ERROR", intersectTest)
+    print("ERROR", intersectTest, file=sys.stderr)
 else:
     print("Success on DFA intersection!")
 
 print("unioned DFA:", unionDFA(smallDFA, DFA2))
 unionTest = testUnion(smallDFA, DFA2, unionDFA(smallDFA, DFA2))
 if unionTest:
-    print("ERROR", unionTest)
+    print("ERROR", unionTest, file=sys.stderr)
 else:
     print("Success on DFA union!")
 
 print("is empty:", isEmptyDFA(smallDFA))
 emptyMessage = testIsEmpty(smallDFA, isEmptyDFA(smallDFA))
 if emptyMessage:
-    print("ERROR", emptyMessage)
+    print("ERROR", emptyMessage, file=sys.stderr)
 else:
     print("Success on DFA emptiness!")
 
@@ -229,14 +230,14 @@ else:
 print("is equivalent:", isEquivalent(smallDFA, largeDFA))
 equivalentMessage = testEquivalent(smallDFA, largeDFA, isEquivalent(smallDFA, largeDFA))
 if equivalentMessage:
-    print("ERROR", equivalentMessage)
+    print("ERROR", equivalentMessage, file=sys.stderr)
 else:
     print("Success on DFA equivalence!")
 
 print("is equivalent:", isEquivalent(smallDFA, DFA2))
 equivalentMessage = testEquivalent(smallDFA, DFA2, isEquivalent(smallDFA, DFA2));
 if equivalentMessage:
-    print("ERROR", equivalentMessage)
+    print("ERROR", equivalentMessage, file=sys.stderr)
 else:
     print("Success on DFA equivalence!")
 `
@@ -380,26 +381,35 @@ const addContent = () => {
       window.onPyBeginLoading();
       let pyodide = await loadPyodide();
       pyodide.setStdout({batched: newLog()});
-      pyodide.setStderr({batched: newLog()});
+      pyodide.setStderr({batched: newLog('error')});
       pyodide.registerJsModule("dfa", { testInvert, testIntersect, testUnion, testIsEmpty, testEquivalent });
       pyodide.runPython(pythonPreamble);
       try {
         pyodide.runPython(code);
       } catch (e) {
-        newLog()(e);
+        newLog('error')(e);
       }
       window.onPyDoneLoading();
       return null;
       // return pyodide.globals.get('evaluate_dfa');
     }
 
+    const savedConsole = console;
+
     async function testJS (code) {
-      var console = console || {}; console.log = newLog();
-      const evaluateDFA = eval(`\
-      (function() {
-        ${code}
-        return {};
-      }())`);
+      var console = {...savedConsole};
+      console.log = newLog();
+      console.error = newLog('error')
+      let evaluateDFA;
+      try {
+        evaluateDFA = eval(`\
+        (function() {
+          ${code}
+          return {};
+        }())`);
+      } catch (e) {
+        newLog('error')(e);
+      }
       return Promise.resolve(evaluateDFA);
     }
 

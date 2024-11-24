@@ -71,7 +71,7 @@ Add to the javascript or python code below to implement the algorithm for evalua
 The function <code>evaluateDFA</code> takes in a DFA object and a string, and should:
 </p>
 <ul>
-  <li>Call the <code>moveToState</code> function to move the DFA to the correct state for each symbol in the string,</li>
+  <li>Call the <code>moveToState</code> function to move the DFA to the correct state for each character in the string,</li>
   <li>Return a boolean to represent whether the word is accepted.</li>
 </ul>
 <p>

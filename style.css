@@ -631,6 +631,10 @@ code {
   text-wrap: nowrap;
 }
 
+.terminal-line.error {
+  color: red;
+}
+
 .terminal-clear {
   position: absolute;
   top: 0px;

@@ -6,7 +6,7 @@ import { RectangleCover } from '../tools/paper_cover.js';
 import { FloatingButton } from '../ui.js';
 import { combineEasing, reverseEasing } from '../utils.js';
 import { newLog } from '../templates/terminal.js';
-import { pythonPreamble } from '../tools/code_execution.js';
+import { objectToMap, pythonPreamble } from '../tools/code_execution.js';
 
 const GS = {
   currentState: 'A'
@@ -195,25 +195,37 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       window.onPyBeginLoading();
       let pyodide = await loadPyodide();
       pyodide.setStdout({batched: newLog()});
-      pyodide.setStderr({batched: newLog()});
+      pyodide.setStderr({batched: newLog('error')});
       pyodide.registerJsModule("dfa", { moveToState });
       pyodide.runPython(pythonPreamble);
       try {
         pyodide.runPython(userCode);
       } catch (e) {
-        newLog()(e);
+        newLog('error')(e);
       }
       window.onPyDoneLoading();
       return pyodide.globals.get('evaluate_dfa');
     }
 
+    const savedConsole = console;
     async function testJS () {
-      var console = console || {}; console.log = newLog();
-      const evaluateDFA = eval(`\
-      (function() {
-        ${userCode}
-        return evaluateDFA;
-      }())`);
+      var console = {...savedConsole};
+      console.log = newLog();
+      console.error = newLog('error')
+      let evaluateDFA;
+      try {
+        evaluateDFA = eval(`\
+        (function() {
+          ${userCode}
+          return evaluateDFA;
+        }())`);
+      } catch (e) {
+        newLog('error')(e);
+        delayFromTween(() => {
+          GS.onFailure('Your code threw an error: ' + e.message);
+          console.error(e);
+        });
+      }
       return Promise.resolve(evaluateDFA);
     }
 
@@ -221,25 +233,28 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       let raised = false;
       let response = null;
       try {
-        const m = new Map();
-        const states = Array.from({ length: 5 }, (_, i) => {
-          const map = new Map();
-          map.set('name', ['A', 'B', 'C', 'D', 'E'][i]);
-          map.set('accepting', [false, false, true, true, false][i]);
-          map.set('starting', [true, false, false, false, false][i]);
-          return map;
-        });
-        m.set('states', states);
-        m.set('alphabet', 'ab');
-        const transitions = Array.from({ length: 9 }, (_, i) => {
-          const map = new Map();
-          map.set('from', ['A', 'A', 'B', 'C', 'C', 'D', 'D', 'E', 'E'][i]);
-          map.set('to', ['B', 'D', 'C', 'A', 'C', 'D', 'E', 'B', 'C'][i]);
-          map.set('label', ['a', 'b', 'a, b', 'b', 'a', 'b', 'a', 'b', 'a'][i]);
-          return map;
-        });
-        m.set('transitions', transitions);
-        response = evaluateDFA(m, `${word_text}`);
+        const sampleDFA = {
+          states: [
+            { name: 'A', accepting: false, starting: true },
+            { name: 'B', accepting: false, starting: false },
+            { name: 'C', accepting: true, starting: false },
+            { name: 'D', accepting: true, starting: false },
+            { name: 'E', accepting: false, starting: false },
+          ],
+          alphabet: ['a', 'b'],
+          transitions: [
+            { from: 'A', to: 'B', label: 'a' },
+            { from: 'A', to: 'D', label: 'b' },
+            { from: 'B', to: 'C', label: 'a, b' },
+            { from: 'C', to: 'A', label: 'b' },
+            { from: 'C', to: 'C', label: 'a' },
+            { from: 'D', to: 'D', label: 'b' },
+            { from: 'D', to: 'E', label: 'a' },
+            { from: 'E', to: 'B', label: 'b' },
+            { from: 'E', to: 'C', label: 'a' },
+          ],
+        }
+        response = evaluateDFA(window.currentTab['dfaAlgorithm'] === 'JS' ? sampleDFA : objectToMap(sampleDFA), `${word_text}`);
       } catch (e) {
         newLog()(e);
         delayFromTween(() => {

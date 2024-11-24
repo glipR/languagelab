@@ -10,13 +10,16 @@ export function addTerminal() {
   document.querySelector('.articleBodyCenter').appendChild(terminal);
 }
 
-export function newLog() {
+export function newLog(method='log') {
   const oldLog = console.log;
+  const oldError = console.error;
   return function message(...args) {
-    oldLog(...args);
+    if (method === 'error') oldError(...args);
+    if (method === 'log') oldLog(...args);
     const terminal = document.getElementById("terminal");
     const log = document.createElement("div");
     log.classList.add("terminal-line");
+    log.classList.add(method);
     log.innerHTML = args.join(" ").replaceAll("\n", "<br>");
     terminal.appendChild(log);
     terminal.style.display = "block";
