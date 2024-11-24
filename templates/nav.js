@@ -60,6 +60,7 @@ const renderItem = (key) => {
 
 const navContent = (key) => `
 <div class="navHeader">
+  <div class="floatingThread"></div>
   <div class="navContainer">
     <div class="projLogo">
       <img src="/icon.png" alt="Language Lab Logo" />

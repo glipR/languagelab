@@ -127,14 +127,21 @@ footer {
   background: url('/img/backgrounds/paperboard.jpg');
   background-size: 20%;
   color: white;
-  padding: 10px 0px;
+  padding: 5px 0px 15px;
   position: fixed;
   width: 100%;
   min-height: 80px;
   max-height: 80px;
   z-index: 100;
-  border-bottom: #4a4a4a90 solid 5px;
+  /*border-bottom: #4a4a4a90 solid 5px;*/
   transition: 0.4s;
+}
+
+.floatingThread {
+  position: absolute;
+  width: 100%;
+  bottom: 3px;
+  border-bottom: 1px dashed #eeeeee;
 }
 
 .navHeader.scrolled {
@@ -161,10 +168,12 @@ footer {
 
 .projTitle {
   transition: 0.4s;
+  margin-block-start: 0.5em;
+  margin-block-end: 0.5em;
 }
 
 .scrolled .projTitle {
-  font-size: 24px;
+  font-size: 28px;
 }
 
 .pageDropdown {
