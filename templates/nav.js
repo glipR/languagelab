@@ -4,7 +4,7 @@ import { trueOnce } from '../utils.js';
 export const contentMapping = {
   dfaIntro: {
     title: "What is a DFA?",
-    type: "notes",
+    type: "worded",
     href: "/pages/dfa_intro",
   },
   dfaExecute: {
@@ -16,6 +16,11 @@ export const contentMapping = {
     title: "Analysing DFAs",
     type: "game",
     href: "/pages/dfa_categorise",
+  },
+  dfaTheory: {
+    title: "Understanding DFAs",
+    type: "questions",
+    href: "/pages/dfa_theory",
   },
   dfaCreate: {
     title: "Making DFAs",
@@ -41,12 +46,14 @@ export const contentMapping = {
 
 const iconMap = (type) => {
   switch (type) {
-    case "notes":
-      return "iconNotes";
+    case "questions":
+      return "iconQuestions";
     case "game":
       return "iconTask";
     case "code":
       return "iconCode";
+    case "worded":
+      return "iconWorded";
     default:
       return "iconWIP";
   }
@@ -82,6 +89,7 @@ const navContent = (key) => `
           ${renderItem('dfaIntro')}
           ${renderItem('dfaExecute')}
           ${renderItem('dfaCategorise')}
+          ${renderItem('dfaTheory')}
           ${renderItem('dfaCreate')}
           ${renderItem('dfaMatch')}
           ${renderItem('dfaAlgorithm')}
@@ -104,9 +112,10 @@ const navContent = (key) => `
 `
 
 const firstTimeModalContents = {
-  notes: `<h2>Welcome!</h2> <p>Depending on your prefferred learning style, you can either play the video or read the descriptions below. (Or do both, whichever gets the best results!)</p>`,
+  worded: `<h2>Welcome!</h2> <p>Depending on your prefferred learning style, you can either play the video or read the descriptions below. (Or do both, whichever gets the best results!)</p>`,
   game: `<h2>Welcome!</h2> <p>Game sheets are a great way to learn by doing. Read the instructions and hit play when you're ready. You'll have to complete multiple challenges to continue.</p>`,
-  code: `<h2>Welcome!</h2> <p>Code sheets are there to strengthen your understanding of the concepts and isn't strongly tested - when you feel you've got everything you want from this sheet (or don't know javascript!) feel free to move onward.</p>`,
+  code: `<h2>Welcome!</h2> <p>Code sheets are there to strengthen your understanding of the concepts and isn't strongly tested - when you feel you've got everything you want from this sheet (or don't know javascript/python!) feel free to move onward.</p>`,
+  questions: `<h2>Welcome!</h2> <p>Question sheets are a great way to test your understanding of the concepts. There's no testing here - once you're happy with you answer/understanding, feel free to move on!</p>`,
 }
 
 const makeModal = (content) => {
@@ -132,8 +141,10 @@ const makeModal = (content) => {
 const updateNavHeightWithScroll = () => {
   if (document.body.scrollTop > 30 || document.documentElement.scrollTop > 30) {
     document.querySelector('.navHeader').classList.add('scrolled');
+    document.querySelector('.terminal')?.classList?.add?.('scrolled');
   } else {
     document.querySelector('.navHeader').classList.remove('scrolled');
+    document.querySelector('.terminal')?.classList?.remove?.('scrolled');
   }
 }
 

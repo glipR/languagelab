@@ -522,6 +522,11 @@ li.locked::before {
   display: block;
 }
 
+.modalContent img.stopHeight {
+  max-height: 40vh;
+  width: auto;
+}
+
 .modal .modalActions {
   position: absolute;
   bottom: 10px;
@@ -714,8 +719,8 @@ code {
 }
 
 .question textarea {
-  min-width: 100%;
-  max-width: 100%;
+  min-width: calc(100% - 22px);
+  max-width: calc(100% - 22px);
   border-radius: 10px;
   border: 1px solid #4a4a4a50;
   padding: 10px;
