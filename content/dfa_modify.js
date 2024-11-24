@@ -256,7 +256,7 @@ You can then paste this into your code to test your functions.</p>
 You can also <code>console.log()/print()</code> a DFA, copy the object, then press the "Import" button to view a DFA in the playground.
 </p>
 
-<a id="runButton" class="button runButton">Run Code</a>
+<a id="runButton" class="button runButton"><div class="threading"></div>Run Code</a>
 `
 
 const addContent = () => {

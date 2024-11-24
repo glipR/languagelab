@@ -274,6 +274,7 @@ a.pageDropdownItem {
   text-align: center;
 
   padding: 5px 10px;
+  position: relative;
 
   background: url('/img/backgrounds/paperboard.jpg');
   background-size: 1000%;
@@ -282,6 +283,16 @@ a.pageDropdownItem {
   text-decoration: none;
   color: white;
   cursor: pointer;
+}
+
+.threading {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  border-radius: 8px;
+  border: 1px dashed #eeeeee;
 }
 
 .nextButton {
