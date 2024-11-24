@@ -63,7 +63,7 @@ const addContent = () => {
   const t2Steps = new StepScenes(categoryContainer, "dfa_validate", t2Tasks, () => {
     markComplete('dfaCategorise');
     // Redirect to next page
-    window.location.href = "/pages/dfa_create";
+    window.location.href = "/pages/dfa_theory";
   }, true, null, { storageKey: 'dfaValidateProgress' });
   registerScene(dfaCategorise.loader, dfaCategorise.unloader, 'dfa_validate', t2Tasks[t2Steps.progress.current], t2Steps.makeOnSuccess(), t2Steps.makeOnFailure());
 }
