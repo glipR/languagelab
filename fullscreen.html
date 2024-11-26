@@ -35,7 +35,7 @@
     import { Scene, SceneManager } from './scene.js';
     import { bg_dark, black } from './colours.js';
     import { registerScene } from './templates/scene.js';
-    import dfaIntro from './anims/dfa_intro.js'
+    import dfaTheoryAnswers from './anims/dfa_theory_answers.js'
     import load from '/tools/loading.js';
 
     // Tween setup - not needed for other scenes.
@@ -53,8 +53,8 @@
       console.log("Speed: ", TweenManager.curSpeed);
     });
 
-    registerScene(dfaIntro.loader, dfaIntro.unloader, 'video', undefined, () => {
-      // markComplete('dfaIntro');
+    registerScene(dfaTheoryAnswers.loader, dfaTheoryAnswers.unloader, 'video', undefined, () => {
+      // markComplete('dfaTheoryAnswers');
     });
 
     load();
