@@ -525,8 +525,8 @@ const mario = () => {
     GS.marioContainer.alpha = GS.easings.easeOutCubic(v);
     GS.marioContainer.scale = GS.easings.easeOutElastic(v);
   }).then(delay(240)).then(new ValueTween(1, 0, 60, GS.easings.linear, (v) => {
-    GS.marioContainer.alpha = GS.easings.easeOutCubic(v);
-    GS.marioContainer.scale = GS.easings.easeOutElastic(v);
+    GS.marioContainer.alpha = GS.easings.easeInCubic(v);
+    GS.marioContainer.scale = GS.easings.easeInElastic(v);
   }));
 }
 

@@ -42,12 +42,12 @@ from dfa import moveToState
 
 def evaluate_dfa(dfa, string):
     # dfa is an dictionary, with the following keys:
-    # - 'dfa["states"]': a list of dictionariess, representing the states of the DFA, each with the following keys:
+    # - 'dfa["states"]': a list of dictionaries, representing the states of the DFA, each with the following keys:
     #   - 'state["name"]': the name of the state
     #   - 'state["accepting"]': a boolean, True if the state is accepting
     #   - 'state["starting"]': a boolean, True if the state is the starting state
     # - 'dfa["alphabet"]': a list of strings, representing the alphabet of the DFA
-    # - 'dfa["transitions"]': a list of dictionariess, each with the following keys:
+    # - 'dfa["transitions"]': a list of dictionaries, each with the following keys:
     #   - 'transition["from"]': the state name the transition starts from
     #   - 'transition["to"]': the state name the transition goes to
     #   - 'transition["label"]': the symbols that the transition reads, separated by commas
