@@ -1,6 +1,7 @@
 import { addScene, registerScene } from '../templates/scene.js';
 import dfaIntro from '../anims/dfa_intro.js'
 import { markComplete } from '../tools/completion.js';
+import { addIcon } from '../templates/icons.js';
 
 const contentText = `
 <div class="aspect-ratio">
@@ -77,20 +78,20 @@ Let's look at some basic languages and how we can represent them with a DFA.
 We can represent this language with 3 states:
 
 <ul>
-  <li>$S$: A state to represent the first character has not yet been read</li>
-  <li>$A$: A state to represent the first character has been read, and this character was an 'a'</li>
-  <li>$B$: A state to represent the first character has been read, and this character was a 'b'</li>
+  <li>${addIcon('s')}: A state to represent the first character has not yet been read</li>
+  <li>${addIcon('a')}: A state to represent the first character has been read, and this character was an 'a'</li>
+  <li>${addIcon('b')}: A state to represent the first character has been read, and this character was a 'b'</li>
 </ul>
 
-The transitions from S are relatively straight-forward, as we can transition to A on an 'a' and to B on a 'b'.
+The transitions from ${addIcon('s')} are relatively straight-forward, as we can transition to ${addIcon('a')} on an 'a' and to ${addIcon('B')} on a 'b'.
 
-This is because these first transitions from S are reading the first character of the word, and this first character determines whether we go to state A or state B.
+This is because these first transitions from ${addIcon('s')} are reading the first character of the word, and this first character determines whether we go to state ${addIcon('a')} or state ${addIcon('b')}.
 
 <img src="/img/dfaIntro/e1p1.png" class="small" />
 
-The transitions from A and B are also super-simple. If we read any more characters, that doesn't change the fact that the first character was an 'a' or 'b', so we can just stay in the same state.
+The transitions from ${addIcon('a')} and ${addIcon('b')} are also super-simple. If we read any more characters, that doesn't change the fact that the first character was an 'a' or 'b', so we can just stay in the same state.
 
-Our starting state is S, and our accepting states are S and A, since neither of these represent words starting with 'b'.
+Our starting state is ${addIcon('s')}, and our accepting states are ${addIcon('s')} and ${addIcon('a')}, since neither of these represent words starting with 'b'.
 
 <img src="/img/dfaIntro/e1p2.png" class="small" />
 
@@ -101,16 +102,16 @@ This language is maybe a bit more complex to identify as humans, but the DFA rep
 We can represent this language with just 2 states:
 
 <ul>
-  <li>$E$: A state to represent that the number of 'a's read so far is even</li>
-  <li>$O$: A state to represent that the number of 'a's read so far is odd</li>
+  <li>${addIcon('e')}: A state to represent that the number of 'a's read so far is even</li>
+  <li>${addIcon('o')}: A state to represent that the number of 'a's read so far is odd</li>
 </ul>
 
 The transitions for the 'b' character are simple - if we read a 'b', the number of 'a's read doesn't change, so we stay in the same state.
 
 <img src="/img/dfaIntro/e2p1.png" class="small" />
 
-The transitions for the 'a' character aren't that much more complicated - if we read an 'a', the number of 'a's read changes <span class='highlight highlight-blue'>parity</span> (Even + 1 = Odd, Odd + 1 = Even), so we transition from E to O and vice versa.
-Our start state is the same as our only accepting state - E.
+The transitions for the 'a' character aren't that much more complicated - if we read an 'a', the number of 'a's read changes <span class='highlight highlight-blue'>parity</span> (Even + 1 = Odd, Odd + 1 = Even), so we transition from ${addIcon('e')} to ${addIcon('o')} and vice versa.
+Our start state is the same as our only accepting state - ${addIcon('e')}.
 
 <img src="/img/dfaIntro/e2p2.png" class="small" />
 
