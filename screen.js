@@ -13,6 +13,7 @@ class Screen {
       width: app.renderer.width,
       height: app.renderer.height,
     })
+    // this.bg.alpha = 0;
     this.childElements = new PIXI.Container();
     this.container.addChild(this.childElements);
     app.stage.addChild(this.bg);

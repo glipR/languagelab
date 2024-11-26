@@ -1,3 +1,5 @@
+import { addIcon } from "../templates/icons.js";
+
 const contentText = `\
 <p>
 Before we start creating some DFAs ourselves, let's first ask ourselves a few questions about DFAs, and understand how we can transform DFAs to have different properties.
@@ -203,8 +205,8 @@ const questions = [
 
       <img class="stopHeight" src="/img/theory/cartesian-product.png" />
 
-      Here, $A$ is the DFA with states $A, B$, $B$ is the DFA with states $1, 2, 3$, and $C$ is the 6 states in the centre that use $A$ and $B$ states as rows/columns.
-      Notice how the starting state in $C$ is aligned to $A, 1$ in the grid, and the accepting states in $C$ are all states in the same row/column as an accepting state in $A$/$B$.
+      Here, $A$ is the DFA with states ${addIcon('a')} and ${addIcon('b')}, $B$ is the DFA with states ${addIcon('1')}, ${addIcon('2')} and ${addIcon('3')}, and $C$ is the 6 states in the centre that use $A$ and $B$ states as rows/columns.
+      Notice how the starting state ${addIcon('a-1')} in $C$ is aligned to ${addIcon('a')} and ${addIcon('1')} in the grid, and the accepting states in $C$ are all states in the same row/column as an accepting state in $A$/$B$.
       <br>
 
       If we wanted to allow the two DFAs to have different alphabets, we can fix this by turning the original DFAs into DFAs with the same alphabet, by adding a sink state which receives all letters that are not present in the original DFA's alphabet.

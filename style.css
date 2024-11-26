@@ -554,6 +554,16 @@ li.locked::before {
   background-color: #00000060;
 }
 
+/* Images */
+
+img.icon {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  margin-bottom: -8px;
+  margin-top: -5px;
+}
+
 /* HIGHLIGHTER */
 .highlight {
   margin-left: -8px;
