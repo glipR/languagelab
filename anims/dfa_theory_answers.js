@@ -269,11 +269,22 @@ const q1 = () => {
   const fadeTable = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
     tableContainer.alpha = v;
   });
-  const fadeEntryNodes = Object.values(tableNodes.map(n => {
-    return new ValueTween(n.graphic.alpha, 1, 60, GS.easings.easeInOutQuad, (v) => {
-      n.graphic.alpha = v;
-    });
-  }))
+  const fadeEntryNodes = [];
+  for (let i=0; i<3; i++) {
+    for (let j=0; j<4; j++) {
+      const n = tableNodes[4 + j * 3 + i];
+      const entryBG = entryBackgrounds[`${i+1}-${j+1}`];
+      fadeEntryNodes.push(
+        delay(40 * j + 10 * i).then(
+          new ValueTween(n.graphic.alpha, 1, 60, GS.easings.easeInOutQuad, (v) => {
+            n.graphic.alpha = v;
+          }).during(new ValueTween(0, 1, 60, flashEasing(), (v) => {
+            entryBG.alpha = v;
+          }))
+        )
+      );
+    }
+  }
   const fadeOut = new ValueTween(1, 0, 60, GS.easings.easeInOutQuad, (v) => {
     tableContainer.alpha = v;
     GS.graph.graph.alpha = v;
@@ -859,6 +870,36 @@ const q6 = () => {
     });
   }
 
+  const equation = "$X \\land Y = (X \\cup Y) \\cap \\overline{(X \\cap Y)}$";
+  const eq_div = document.createElement('div');
+  eq_div.style.fontSize = '48px';
+  eq_div.style.position = 'fixed';
+  eq_div.style.left = '50%';
+  eq_div.style.top = '30%';
+  eq_div.style.transform = 'translate(-50%, -50%)';
+  eq_div.style.color = 'black';
+  eq_div.style.opacity = 0;
+  eq_div.innerHTML = equation;
+  document.body.appendChild(eq_div);
+
+  const explanation1 = "$X \\land Y = $ Exclusive OR"
+  const explanation2 = "$X \\cup Y = $ Union"
+  const explanation3 = "$X \\cap Y = $ Intersection"
+  const explanation4 = "$\\overline{X} = $ Negation"
+
+  const eq_div2 = document.createElement('div');
+  eq_div2.style.fontSize = '48px';
+  eq_div2.style.position = 'fixed';
+  eq_div2.style.left = '50%';
+  eq_div2.style.top = '60%';
+  eq_div2.style.transform = 'translate(-50%, -50%)';
+  eq_div2.style.color = 'black';
+  eq_div2.style.opacity = 0;
+  eq_div2.innerHTML = explanation1 + "<br>" + explanation2 + "<br>" + explanation3 + "<br>" + explanation4;
+  document.body.appendChild(eq_div2);
+
+  MathJax.typeset();
+
   return delay(0)
     .then(fadeAB)
     .then(delay(60))
@@ -890,6 +931,16 @@ const q6 = () => {
       dfaA.graph.alpha = v;
       dfaB.graph.alpha = v;
     }))
+    .then(delay(60))
+    .then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
+      eq_div.style.opacity = v;
+      eq_div2.style.opacity = v;
+    }))
+    .then(delay(60))
+    .then(new ValueTween(1, 0, 60, GS.easings.easeInOutQuad, (v) => {
+      eq_div.style.opacity = v;
+      eq_div2.style.opacity = v;
+    }));
 }
 
 const unloader = () => {
