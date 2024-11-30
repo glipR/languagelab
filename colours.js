@@ -9,6 +9,8 @@ export const red = new PIXI.Color(0xfb6f92); //e9ff70)
 export const blue = new PIXI.Color(0x70d6ff)
 export const purple = new PIXI.Color(0xb388eb)
 
+export const darkPurple = new PIXI.Color(0x5a4476);
+
 export const lightGrey = new PIXI.Color(0xd6ccc2);
 export const darkGrey = new PIXI.Color(0x4a5759);
 

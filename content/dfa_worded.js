@@ -14,6 +14,8 @@ Need a hint? Feel free to click the "Hint" button to access the hints for a ques
 </p>
 `
 
+const video = (s) => `<div class="aspect-ratio" style="margin-bottom: 20px"><iframe src="https://www.youtube.com/embed/TXfRQkQTiU0?si=tZ8q30tTQF8_Sm3t&amp;start=${s}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`
+
 const addQuestion = (title, id, question, hint, solution) => {
   const questionDiv = document.createElement('div');
   questionDiv.classList.add('question');
@@ -86,7 +88,9 @@ const questions = [
           ${detailSummary("Try to think about how many transitions are needed for each state in the DFA.", "Hint 2")}
           ${detailSummary("For the maximal case, no transition should have a label with multiple characters - this could be split into multiple transitions.", "Hint 3")}
           ${detailSummary("For the minimal case, each state still needs at least one transition beginning there, is this enough, or do we need more transitions?", "Hint 4")}`,
-    solution:  `The maximum number of transitions that can be present in the DFA is $n \\times m$, this is because of the rule that for every state/letter combination, there should be exactly one transition that begins at that state, and includes that letter in the label.
+    solution:  `${video(0)}
+
+                The maximum number of transitions that can be present in the DFA is $n \\times m$, this is because of the rule that for every state/letter combination, there should be exactly one transition that begins at that state, and includes that letter in the label.
                 <img class="stopHeight" src="/img/theory/maximal-transitions.png" />
                 In this example, there are 4 states, 3 letters in the alphabet, and so 12 transitions in total.<br>
                 The minimum number of transitions that can be present in the DFA is $n$, this is because we can have a transition that includes every letter in the alphabet for each state, and this would be the minimum number of transitions that can be present in the DFA.
@@ -189,7 +193,7 @@ const questions = [
       ${detailSummary("We'll need $n \\times m$ states in total. For every pair of states $a \\in A$ and $b \\in B$, we'll have a state $(a,b) \\in C$. How should these be connected by transtitions? What are starting/accepting states?", "Hint 3")}
       ${detailSummary("Because we are simulating $A$ and $B$ simultaneously, every transition in $C$ is kind of a merger of a transition in $A$ and a transition in $B$.", "Hint 4")}
     `,
-    solution: `
+    solution: `${video(40)}
       Our DFA $C$ is essentially going to simulate moving through $A$ and $B$ independently. We'll need $n \\times m$ states in total to achieve this.
       <br>
 
@@ -225,7 +229,7 @@ const questions = [
       ${detailSummary("The solution needs to accept all words that are accepted by one DFA, but rejected by the other", "Hint 2")}
       ${detailSummary("Your solution should look exactly the same as Question 5, except with different accepting states.", "Hint 3")}
     `,
-    solution: `
+    solution: `${video(160)}
       Assuming you've done question 5, the solution to this question is suprisingly simple. We want the DFA to accept words which are accepted by one DFA but not the other.
       <br>
       So take our union DFA from the previous question, and simply make any state an accepting state if exactly one of the row/column states are an accepting state.
