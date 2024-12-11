@@ -135,14 +135,16 @@ class Progress {
     if (this.storageKey) {
       localStorage.setItem(this.storageKey, this.current);
     }
+    let reset = false
     if (this.current >= this.instructions.length && this.resetOnComplete) {
       // Reset current to 0.
       this.current = 0;
       if (this.storageKey) {
         localStorage.setItem(this.storageKey, this.current);
       }
+      reset = true;
     }
-    if (this.current >= this.instructions.length) {
+    if (reset || this.current >= this.instructions.length) {
       window.setTimeout(() => {
         if (this.progressContainer) {
           this.progressContainer.style.display = "none";

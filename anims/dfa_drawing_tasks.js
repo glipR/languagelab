@@ -112,7 +112,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       GS.progress.markCompleted(4)
     }
     // Dragged edges get recreated.
-    if (edge.from.label === edge.to.label && edge.style.loopOffset) {
+    if (edge.from.label === edge.to.label && edge.style.loopOffset && (edge.style.loopOffset.x !== 0 || edge.style.loopOffset.y !== -75)) {
       // Loop drag
       GS.progress.markCompleted(8);
     } else if (edge.from.label !== edge.to.label && edge.style.edgeAnchor) {
