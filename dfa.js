@@ -5,101 +5,6 @@ import { mergeDeep } from "./utils.js";
 const gsc = window.gameScaling ?? 1;
 
 class DFA extends Graph {
-  static baseNodeStyle = { radius: 30 * gsc, fill: bg_dark, strokeWidth: 3 * gsc, stroke: black, showLabel: true, entryWidth: 5 * gsc };
-  static baseEdgeStyle = (lab) => ({ edgeLabel: lab });
-
-  fromJSON(json) {
-    // console.log(json);
-    const nodeStyle = DFA.baseNodeStyle ?? {};
-    const edgeStyle = DFA.baseEdgeStyle ?? {};
-    const newObj = {};
-    newObj.nodes = {};
-    Object.keys(json.nodes).forEach((key) => {
-      newObj.nodes[key] = {
-        position: {
-          x: json.nodes[key].x,
-          y: json.nodes[key].y,
-        },
-        style: mergeDeep({...DFA.baseNodeStyle}, nodeStyle, json.nodes[key].style ?? {}, {
-          isEntry: json.nodes[key].start,
-          doubleBorder: json.nodes[key].accepting,
-        }),
-      }
-    });
-    newObj.edges = json.edges.map((edge) => ({
-      ...edge,
-      style: mergeDeep({...DFA.baseEdgeStyle(edge.label)}, edgeStyle, edge.style ?? {}, {
-        label: edge.label,
-      }),
-    }));
-    return super.fromJSON(newObj);
-  }
-
-  export() {
-    return {
-      states: Object.values(this.nodes).map((node) => ({
-        name: node.label,
-        position: { x: node.position.x, y: node.position.y },
-        accepting: !!node.style.doubleBorder,
-        starting: !!node.style.isEntry,
-      })),
-      alphabet: this.collectAlphabet(),
-      transitions: this.edges.map((edge) => {
-        const e = {
-          from: edge.from.label,
-          to: edge.to.label,
-          label: edge.style.edgeLabel,
-          style: {},
-        }
-        if (edge.style.edgeAnchor) {
-          e.style.edgeAnchor = edge.style.edgeAnchor;
-        }
-        if (edge.style.loopOffset) {
-          e.style.loopOffset = edge.style.loopOffset;
-        }
-        return e;
-      }),
-    }
-  }
-
-  import(data) {
-    const get = (obj, key) => {
-      try {
-        return obj.get(key);
-      } catch (e) {
-        return obj[key];
-      }
-    }
-    const json = {
-      nodes: {},
-      edges: [],
-    }
-    console.log(data)
-    get(data, "states").forEach((state) => {
-      json.nodes[get(state, 'name')] = {
-        x: get(state, 'position')?.x ?? 0,
-        y: get(state, 'position')?.y ?? 0,
-        start: get(state, 'starting'),
-        accepting: get(state, 'accepting'),
-      }
-    });
-    get(data, "transitions").forEach((transition) => {
-      const e = {
-        from: get(transition, 'from'),
-        to: get(transition, 'to'),
-        label: get(transition, 'label'),
-        style: {},
-      };
-      if (get(transition, 'style')?.edgeAnchor) {
-        e.style.edgeAnchor = get(transition, 'style').edgeAnchor;
-      }
-      if (transition.style?.loopOffset) {
-        e.style.loopOffset = get(transition, 'style').loopOffset;
-      }
-      json.edges.push(e);
-    });
-    this.fromJSON(json);
-  }
 
   validate(fixedAlphabet) {
     let startNodes = Object.values(this.nodes).filter((node) => node.style.isEntry);
@@ -376,6 +281,24 @@ class DFA extends Graph {
 
   // Make a new DFA which recognises me and other
   combine(other, accepts = (me, other) => boolean) {
+    console.log("COMBINE")
+    const meTrue = this.invert().findAcceptingString() === null;
+    const meFalse = this.findAcceptingString() === null;
+    const otherTrue = other.invert().findAcceptingString() === null;
+    const otherFalse = other.findAcceptingString() === null;
+
+    if (meTrue || meFalse) {
+      const normal = accepts(meTrue, false);
+      const accept = accepts(meTrue, true);
+      return other.combine(other, (a, b) => a ? accept : normal);
+    }
+    if (otherTrue || otherFalse) {
+      console.log(otherTrue, otherFalse)
+      const normal = accepts(false, otherTrue);
+      const accept = accepts(true, otherTrue);
+      return this.combine(this, (a, b) => a ? accept : normal);
+    }
+
     const newDFA = new DFA();
     const json = {
       nodes: {},
@@ -397,6 +320,7 @@ class DFA extends Graph {
     const myMissing = Array.from(otherAlphabet).filter(char => !alphabet.includes(char)).join(", ");
     const otherMissing = Array.from(alphabet).filter(char => !otherAlphabet.includes(char)).join(", ");
     const oldEdges = [...this.edges];
+    const otherOldEdges = [...other.edges];
     if (myMissing) {
       this.edges = this.edges.concat(Object.values(this.nodes).map((node) => ({
         from: node,
@@ -409,7 +333,6 @@ class DFA extends Graph {
       to: this.nodes['ME_DEATH'],
       style: { edgeLabel: `${alphabet.join(`, `)}, ${myMissing}` }
     }])
-    const otherOldEdges = [...other.edges];
     if (otherMissing) {
       other.edges = other.edges.concat(Object.values(other.nodes).map((node) => ({
         from: node,
@@ -482,7 +405,7 @@ class DFA extends Graph {
     let result = [];
     while (current !== startNode.label) {
       const edge = this.edges.find((edge) => edge.from.label === parent[current] && edge.to.label === current);
-      result.push(edge.style.edgeLabel.split(",")[0]);
+      result.push(edge.style.edgeLabel.split(",")[0].trim());
       current = parent[current];
     }
     return result.reverse().join("");

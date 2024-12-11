@@ -200,6 +200,12 @@ class ValueTween extends Tween {
   }
 }
 
+class ImmediateTween extends Tween {
+  constructor (fn) {
+    super(0, t => t, () => {}, fn);
+  }
+}
+
 const delay = (duration) => new Tween(duration, t => t, () => {});
 const chain = (tweens) => tweens.reduce((acc, tween) => acc.then(tween), delay(0));
 const atOnce = (tweens) => tweens.slice(1).reduce((acc, tween) => acc.during(tween), tweens[0]);
@@ -212,6 +218,6 @@ const randomDelay = (tweens, maxDelay=20) => {
 };
 
 export {
-  TweenManager, Tween, PropertyTween, ValueTween,
+  TweenManager, Tween, PropertyTween, ValueTween, ImmediateTween,
   interpValue, delay, chain, atOnce, randomDelay
 };

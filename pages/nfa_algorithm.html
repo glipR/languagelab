@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NFA - Algorithm</title>
+  <script>var exports = {};</script>
+  <script src="https://pixijs.download/release/pixi.js"></script>
+  <script src="https://unpkg.com/@pixi/sound/dist/pixi-sound.js"></script>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+  </script>
+  <script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <link rel="stylesheet" type="text/css" href="/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="articleBodyCenter">
+  </div>
+  <script type="module">
+    import { TweenManager } from '/tween.js';
+    import { Scene, SceneManager } from '/scene.js';
+    import addContent from '/content/nfa_algorithm.js';
+    import addNextButton from '/templates/next.js';
+    import addNav from '/templates/nav.js';
+    import addFooter from '/templates/footer.js';
+    import load from '/tools/loading.js';
+
+    // Content
+    addNav('nfaAlgorithm');
+    addContent();
+    addNextButton('nfa_convert')
+    addFooter();
+
+    load();
+
+  </script>
+</body>
+</html>

@@ -42,8 +42,9 @@ class KeyEntryModal extends PIXI.Container {
           this.deactivate();
         }
       } else if (this.acceptedCharacters.includes(e.key) && this.curText.length < this.maxKeyLength) {
+        const addedChar = e.key === "." ? "ε" : e.key;
         this.validationText.text = "";
-        this.curText = this.curText + e.key;
+        this.curText = this.curText + addedChar;
         this.curText = this.textMap(this.curText);
         this.onChange?.(this.curText);
         if (this.maxKeyLength == 1) {

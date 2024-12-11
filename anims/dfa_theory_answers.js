@@ -1,4 +1,4 @@
-import { bg_dark, black, green, highlightColours, orange, purple, red } from "../colours.js";
+import { bg_dark, black, green, highlightColours, darkPurple, orange, purple, red } from "../colours.js";
 import DFA from "../dfa.js";
 import { Node } from "../graph.js";
 import Screen from "../screen.js";
@@ -26,11 +26,7 @@ const flashEasing = () => combineEasing([
 ]);
 
 const wordIndexPosition = ((i, word) => {
-  const localFirstCharPos = GS.screen.globalToLocal(word[i].getGlobalPosition().x, word[i].getGlobalPosition().y);
-  return {
-    x: localFirstCharPos.x,
-    y: localFirstCharPos.y,
-  }
+  return word[i].position;
 });
 
 const moveBetween = (l1, l2, duration, graph, nodePointer, wordPointer, word) => {
@@ -408,8 +404,8 @@ const q5 = () => {
 
   const nodePointers = Array.from({length: 3}).map(() => {
     const nodePointer = new PIXI.Graphics();
-    nodePointer.rect(-5 * gsc, -10 * gsc, 10 * gsc, 20 * gsc).fill(orange);
-    nodePointer.moveTo(-10 * gsc, 10 * gsc).lineTo(10 * gsc, 10 * gsc).lineTo(0, 25 * gsc).lineTo(-10 * gsc, 10 * gsc).fill(orange);
+    nodePointer.rect(-5 * gsc, -10 * gsc, 10 * gsc, 20 * gsc).fill(darkPurple);
+    nodePointer.moveTo(-10 * gsc, 10 * gsc).lineTo(10 * gsc, 10 * gsc).lineTo(0, 25 * gsc).lineTo(-10 * gsc, 10 * gsc).fill(darkPurple);
     nodePointer.position.set(dfaA.nodes['A'].position.x, dfaA.nodes['A'].position.y - 60 * gsc);
     nodePointer.alpha = 0;
     return nodePointer;
@@ -467,10 +463,10 @@ const q5 = () => {
   GS.screen.addChild(wordCover);
   GS.screen.addChild(wordContainer);
   const wordPointer = new PIXI.Graphics();
-  wordPointer.rect(1 * gsc, 0 * gsc, 11 * gsc, 3 * gsc).fill(orange);
+  wordPointer.rect(1 * gsc, 0 * gsc, 11 * gsc, 3 * gsc).fill(darkPurple);
   wordPointer.position.set(wordIndexPosition(0, word).x, wordIndexPosition(0, word).y);
   wordPointer.alpha = 0;
-  GS.screen.addChild(wordPointer);
+  wordContainer.addChild(wordPointer);
 
   const fadeAllIn = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
     wordContainer.alpha = v;
@@ -825,39 +821,76 @@ const q6 = () => {
   GS.screen.addChild(wordCover);
   GS.screen.addChild(wordContainer);
   const wordPointer = new PIXI.Graphics();
-  wordPointer.rect(1 * gsc, 0 * gsc, 11 * gsc, 3 * gsc).fill(orange);
-  wordPointer.position.set(wordIndexPosition(0, word).x, wordIndexPosition(0, word).y);
+  wordPointer.rect(1 * gsc, 0 * gsc, 11 * gsc, 3 * gsc).fill(darkPurple);
+  wordPointer.position.set(
+    wordIndexPosition(0, word).x,
+    wordIndexPosition(0, word).y
+  );
   wordPointer.alpha = 0;
-  GS.screen.addChild(wordPointer);
+  wordContainer.addChild(wordPointer);
 
-  const nodePointer = new PIXI.Graphics();
-  nodePointer.rect(-5 * gsc, -10 * gsc, 10 * gsc, 20 * gsc).fill(orange);
-  nodePointer.moveTo(-10 * gsc, 10 * gsc).lineTo(10 * gsc, 10 * gsc).lineTo(0, 25 * gsc).lineTo(-10 * gsc, 10 * gsc).fill(orange);
-  nodePointer.position.set(dfaProduct.nodes['A-1'].position.x, dfaProduct.nodes['A-1'].position.y - 60 * gsc);
-  nodePointer.alpha = 0;
-  dfaProduct.graph.addChild(nodePointer);
+  const nodePointers = Array.from({length: 3}).map((k, i) => {
+    const graph = [dfaProduct, dfaA, dfaB][i];
+    const nodeKey = ['A-1', 'A', '1'][i];
+
+    const nodePointer = new PIXI.Graphics();
+    nodePointer.rect(-5 * gsc, -10 * gsc, 10 * gsc, 20 * gsc).fill(darkPurple);
+    nodePointer.moveTo(-10 * gsc, 10 * gsc).lineTo(10 * gsc, 10 * gsc).lineTo(0, 25 * gsc).lineTo(-10 * gsc, 10 * gsc).fill(darkPurple);
+    nodePointer.position.set(graph.nodes[nodeKey].position.x, graph.nodes[nodeKey].position.y - 60 * gsc);
+    nodePointer.alpha = 0;
+    graph.graph.addChild(nodePointer);
+    return nodePointer;
+  });
 
   const fadePointerAndWord = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
     wordContainer.alpha = v;
     wordCover.alpha = v;
     wordPointer.alpha = v;
-    nodePointer.alpha = v;
+    nodePointers[0].alpha = v;
+    nodePointers[1].alpha = v;
+    nodePointers[2].alpha = v;
   });
 
   GS.curWordIndex = 0;
   const movement = delay(0)
-    .then(moveBetween('A-1', 'B-2', 60, dfaProduct, nodePointer, wordPointer, word))
-    .then(moveBetween('B-2', 'A-2', 60, dfaProduct, nodePointer, wordPointer, word))
-    .then(moveBetween('A-2', 'B-2', 60, dfaProduct, nodePointer, wordPointer, word))
-    .then(moveBetween('B-2', 'B-3', 60, dfaProduct, nodePointer, wordPointer, word))
-    .then(moveBetween('B-3', 'A-3', 60, dfaProduct, nodePointer, wordPointer, word))
-    .then(moveBetween('A-3', 'B-1', 60, dfaProduct, nodePointer, wordPointer, word))
+    .then(
+      moveBetween('A-1', 'B-2', 60, dfaProduct, nodePointers[0], wordPointer, word),
+      moveBetween('A', 'B', 60, dfaA, nodePointers[1]),
+      moveBetween('1', '2', 60, dfaB, nodePointers[2]),
+    )
+    .then(
+      moveBetween('B-2', 'A-2', 60, dfaProduct, nodePointers[0], wordPointer, word),
+      moveBetween('B', 'A', 60, dfaA, nodePointers[1]),
+      moveBetween('2', '2', 60, dfaB, nodePointers[2]),
+    )
+    .then(
+      moveBetween('A-2', 'B-2', 60, dfaProduct, nodePointers[0], wordPointer, word),
+      moveBetween('A', 'B', 60, dfaA, nodePointers[1]),
+      moveBetween('2', '2', 60, dfaB, nodePointers[2]),
+    )
+    .then(
+      moveBetween('B-2', 'B-3', 60, dfaProduct, nodePointers[0], wordPointer, word),
+      moveBetween('B', 'B', 60, dfaA, nodePointers[1]),
+      moveBetween('2', '3', 60, dfaB, nodePointers[2]),
+    )
+    .then(
+      moveBetween('B-3', 'A-3', 60, dfaProduct, nodePointers[0], wordPointer, word),
+      moveBetween('B', 'A', 60, dfaA, nodePointers[1]),
+      moveBetween('3', '3', 60, dfaB, nodePointers[2]),
+    )
+    .then(
+      moveBetween('A-3', 'B-1', 60, dfaProduct, nodePointers[0], wordPointer, word),
+      moveBetween('A', 'B', 60, dfaA, nodePointers[1]),
+      moveBetween('3', '1', 60, dfaB, nodePointers[2]),
+    )
 
   const fadeWord = new ValueTween(1, 0, 60, GS.easings.easeInOutQuad, (v) => {
     wordContainer.alpha = v;
     wordCover.alpha = v;
     wordPointer.alpha = v;
-    nodePointer.alpha = v;
+    nodePointers[0].alpha = v;
+    nodePointers[1].alpha = v;
+    nodePointers[2].alpha = v;
   });
 
   const colourNodes = (nodes, colour, duration) => {

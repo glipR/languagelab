@@ -703,11 +703,11 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   });
   GS.graph.fromJSON({
     nodes: {
-      A: { position: { x: 250 * gsc, y: 300 * gsc }, style: {...nodeStyle, isEntry: true, entryWidth: 5 * gsc } },
-      B: { position: { x: 500 * gsc, y: 300 * gsc }, style: nodeStyle },
-      C: { position: { x: 750 * gsc, y: 300 * gsc }, style: {...nodeStyle, doubleBorder: black } },
-      D: { position: { x: 375 * gsc, y: 500 * gsc }, style: {...nodeStyle, doubleBorder: black } },
-      E: { position: { x: 625 * gsc, y: 500 * gsc }, style: nodeStyle },
+      A: { x: 250 * gsc, y: 300 * gsc, style: {...nodeStyle, isEntry: true, entryWidth: 5 * gsc } },
+      B: { x: 500 * gsc, y: 300 * gsc, style: nodeStyle },
+      C: { x: 750 * gsc, y: 300 * gsc, style: {...nodeStyle, doubleBorder: black } },
+      D: { x: 375 * gsc, y: 500 * gsc, style: {...nodeStyle, doubleBorder: black } },
+      E: { x: 625 * gsc, y: 500 * gsc, style: nodeStyle },
     },
     edges: [
       { from: 'A', to: 'B', style: edgeStyle('a') },

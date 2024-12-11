@@ -42,6 +42,42 @@ export const contentMapping = {
     type: "code",
     href: "/pages/dfa_code_modify",
   },
+
+  nfaIntro: {
+    title: "What is an NFA?",
+    type: "worded",
+    href: "/pages/nfa_intro",
+  },
+  nfaSimulate: {
+    title: "Simulating NFAs",
+    type: "game",
+    href: "/pages/nfa_sim",
+  },
+  nfaCategorise: {
+    title: "Categorising NFAs",
+    type: "game",
+    href: "/pages/nfa_categorise",
+  },
+  nfaMatch: {
+    title: "Recognising Languages",
+    type: "game",
+    href: "/pages/nfa_match",
+  },
+  nfaAlgorithm: {
+    title: "Implementing the algorithm",
+    type: "worded",
+    href: "/pages/nfa_algorithm",
+  },
+  nfaConvert: {
+    title: "Converting NFAs to DFAs",
+    type: "game",
+    href: "/pages/nfa_convert",
+  },
+  nfaTheory: {
+    title: "Understanding NFAs",
+    type: "questions",
+    href: "/pages/nfa_theory",
+  }
 }
 
 const iconMap = (type) => {
@@ -95,8 +131,16 @@ const navContent = (key) => `
           ${renderItem('dfaAlgorithm')}
           ${renderItem('dfaModify')}
         </div>
-        <div class="pageDropdownSection smallSection">
-          <h4 class="iconWIP pageDropdownSectionTitle"> NFA</h4>
+        <div class="pageDropdownSection nfaSection">
+          <h4 class="iconSection pageDropdownSectionTitle"> NFA</h4>
+          <hr />
+          ${renderItem('nfaIntro')}
+          ${renderItem('nfaSimulate')}
+          ${renderItem('nfaCategorise')}
+          ${renderItem('nfaMatch')}
+          ${renderItem('nfaAlgorithm')}
+          ${renderItem('nfaConvert')}
+          ${renderItem('nfaTheory')}
         </div>
         <div class="pageDropdownSection smallSection">
           <h4 class="iconWIP pageDropdownSectionTitle"> Translating</h4>

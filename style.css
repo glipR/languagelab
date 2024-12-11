@@ -76,6 +76,7 @@ h1, h2, h3 {
   margin: 15px auto;
   display: block;
   max-width: 80%;
+  max-height: 60vh;
 }
 
 .articleBodyCenter img.small {
@@ -262,7 +263,7 @@ a.pageDropdownItem {
   right: 0;
 }
 
-.dfaSection {
+.dfaSection, .nfaSection {
   background: url('/img/backgrounds/cardboard-resize.png');
   background-size: cover;
   padding: 20px 45px 45px 45px;
@@ -569,6 +570,12 @@ img.icon {
   margin-left: -8px;
   margin-right: -8px;
   padding: 0px 8px;
+}
+
+.highlight-small {
+  margin-left: -4px;
+  margin-right: -4px;
+  padding: 0px 4px;
 }
 
 .highlight-red {

@@ -8,17 +8,20 @@ const t1Opts = {
   graph: t1JSON,
   word: 'baab',
   showNextEdge: true,
+  completeOnLast: true,
 };
 const t2Opts = {
   graph: t2JSON,
   word: 'baaab',
   showNextEdge: false,
+  completeOnLast: true,
 }
 const t3Opts = {
   graph: t3JSON,
   word: 'bcbcca',
   showNextEdge: false,
   addBackwards: true,
+  completeOnLast: true,
 }
 
 const t1Tasks = [t1Opts, t2Opts, t3Opts];

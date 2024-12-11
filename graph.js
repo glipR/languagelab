@@ -44,8 +44,8 @@ class Node {
     this.nodeBG = new CircleCover(this.circle, {points: 10});
     this.separatedGraphic.addChild(this.nodeBG);
     this.onActions = {};
-    this.circle.interactive = true;
-    this.circle.buttonMode = true;
+    this.circle.interactive = this.style.button !== false;
+    this.circle.buttonMode = this.style.button !== false;
 
     this.updateGraphic();
   }
@@ -399,8 +399,22 @@ class AbstractEdge {
     });
   }
 
+  hideEdgeTween(duration, easing) {
+    return new ValueTween(1, 0, duration, easing, (t) => {
+      this.drawnAmount = t;
+      this.updateGraphic();
+    });
+  }
+
   showLabelTween(duration, easing) {
     return new ValueTween(0, 1, duration, easing, (t) => {
+      this.labelText.alpha = t;
+      this.labelBG.alpha = t;
+    });
+  }
+
+  hideLabelTween(duration, easing) {
+    return new ValueTween(1, 0, duration, easing, (t) => {
       this.labelText.alpha = t;
       this.labelBG.alpha = t;
     });
@@ -433,6 +447,7 @@ class CurveEdge extends AbstractEdge {
     return {
       ...super.baseStyle(),
       edgeAnchor: { x: 0, y: -75 * gsc },
+      anchorOffsetMult: 2,
     }
   }
 
@@ -440,8 +455,8 @@ class CurveEdge extends AbstractEdge {
     const vertexMidpoint = interpValue(this.getEdgeStart(), this.getEdgeEnd(), 0.5);
     const anchorAngle = Math.atan2(this.style.edgeAnchor.y, this.style.edgeAnchor.x);
     const anchorOffset = {
-      x: Math.cos(anchorAngle + Math.PI/2) * magnitude(this.style.edgeAnchor) * 2,
-      y: Math.sin(anchorAngle + Math.PI/2) * magnitude(this.style.edgeAnchor) * 2,
+      x: Math.cos(anchorAngle + Math.PI/2) * magnitude(this.style.edgeAnchor) * this.style.anchorOffsetMult,
+      y: Math.sin(anchorAngle + Math.PI/2) * magnitude(this.style.edgeAnchor) * this.style.anchorOffsetMult,
     }
     const startDist = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, anchorOffset, negate(this.getEdgeStart())));
     const endDist = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, anchorOffset, negate(this.getEdgeEnd())));
@@ -493,6 +508,9 @@ class LoopEdge extends AbstractEdge {
 
 class Graph {
 
+  static baseNodeStyle = { radius: 30 * gsc, fill: bg_dark, strokeWidth: 3 * gsc, stroke: black, showLabel: true, entryWidth: 5 * gsc };
+  static baseEdgeStyle = (lab) => ({ edgeLabel: lab });
+
   constructor() {
     this.graph = new PIXI.Container();
     this.nodeContainer = new PIXI.Container();
@@ -532,13 +550,119 @@ class Graph {
   }
 
   fromJSON(json) {
-    Object.keys(json.nodes).forEach((label) => {
-      const node = json.nodes[label];
-      this.addNode(new Node(label, node.position, node.style));
+    console.log(json);
+    const nodeStyle = Graph.baseNodeStyle ?? {};
+    const edgeStyle = Graph.baseEdgeStyle ?? {};
+    Object.keys(json.nodes).forEach((key) => {
+      this.addNode(new Node(key, {
+        x: json.nodes[key].x,
+        y: json.nodes[key].y,
+      }, mergeDeep({...Graph.baseNodeStyle}, nodeStyle, json.nodes[key].style ?? {}, {
+        isEntry: json.nodes[key].start,
+        doubleBorder: json.nodes[key].accepting,
+      })));
     });
     json.edges.forEach((edge) => {
-      this.addEdge(AbstractEdge.decide(this.nodes[edge.from], this.nodes[edge.to], edge.style));
+      this.addEdge(AbstractEdge.decide(this.nodes[edge.from], this.nodes[edge.to], mergeDeep({...Graph.baseEdgeStyle(edge.label)}, edgeStyle, edge.style ?? {}, {
+        label: edge.label,
+      })))}
+    );
+  }
+
+  toJSON() {
+    const json = {nodes: {}, edges: []};
+    Object.values(this.nodes).forEach((node) => {
+      json.nodes[node.label] = {
+        x: node.position.x,
+        y: node.position.y,
+        start: !!node.style.isEntry,
+        accepting: !!node.style.doubleBorder,
+      };
     });
+    this.edges.forEach((edge) => {
+      const edgeStyle = {};
+      if (edge.style.edgeAnchor) {
+        edgeStyle.edgeAnchor = edge.style.edgeAnchor;
+        edgeStyle.anchorOffsetMult = edge.style.anchorOffsetMult;
+      }
+      if (edge.style.loopOffset) {
+        edgeStyle.loopOffset = edge.style.loopOffset;
+        edgeStyle.loopAnchorMult = edge.style.loopAnchorMult;
+      }
+      json.edges.push({
+        from: edge.from.label,
+        to: edge.to.label,
+        label: edge.style.edgeLabel,
+        style: {},
+      });
+    });
+    return json;
+  }
+
+  export() {
+    return {
+      states: Object.values(this.nodes).map((node) => ({
+        name: node.label,
+        position: { x: node.position.x, y: node.position.y },
+        accepting: !!node.style.doubleBorder,
+        starting: !!node.style.isEntry,
+      })),
+      alphabet: this.collectAlphabet(),
+      transitions: this.edges.map((edge) => {
+        const e = {
+          from: edge.from.label,
+          to: edge.to.label,
+          label: edge.style.edgeLabel,
+          style: {},
+        }
+        if (edge.style.edgeAnchor) {
+          e.style.edgeAnchor = edge.style.edgeAnchor;
+        }
+        if (edge.style.loopOffset) {
+          e.style.loopOffset = edge.style.loopOffset;
+        }
+        return e;
+      }),
+    }
+  }
+
+  import(data) {
+    const get = (obj, key) => {
+      try {
+        return obj.get(key);
+      } catch (e) {
+        return obj[key];
+      }
+    }
+    const json = {
+      nodes: {},
+      edges: [],
+    }
+    console.log(data)
+    get(data, "states").forEach((state) => {
+      json.nodes[get(state, 'name')] = {
+        x: get(state, 'position')?.x ?? 0,
+        y: get(state, 'position')?.y ?? 0,
+        start: get(state, 'starting'),
+        accepting: get(state, 'accepting'),
+      }
+    });
+    get(data, "transitions").forEach((transition) => {
+      const e = {
+        from: get(transition, 'from'),
+        to: get(transition, 'to'),
+        label: get(transition, 'label'),
+        style: {},
+      };
+      if (get(transition, 'style')?.edgeAnchor) {
+        e.style.edgeAnchor = get(transition, 'style').edgeAnchor;
+      }
+      if (transition.style?.loopOffset) {
+        e.style.loopOffset = get(transition, 'style').loopOffset;
+      }
+      json.edges.push(e);
+    });
+    this.fromJSON(json);
   }
 
   clear() {

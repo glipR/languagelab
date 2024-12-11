@@ -1,9 +1,10 @@
-import { black, bg_dark, green, purple, blue } from '../colours.js';
+import { black, bg_dark, green, purple, blue, red } from '../colours.js';
 import { TweenManager, ValueTween } from '../tween.js';
 import { magnitude, negate, vectorCombine } from '../utils.js';
 import DFA from '../dfa.js';
 import Screen from '../screen.js';
 import { RectangleCover } from '../tools/paper_cover.js';
+import { FloatingButton } from '../ui.js';
 
 // TODO: Move this into a tools class with events.
 
@@ -35,6 +36,32 @@ const connect = (sphere1, sphere2, oneWay=false) => {
   if (!oneWay) {
     sphere2.adj.push(sphere1);
   }
+}
+
+const reset = () => {
+  console.log('resetting');
+  GS.curWordIndex = 0;
+  GS.curNodeKey = GS.startNodeKey;
+  GS.curSphere = null;
+  GS.pullSpheres = [];
+  interactiveMoveToKey(GS.startNodeKey);
+
+  // Tweens
+  const tweens = [];
+  GS.letters.forEach((c, i) => {
+    tweens.push(new ValueTween(c.style.fill, black, 60, GS.easings.easeInOutQuad, (v) => {
+      c.style.fill = v;
+    }));
+  });
+  tweens.push(new ValueTween(GS.wordPointer.position, { x: GS.letters[0].x, y: GS.letters[0].y + GS.letters[0].height }, 60, GS.easings.easeInOutQuad, (v) => {
+    GS.wordPointer.position.set(v.x, v.y);
+  }));
+  tweens.push(new ValueTween(GS.positionPointer.position, GS.graph.nodes[GS.startNodeKey].graphic, 60, GS.easings.easeInOutQuad, (v) => {
+    GS.positionPointer.position.set(v.x, v.y);
+  }));
+  tweens.forEach(tween => {
+    TweenManager.add(tween);
+  });
 }
 
 const interactiveMoveToKey = (key) => {
@@ -108,13 +135,13 @@ const interactiveMoveToKey = (key) => {
     }
   });
   if (GS.opts.showPullSpheres) {
-    pullSphereContainer.removeChildren();
+    GS.pullSphereContainer.removeChildren();
     GS.pullSpheres.forEach((sphere, i) => {
       const g = new PIXI.Graphics();
       g.circle(sphere.x, sphere.y, sphere.radius);
       g.fill(i === 0 ? blue : green);
       g.alpha = 0.3;
-      pullSphereContainer.addChild(g);
+      GS.pullSphereContainer.addChild(g);
       sphere.graphic = g;
     });
   }
@@ -123,15 +150,20 @@ const interactiveMoveToKey = (key) => {
 
 const moveAlongEdge = (edge) => {
   const edgeLabel = edge.labelText.text;
-  const charRead = GS.letters[GS.curWordIndex].text;
+  const charRead = GS.curWordIndex === GS.letters.length ? '[' : GS.letters[GS.curWordIndex].text;
   if (edge.backwards) {
     GS.onFailure(`Wrong transition taken! You took a transition going into your current state, not out of it.`);
     return;
   }
-  if (!edgeLabel.includes(charRead)) {
-    GS.onFailure(`Wrong transition taken! The next letter to read was ${charRead}, but the transition you had taken only accepts ${edgeLabel}`);
+  // Could be epsilon
+  if (edgeLabel !== 'ε'  && !edgeLabel.includes(charRead)) {
+    if (charRead === '[') {
+      GS.onFailure(`Wrong transition taken! You had read all letters in your word, but the transition you had taken only accepts ${edgeLabel}`);
+    } else {
+      GS.onFailure(`Wrong transition taken! The next letter to read was ${charRead}, but the transition you had taken only accepts ${edgeLabel}`);
+    }
     return;
-  } else if (GS.curWordIndex === GS.letters.length - 1) {
+  } else if (edgeLabel !== 'ε' && GS.curWordIndex === GS.letters.length - 1 && GS.opts.completeOnLast) {
     const accepted = edge.to.style.doubleBorder;
     GS.onSuccess(
       "Successfully executed the algorithm! " +
@@ -149,20 +181,22 @@ const moveAlongEdge = (edge) => {
     })
   }
 
-  GS.curWordIndex++;
-  const tweens = [];
-  const curWordIndex = GS.curWordIndex;
-  tweens.push(new ValueTween(GS.letters[GS.curWordIndex - 1].style.fill, bg_dark, 60, GS.easings.easeInOutQuad, (v) => {
-    GS.letters[curWordIndex - 1].style.fill = v;
-  }));
-  if (GS.curWordIndex < GS.letters.length) {
-    tweens.push(new ValueTween(GS.letters[GS.curWordIndex-1].position, GS.letters[GS.curWordIndex].position, 60, GS.easings.easeInOutQuad, (v) => {
-      GS.wordPointer.position.set(v.x, v.y + GS.letters[curWordIndex].height);
+  if (edgeLabel !== 'ε') {
+    GS.curWordIndex++;
+    const tweens = [];
+    const curWordIndex = GS.curWordIndex;
+    tweens.push(new ValueTween(GS.letters[GS.curWordIndex - 1].style.fill, bg_dark, 60, GS.easings.easeInOutQuad, (v) => {
+      GS.letters[curWordIndex - 1].style.fill = v;
     }));
+    if (GS.curWordIndex < GS.letters.length) {
+      tweens.push(new ValueTween(GS.letters[GS.curWordIndex-1].position, GS.letters[GS.curWordIndex].position, 60, GS.easings.easeInOutQuad, (v) => {
+        GS.wordPointer.position.set(v.x, v.y + GS.letters[curWordIndex].height);
+      }));
+    }
+    tweens.forEach(tween => {
+      TweenManager.add(tween);
+    });
   }
-  tweens.forEach(tween => {
-    TweenManager.add(tween);
-  });
 }
 
 const pointerDown = (event) => {
@@ -324,14 +358,60 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.curNodeKey = GS.startNodeKey;
   GS.pullSpheres = [];
   GS.curSphere = null;
-  const pullSphereContainer = new PIXI.Container();
-  GS.screen.addChild(pullSphereContainer);
+  GS.pullSphereContainer = new PIXI.Container();
+  GS.screen.addChild(GS.pullSphereContainer);
 
   interactiveMoveToKey(GS.startNodeKey);
 
   GS.positionPointer.on('pointerdown', pointerDown);
   window.addEventListener('pointerup', pointerUp);
   window.addEventListener('pointermove', pointerMove);
+
+  if (GS.opts.allowReset) {
+    GS.resetButton = new FloatingButton({
+      label: { text: 'Reset' },
+      bg: { fill: bg_dark },
+      height: 50,
+    });
+    GS.resetButton.position.set(10, GS.screen.gameHeight - 60);
+    GS.resetButton.onClick = reset;
+    GS.screen.addChild(GS.resetButton);
+  }
+
+  if (GS.opts.acceptRejectButtons) {
+    GS.acceptButton = new FloatingButton({
+      label: { text: 'Accept' },
+      bg: { fill: green },
+      height: 50,
+    });
+    GS.rejectButton = new FloatingButton({
+      label: { text: 'Reject' },
+      bg: { fill: red },
+      height: 50,
+    });
+    GS.acceptButton.position.set(GS.screen.gameWidth - 110, GS.screen.gameHeight - 120);
+    GS.rejectButton.position.set(GS.screen.gameWidth - 110, GS.screen.gameHeight - 60);
+    GS.acceptButton.onClick = () => {
+      const readAll = GS.curWordIndex === GS.letters.length;
+      const accepting = GS.graph.nodes[GS.curNodeKey].style.doubleBorder;
+      if (readAll && accepting) {
+        GS.onSuccess('Correctly accepted the word! The word is accepted.');
+      } else if (readAll && !accepting) {
+        GS.onFailure('Incorrectly accepted the word! You are not in an accepting state.');
+      } else {
+        GS.onFailure('Incorrectly accepted the word! The word is not fully read.');
+      }
+    }
+    GS.rejectButton.onClick = () => {
+      if (GS.opts.shouldFail) {
+        GS.onSuccess('Correctly rejected the word! There is no solution.');
+      } else {
+        GS.onFailure('Incorrectly rejected the word! There is a solution.');
+      }
+    }
+    GS.screen.addChild(GS.acceptButton);
+    GS.screen.addChild(GS.rejectButton);
+  }
 }
 
 

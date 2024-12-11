@@ -35,8 +35,8 @@
     import { Scene, SceneManager } from './scene.js';
     import { bg_dark, black } from './colours.js';
     import { registerScene } from './templates/scene.js';
-    import dfaTheoryAnswers from './anims/dfa_theory_answers.js'
-    import load from '/tools/loading.js';
+    import nfaIntro from './anims/nfa_alg_video.js'
+    import load from './tools/loading.js';
 
     // Tween setup - not needed for other scenes.
     window.addEventListener("keypress",  (e) => {
@@ -53,8 +53,8 @@
       console.log("Speed: ", TweenManager.curSpeed);
     });
 
-    registerScene(dfaTheoryAnswers.loader, dfaTheoryAnswers.unloader, 'video', undefined, () => {
-      // markComplete('dfaTheoryAnswers');
+    registerScene(nfaIntro.loader, nfaIntro.unloader, 'video', undefined, () => {
+      // markComplete('nfaIntro');
     });
 
     load();

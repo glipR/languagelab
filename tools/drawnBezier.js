@@ -3,12 +3,14 @@ import { black } from "../colours.js";
 import { interpValue } from "../tween.js";
 import { bezier, bezierLength, inverseBezierRateFunction, magnitude, mergeDeep, negate, partialBezier, vectorCombine } from "../utils.js";
 
+const gsc = window.gameScaling ?? 1;
+
 export class DrawnBezier extends PIXI.Graphics {
   constructor(fixStyle, bezier, drawnAmount=0) {
     super();
     this.fixStyle = mergeDeep({
       stroke: {
-        width: 2,
+        width: 2 * gsc,
         color: black,
       },
       points: 10,
@@ -169,5 +171,13 @@ export class DrawnBezier extends PIXI.Graphics {
       points.slice(1).forEach(point => this.lineTo(point.x, point.y));
       this.stroke(this.fixStyle.stroke);
     }
+  }
+
+  copy() {
+    // Same random same everything
+    const bez = new DrawnBezier({...this.fixStyle}, this.drawnBezierPoints, this.drawnAmount);
+    bez.drawnRandoms = this.drawnRandoms;
+    bez.setDrawnBezier(this.drawnBezierPoints);
+    return bez;
   }
 }

@@ -78,11 +78,11 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   const edgeStyle = (lab) => ({ edgeLabel: lab });
   GS.graph.fromJSON({
     nodes: {
-      A: { position: { x: 250, y: 300 }, style: {...nodeStyle, isEntry: true, entryWidth: 5 } },
-      B: { position: { x: 500, y: 300 }, style: nodeStyle },
-      C: { position: { x: 750, y: 300 }, style: {...nodeStyle, doubleBorder: black } },
-      D: { position: { x: 375, y: 500 }, style: {...nodeStyle, doubleBorder: black } },
-      E: { position: { x: 625, y: 500 }, style: nodeStyle },
+      A: { x: 250, y: 300, style: {...nodeStyle, isEntry: true, entryWidth: 5 } },
+      B: { x: 500, y: 300, style: nodeStyle },
+      C: { x: 750, y: 300, style: {...nodeStyle, doubleBorder: black } },
+      D: { x: 375, y: 500, style: {...nodeStyle, doubleBorder: black } },
+      E: { x: 625, y: 500, style: nodeStyle },
     },
     edges: [
       { from: 'A', to: 'B', style: edgeStyle('a') },

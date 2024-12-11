@@ -28,7 +28,7 @@ class DFADraw {
 
     this.curState = DFADraw.SELECT_EMPTY;
     this.nodeLabelModal = new KeyEntryModal("Enter a label for the node", 1);
-    this.transitionLabelModal = new KeyEntryModal("Enter a label for the transition (or delete)", 20, "abcdefghijklmnopqrstuvwxyz123456789, ");
+    this.transitionLabelModal = new KeyEntryModal("Enter a label for the transition (or delete)", 20, "abcdefghijklmnopqrstuvwxyz0123456789, .");
     this.fakeTargetNode = new Node("ABCDEF", { x: 0, y: 0 }, {...DFADraw.baseStyle});
     this.fakeTargetNode.graphic.visible = false;
     this.fakeEdge = AbstractEdge.decide(this.fakeTargetNode, this.fakeTargetNode, {...DFADraw.baseEdgeStyle});
