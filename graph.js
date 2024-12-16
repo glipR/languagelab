@@ -172,7 +172,7 @@ class AbstractEdge {
   constructor(from, to, style) {
     this.from = from;
     this.to = to;
-    this.style = {...this.baseStyle(), ...style};
+    this.style = mergeDeep({...this.baseStyle()}, style);
     this.drawnAmount = 1;
     this.onActions = {};
     this.initGraphic();
