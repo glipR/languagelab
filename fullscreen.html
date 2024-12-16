@@ -35,7 +35,7 @@
     import { Scene, SceneManager } from './scene.js';
     import { bg_dark, black } from './colours.js';
     import { registerScene } from './templates/scene.js';
-    import nfaIntro from './anims/nfa_alg_video.js'
+    import playground from './anims/video_playground.js'
     import load from './tools/loading.js';
 
     // Tween setup - not needed for other scenes.
@@ -53,7 +53,7 @@
       console.log("Speed: ", TweenManager.curSpeed);
     });
 
-    registerScene(nfaIntro.loader, nfaIntro.unloader, 'video', undefined, () => {
+    registerScene(playground.loader, playground.unloader, 'video', undefined, () => {
       // markComplete('nfaIntro');
     });
 

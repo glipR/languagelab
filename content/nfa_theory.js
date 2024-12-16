@@ -20,7 +20,7 @@ const preQuivText = `\
 </p>
 `
 
-// const video = (s) => `<div class="aspect-ratio" style="margin-bottom: 20px"><iframe src="https://www.youtube.com/embed/TXfRQkQTiU0?si=tZ8q30tTQF8_Sm3t&amp;start=${s}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`
+const video = (src) => `<div class="aspect-ratio" style="margin-bottom: 20px"><iframe src="${src}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>`
 
 const addQuestion = (title, id, question, hint, solution) => {
   const questionDiv = document.createElement('div');
@@ -99,21 +99,31 @@ const questions = [
     title: "Conversion Q1",
     id: "q2",
     question: "DFAs, but you're allowed to use the character $\\star$ in transitions, which can match any character.",
-    hint: `TODO`,
+    hint: `
+      ${detailSummary("Think about the NFA which is just a single star transition from the start state to an accepting state. How we achieve this without the star transition, if the alphabet was a,b?", "Hint 1")}
+      ${detailSummary("There is a label we can give a transition which is functionally equivalent to the $\\star$", "Hint 2")}
+    `,
     solution: `We can just convert the $\\star$ to a transition which includes all letters in the alphabet of the language.
-    Image: TODO
+    <img class="stopHeight" src="/img/nfaTheory/ex1.png">
     `,
   },
   {
     title: "Conversion Q2",
     id: "q3",
     question: "A list of words $w_1, w_2, \\ldots, w_n$ is provided, and a word is matched by this machine if it contains any of $w_1, w_2, \\ldots w_n$ as a substring.",
-    hint: `TODO`,
+    hint: `
+      ${detailSummary("Can you make $n$ NFAs to match $w_1$ through $w_n$? If so, how would you combine these into a single NFA which looks for any of them as a substring.", "Hint 1")}
+      ${detailSummary("The NFAs might look like this: <img class='stopHeight' src='/img/nfaTheory/ex2-1.png'> Alongside all the $n$ NFA's different states, you might introduce 2 more: One being the start state, and representing that no substring has been read yet, and an end state, representing that a substring has been read and we can accept the word, no matter what letters follow.", "Hint 2")}
+      ${detailSummary("We can make epsilon transitions between these two new states and the starts/ends of the word NFAs. What other transitions do we need?", "Hint 3")}
+    `,
     solution: `
-      We can achieve this by making a string of states for each of $w_1$ through to $w_n$, then connecting the start and end of these strings to two states with epsilon transitions.
-      This two states should then be able to read as many characters as they want with self-transitions, and then we can make the end state an accepting state:
+      We already know we can make an NFA that that recognises each of $w_1$ through to $w_n$:
+      <img class="stopHeight" src="/img/nfaTheory/ex2-1.png">
 
-      Image: TODO
+      Then all we need to do to make it a single NFA matching any of them, is connecting the start and end of these strings to two states with epsilon transitions.
+      These two states should then be able to read as many characters as they want with self-transitions, and then we can make the end state an accepting state:
+
+      <img class="stopHeight" src="/img/nfaTheory/ex2-2.png">
               `
   },
   {
@@ -126,11 +136,14 @@ const questions = [
 
       <img src="/img/theory/nfa-words.png" />
       `,
-    hint: `TODO`,
+    hint: `
+      ${detailSummary("We'll simply need to replace the word transitions with some extra states/transitions that achieve the same outcome.", "Hint 1")}
+      ${detailSummary("What is an NFA that matches the word 'odd'? Can this be neatly 'inserted' into NFAs that use the 'odd' transition?", "Hint 2")}
+    `,
     solution: `
       We can just replace every word transition with a string of states and transitions that only read one character at a time.
 
-      Image: TODO
+      <img class="stopHeight" src="/img/nfaTheory/ex4.png">
     `,
   },
   {
@@ -138,12 +151,16 @@ const questions = [
     id: "q5",
     question: `An NFA that accepts a word if we can reach an accepting state (no need to read the entire word).`,
     hint: `
-      TODO
+      ${detailSummary("If all of our accepting states already have self transitions that read every character, we are done. If not, what should we do?", "Hint 1")}
     `,
     solution: `
       We can turn this into a normal NFA by introducing a new accepting state, which has transitions to itself for every character, and then adding epsilon transitions from every existing accepting state into this new one.
 
-      Image: TODO
+      <img class="stopHeight" src="/img/nfaTheory/ex3-1.png">
+
+      becomes
+
+      <img class="stopHeight" src="/img/nfaTheory/ex3-2.png">
     `,
   },
   {
@@ -153,21 +170,22 @@ const questions = [
       NFA, but it only accepts a word if <span class="highlight-small highlight-blue">all</span> paths can read the entire word and land on an accepting state.
       As an example, this NFA would accept aaaaaabaaaaaaaaaaaa, but not baab
 
-      <img src="/img/theory/nfa-all-paths.png" />
+      <img src="/img/nfaTheory/ex5.png" />
     `,
     hint: `
-      TODO
+      ${detailSummary("Our solution to convert NFAs to DFAs simulated all paths at once, maybe there's a modification to that algorithm that will work here.", "Hint 1")}
+      ${detailSummary("If we just change the accepting states of the resultant DFA to be accepting if all possible states are accepting, our conversion algorithm still isn't quite right. This is because some paths in the algorithm might've been cut short because no transition was available. How should we modify our table to fix this?", "Hint 2")}
     `,
     solution: `
       We can do this by turning into a DFA using the same table algorithm, with some major adjustments:
       <ul>
         <li>Obviously, the accepting condition of the DFA state changes - they accept only if all states in the collection are accepting.</li>
-        <li>To ensure all paths work, and never die out, we have another condition - if at any point, some possible state does not have a transition for the next character, then the collection transition for that character is empty, regardless of if there were other states that did have the transition.</li>
+        <li>To ensure all paths work, and never die out, we have another condition - if at any point, some possible state does not have a transition for the next character, then the transition for that character on that collection of states is empty, regardless of if there were other states that did have the transition.</li>
       </ul>
 
-      To follow on that second point, imagine we are figuring out the transitions for collection A, B, C on character 'a'. If A and C have a transition that reads 'a', but B does not, then the transition for 'a' on the collection A, B, C is empty, where as usually, we would just transitions from A and C, and ignore B.
+      Watch the algorithm being executed below - all steps are the same, except for the last step shown - notice how there are still paths to S, A and 1 upon reading a 'b', but the transition for 'b' is empty, because there is not b transition from state 3.
 
-      Image: TODO
+      ${video("https://www.youtube.com/embed/ay_k0Hui1Pw?si=Y85ciXnPHvqbRzi4")}
     `,
   },
   {
@@ -175,36 +193,37 @@ const questions = [
     id: "q7",
     question: `An NFA, but you can give transitions a weight $w$, such that you can only traverse this transition at most $w$ times while reading a word.
 
-      As an example, this NFA accepts caaaaabac, but not abacaba.
+      As an example, this NFA accepts aaabaaa, but not baaabaaaa.
 
       <img src="/img/theory/nfa-fixed.png" />
     `,
     hint: `
-      TODO
+      ${detailSummary("Our transformed solution needs to encode this weight information in the current state, rather than attaching it to transitions", "Hint 1")}
+      ${detailSummary("In the NFA that's shown, let's make 6 copies of the NFA, each corresponding to a different possible amount of transitions remaining (1 of the b transition and 2 of the a transition, or 1 of the b transition and 0 of the a transition, etc.). What transitions would exist between the copies? What transitions would need to be removed?", "Hint 2")}
     `,
     solution: `
       We can do this by having many copies of the NFA, and these weighted transitions move us between these copies.
 
       The reason for this is that then these copies can represent how many times we have traversed a particular transition, and we can keep track of this as we read the word, and remove transitions from the copies accordingly.
 
-      For example, suppose we had one transition that had weight 2, and another with weight 1. Call them $a$ and $b$.
+      For example, suppose we had one transition that had weight 2, and another with weight 1. Call them $x$ and $y$.
 
       Then we make 6 copies of the NFA, representing:
 
       <ul>
-        <li>0 copies of $a$ and 0 copies of $b$ remaining</li>
-        <li>1 copy of $a$ and 0 copies of $b$ remaining</li>
-        <li>2 copies of $a$ and 0 copies of $b$ remaining</li>
-        <li>0 copies of $a$ and 1 copy of $b$ remaining</li>
-        <li>1 copy of $a$ and 1 copy of $b$ remaining</li>
-        <li>2 copies of $a$ and 1 copy of $b$ remaining</li>
+        <li>0 copies of $x$ and 0 copies of $y$ remaining</li>
+        <li>1 copy of $x$ and 0 copies of $y$ remaining</li>
+        <li>2 copies of $x$ and 0 copies of $y$ remaining</li>
+        <li>0 copies of $x$ and 1 copy of $y$ remaining</li>
+        <li>1 copy of $x$ and 1 copy of $y$ remaining</li>
+        <li>2 copies of $x$ and 1 copy of $y$ remaining</li>
       </ul>
 
-      For the $a$ transition, instead of pointing to the end state in it's own copy, will point to the end state in the copy with 1 less $a$ transition remaining, and the copies with 0 remaining will have no such transition.
+      For the $x$ transition, instead of pointing to the end state in it's own copy, will point to the end state in the copy with 1 less $x$ transition remaining, and the copies with 0 remaining will have no such transition.
 
-      Similarly, the $b$ transition will point to the end state in the copy with 1 less $b$ transition remaining, and the copies with 0 remaining will have no such transition.
+      Similarly, the $y$ transition will point to the end state in the copy with 1 less $y$ transition remaining, and the copies with 0 remaining will have no such transition.
 
-      TODO: Image.
+      ${video("https://www.youtube.com/embed/LOENf4rnlnU?si=Y0-4bZu8X8ym1kTT")}
     `
   }
 ]
