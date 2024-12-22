@@ -133,6 +133,24 @@ class DFA extends Graph {
       Object.values(this.nodes).filter((node) => !node.style.doubleBorder && marked[node.label]),
       Object.values(this.nodes).filter((node) => node.style.doubleBorder && marked[node.label]),
     ];
+    if (newStates[0].length === 0 || newStates[1].length === 0) {
+      // No accepting states - just a single node.
+      const newDFA = new DFA();
+      newDFA.fromJSON({
+        nodes: {
+          'S': {
+            x: 0,
+            y: 0,
+            start: true,
+            accepting: newStates[1].length > 0,
+          }
+        },
+        edges: [
+          { from: 'S', to: 'S', label: this.collectAlphabet().join(", ") }
+        ]
+      });
+      return newDFA;
+    }
     // Set group index.
     newStates.forEach((state, i) => state.forEach((node) => node.groupIndex = i));
     const alphabet = this.collectAlphabet();
@@ -173,6 +191,7 @@ class DFA extends Graph {
     }
     // Reset group indicies.
     newStates.forEach((state, i) => state.forEach((node) => node.groupIndex = i));
+    console.log(newStates);
     // Create the new DFA
     const newDFA = new DFA();
     newDFA.fromJSON({
