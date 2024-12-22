@@ -98,7 +98,11 @@ class NFA extends Graph {
   }
 
   _includeEpsilonTransitions(curStateBitset, stateMap) {
-    return curStateBitset | this._stateSetAfterChar(curStateBitset, 'ε', stateMap);
+    while (true) {
+      const newSet = curStateBitset | this._stateSetAfterChar(curStateBitset, 'ε', stateMap);
+      if (newSet === curStateBitset) return newSet;
+      curStateBitset = newSet;
+    }
   }
 }
 
