@@ -263,7 +263,7 @@ a.pageDropdownItem {
   right: 0;
 }
 
-.dfaSection, .nfaSection {
+.dfaSection, .regexSection, .nfaSection {
   background: url('/img/backgrounds/cardboard-resize.png');
   background-size: cover;
   padding: 20px 45px 45px 45px;
@@ -593,6 +593,9 @@ img.icon {
 .highlight-purple {
   background: linear-gradient(105deg, #0000 8%, #b388eb 10%, #b388eb 90%, #0000 92%);
 }
+.highlight-yellow {
+  background: linear-gradient(105deg, #0000 8%, #e9f840 10%, #e9f840 90%, #0000 92%);
+}
 .highlight-red-long {
   background: linear-gradient(105deg, #0000 1%, #fb6f92 2%, #fb6f92 98%, #0000 99%);
 }
@@ -607,6 +610,9 @@ img.icon {
 }
 .highlight-purple-long {
   background: linear-gradient(105deg, #0000 1%, #b388eb 2%, #b388eb 98%, #0000 99%);
+}
+.highlight-yellow-long {
+  background: linear-gradient(105deg, #0000 1%, #e9f840 2%, #e9f840 98%, #0000 99%);
 }
 
 .tab-view {

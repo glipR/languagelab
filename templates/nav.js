@@ -2,6 +2,11 @@ import { isComplete } from '../tools/completion.js';
 import { trueOnce } from '../utils.js';
 
 export const contentMapping = {
+  intro: {
+    title: "Introduction",
+    type: "worded",
+    href: "/",
+  },
   dfaIntro: {
     title: "What is a DFA?",
     type: "worded",
@@ -41,6 +46,30 @@ export const contentMapping = {
     title: "Modifying DFAs",
     type: "code",
     href: "/pages/dfa_code_modify",
+  },
+
+  regexIntro: {
+    title: "Regular Expressions?",
+    type: "worded",
+    href: "/pages/regex_intro",
+  },
+
+  regexClassify: {
+    title: "Analysing Regex",
+    type: "game",
+    href: "/pages/regex_classify",
+  },
+
+  regexMatch: {
+    title: "Recognising Languages",
+    type: "game",
+    href: "/pages/regex_match",
+  },
+
+  regexGame: {
+    title: "Regex Game",
+    type: "game",
+    href: "/pages/regex_game",
   },
 
   nfaIntro: {
@@ -115,9 +144,7 @@ const navContent = (key) => `
       </div>
       <div class="pageDropdownResults">
         <div class="pageDropdownSection smallSection">
-          <h4 class="iconWIP pageDropdownSectionTitle">
-            Regex
-          </h4>
+          ${renderItem('intro')}
         </div>
         <div class="pageDropdownSection dfaSection">
           <h4 class="iconSection pageDropdownSectionTitle"> DFA</h4>
@@ -130,6 +157,16 @@ const navContent = (key) => `
           ${renderItem('dfaMatch')}
           ${renderItem('dfaAlgorithm')}
           ${renderItem('dfaModify')}
+        </div>
+        <div class="pageDropdownSection regexSection">
+          <h4 class="iconSection pageDropdownSectionTitle">
+            Regex
+          </h4>
+          <hr />
+          ${renderItem('regexIntro')}
+          ${renderItem('regexClassify')}
+          ${renderItem('regexMatch')}
+          ${renderItem('regexGame')}
         </div>
         <div class="pageDropdownSection nfaSection">
           <h4 class="iconSection pageDropdownSectionTitle"> NFA</h4>
