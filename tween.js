@@ -1,3 +1,5 @@
+import { mergeDeep } from "./utils.js";
+
 class TweenManager {
   static curSpeed = 1;
   static paused = false;
@@ -154,12 +156,31 @@ class Tween {
   }
 }
 
-const interpValue = (start, end, t) => {
+const interpValue = (start, end, t, tweenObj=false) => {
   if (typeof start === 'number') {
     return start + (end - start) * t;
   }
+  else if (tweenObj) {
+    // Tween every property of the object
+    const newObj = {};
+    const startMerge = mergeDeep({}, end, start);
+    const endMerge = mergeDeep({}, start, end);
+    for (const key in startMerge) {
+      newObj[key] = interpValue(startMerge[key], endMerge[key], t);
+    }
+    return newObj
+  }
   else if (start.x !== undefined) {
     if (end.x === NaN) { throw new Error('end.x is NaN'); }
+    if (start.width !== undefined) {
+      // Transform
+      return {
+        x: start.x + (end.x - start.x) * t,
+        y: start.y + (end.y - start.y) * t,
+        width: start.width + (end.width - start.width) * t,
+        height: start.height + (end.height - start.height) * t,
+      }
+    }
     return {
       x: start.x + (end.x - start.x) * t,
       y: start.y + (end.y - start.y) * t,

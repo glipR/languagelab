@@ -41,7 +41,6 @@ const wordIndexPosition = ((i, word) => {
 
 const moveBetween = (l1, l2, duration, graph, nodePointer, wordPointer, word) => {
   const edge = graph.edgeMap[`${l1}->${l2}`];
-  console.log(l1, l2, edge)
   if (!edge) return new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, () => {});
   const tween = new ValueTween(0, 1, duration, GS.easings.easeInOutQuad, (v) => {
     const pos = edge.bezierEdgeInterp(v).position;

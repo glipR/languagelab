@@ -93,8 +93,6 @@ class Scene {
       this.loaded = false;
       return;
     }
-    // Log position of parent element.
-    console.log(this.parent.getBoundingClientRect());
 
     const app = new PIXI.Application();
     await app.init({

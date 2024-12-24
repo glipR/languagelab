@@ -550,7 +550,6 @@ class Graph {
   }
 
   fromJSON(json) {
-    console.log(json);
     const nodeStyle = Graph.baseNodeStyle ?? {};
     const edgeStyle = Graph.baseEdgeStyle ?? {};
     Object.keys(json.nodes).forEach((key) => {
@@ -638,7 +637,6 @@ class Graph {
       nodes: {},
       edges: [],
     }
-    console.log(data)
     get(data, "states").forEach((state) => {
       json.nodes[get(state, 'name')] = {
         x: get(state, 'position')?.x ?? 0,

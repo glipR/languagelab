@@ -46,6 +46,8 @@ class Table extends PIXI.Container {
     this.scrollContainer.addChild(this.scrollContainer.mask);
     this.scrollContainer.on('wheel', (e) => {
       // preventDefault doesn't work in PIXI :( so we have to do this.
+      // TODO: This is because all events are passive. This can be fixed since this event first before other wheel events.
+      // You can solve this by setting a global flag in this event, which will be reset on the other wheel event (which will also prevent default)
       window.scrollBy(-e.deltaX, -e.deltaY);
       const newX = Math.max(0,Math.min(
         this.style.headerWidth + (this.data[0].length-1) * this.style.itemWidth - this.style.totalWidth,

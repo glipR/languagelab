@@ -29,7 +29,7 @@ const t4Tasks = [
 const contentText = `
 Let's make some NFAs that recognise a specific language.
 <br>
-When entering in label characters, you can press '.' and this will be replaced with 'ε'.
+When entering in label characters, you can press ';' and this will be replaced with 'ε'.
 <br>
 The third and final language is rather challenging, feel free to intentionally submit the wrong NFA so you can peek the hints if need be!
 `

@@ -42,6 +42,7 @@ class Progress {
     // This shouldn't change anything
     this.startInstruction(this.current);
     this.incrementCurrent();
+    this.checkCompleted();
   }
 
   markCompleted = (index) => {

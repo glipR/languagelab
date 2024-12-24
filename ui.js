@@ -42,7 +42,7 @@ class KeyEntryModal extends PIXI.Container {
           this.deactivate();
         }
       } else if (this.acceptedCharacters.includes(e.key) && this.curText.length < this.maxKeyLength) {
-        const addedChar = e.key === "." ? "ε" : e.key;
+        const addedChar = e.key === ";" ? "ε" : e.key;
         this.validationText.text = "";
         this.curText = this.curText + addedChar;
         this.curText = this.textMap(this.curText);
@@ -124,10 +124,10 @@ class FloatingButton extends PIXI.Container {
     this.bg.tint = this.opts.bg.fill;
     this.addChild(this.bg);
 
-    this.bg.interactive = true;
-    this.bg.buttonMode = true;
-    this.bg.cursor = "pointer";
-    this.bg.on("pointerdown", () => {
+    this.interactive = true;
+    this.buttonMode = true;
+    this.cursor = "pointer";
+    this.on("pointerdown", () => {
       if (!this.disabled) {
         this.onClick?.();
       }

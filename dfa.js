@@ -176,7 +176,6 @@ class DFA extends Graph {
         }
         const newGroups = Object.values(alphMaps);
         if (newGroups.length > 1) {
-          console.log("Splitting", state.map((node) => node.label), "into", newGroups.map((group) => group.map((node) => node.label)));
           done = false;
           newGroups.forEach((group) => {
             newStatesCopy.push(group);
@@ -191,7 +190,6 @@ class DFA extends Graph {
     }
     // Reset group indicies.
     newStates.forEach((state, i) => state.forEach((node) => node.groupIndex = i));
-    console.log(newStates);
     // Create the new DFA
     const newDFA = new DFA();
     newDFA.fromJSON({
@@ -300,19 +298,21 @@ class DFA extends Graph {
 
   // Make a new DFA which recognises me and other
   combine(other, accepts = (me, other) => boolean) {
-    console.log("COMBINE")
     const meTrue = this.invert().findAcceptingString() === null;
     const meFalse = this.findAcceptingString() === null;
     const otherTrue = other.invert().findAcceptingString() === null;
     const otherFalse = other.findAcceptingString() === null;
+    const alphabet = this.collectAlphabet();
+    const otherAlphabet = other.collectAlphabet();
+    const combinedAlphabet = Array.from(new Set([...alphabet, ...otherAlphabet]));
+    const alphabetSame = combinedAlphabet.length === alphabet.length && combinedAlphabet.length === otherAlphabet.length;
 
-    if (meTrue || meFalse) {
+    if ((meTrue || meFalse) && alphabetSame) {
       const normal = accepts(meTrue, false);
       const accept = accepts(meTrue, true);
       return other.combine(other, (a, b) => a ? accept : normal);
     }
-    if (otherTrue || otherFalse) {
-      console.log(otherTrue, otherFalse)
+    if ((otherTrue || otherFalse) && alphabetSame) {
       const normal = accepts(false, otherTrue);
       const accept = accepts(true, otherTrue);
       return this.combine(this, (a, b) => a ? accept : normal);
@@ -323,8 +323,6 @@ class DFA extends Graph {
       nodes: {},
       edges: []
     }
-    const alphabet = this.collectAlphabet();
-    const otherAlphabet = other.collectAlphabet();
     this.nodes = {...this.nodes, 'ME_DEATH': {
       label: 'ME_DEATH',
       position: { x: 0, y: 0 },
@@ -336,8 +334,8 @@ class DFA extends Graph {
       style: { isEntry: false, doubleBorder: false },
     }};
     // Temporarily add edges to death nodes
-    const myMissing = Array.from(otherAlphabet).filter(char => !alphabet.includes(char)).join(", ");
-    const otherMissing = Array.from(alphabet).filter(char => !otherAlphabet.includes(char)).join(", ");
+    const myMissing = Array.from(combinedAlphabet).filter(char => !alphabet.includes(char)).join(", ");
+    const otherMissing = Array.from(combinedAlphabet).filter(char => !otherAlphabet.includes(char)).join(", ");
     const oldEdges = [...this.edges];
     const otherOldEdges = [...other.edges];
     if (myMissing) {
@@ -376,7 +374,7 @@ class DFA extends Graph {
     });
     Object.values(this.nodes).forEach((node) => {
       Object.values(other.nodes).forEach((otherNode) => {
-        alphabet.forEach((char) => {
+        combinedAlphabet.forEach((char) => {
           const myNext = this.getNextNode(node, char);
           const otherNext = other.getNextNode(otherNode, char);
           json.edges.push({

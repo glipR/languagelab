@@ -39,7 +39,6 @@ const connect = (sphere1, sphere2, oneWay=false) => {
 }
 
 const reset = () => {
-  console.log('resetting');
   GS.curWordIndex = 0;
   GS.curNodeKey = GS.startNodeKey;
   GS.curSphere = null;
