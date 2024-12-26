@@ -1,7 +1,13 @@
-import { black, blue, green, highlightColours, red, white } from "../colours.js";
+import { black, blue, green, highlightColours, lightGrey, red, white } from "../colours.js";
+import Regex from "../regex.js";
 import Screen from "../screen.js";
 import { RectangleCover } from "../tools/paper_cover.js";
-import { delay, interpValue, TweenManager, ValueTween } from "../tween.js";
+import { delay, ImmediateTween, interpValue, TweenManager, ValueTween } from "../tween.js";
+import RegexGame from './regex_game.js'
+import NFAConvert from './nfa_convert.js';
+import { convertTasks } from '../content/nfa_convert.js';
+import { vectorCombine } from "../utils.js";
+import DFA from "../dfa.js";
 
 const gsc = window.gameScaling ?? 1;
 
@@ -321,7 +327,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     codeSprite('42-valid-2'),
   ]
 
-  const evenCover = new RectangleCover(finalAccept, { width: 1050, height: 300, randMult: 0.1, points: 30 });
+  const evenCover = new RectangleCover(finalAccept, { width: 1150, height: 300, randMult: 0.1, points: 25 });
   evenCover.position.set(2000, 1000);
   evenCover.alpha = 0;
   finalContainer.addChild(evenCover);
@@ -403,7 +409,161 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
 
   // But more importantly than anything else, <span class="highlight-small highlight-green-long">we'll have fun doing it!</span> This course is interactive wherever possible, so you'll have the opportunity to execute, design, and explore the algorithms and languages provided.
 
-  // TODO: Show the interactive elements.
+  const movePointer = (pointer, pos, duration) => new ValueTween(0, 1, duration, GS.easings.easeInOutQuad, (v) => {
+    const pos = interpValue(pointer.startPos, pointer.endPos, v);
+    pointer.position.set(pos.x, pos.y);
+  }, () => {
+    pointer.startPos = {x: pointer.position.x, y: pointer.position.y};
+    pointer.endPos = pos;
+  });
+  const pointerClick = (pointer) => new ValueTween(lightGrey, black, 25, GS.easings.easeInOutQuad, (v) => pointer.tint = v);
+
+  const fakeDFAJSON = {
+    nodes: {
+      A: { x: 0, y: 0, start: true, style: {radius: 90, entryWidth: 15} },
+      B: { x: 600, y: 0, style: {radius: 90, entryWidth: 15} },
+    },
+    edges: [
+      { from: 'A', to: 'B', label: 'a' },
+    ],
+  }
+  const fakeDFA = new DFA();
+  fakeDFA.fromJSON(fakeDFAJSON);
+  fakeDFA.graph.position.set(2600, 600);
+  GS.screen.addChild(fakeDFA.graph);
+  Object.values(fakeDFA.nodes).forEach(node => {
+    node.graphic.alpha = 0;
+    node.separatedGraphic.alpha = 0;
+  });
+  fakeDFA.edges.forEach(edge => {
+    edge.labelBG.alpha = 1;
+    edge.drawnAmount = 0;
+    edge.updateGraphic();
+  })
+  const fakeDFAPointer = new PIXI.Graphics();
+  fakeDFAPointer
+    .moveTo(0, 0)
+    .lineTo(0, 100)
+    .lineTo(Math.cos(3 * Math.PI / 8) * 60, Math.sin(3 * Math.PI / 8) * 60)
+    .lineTo(Math.cos(Math.PI / 4) * 100, Math.sin(Math.PI / 4) * 100)
+    .lineTo(0, 0)
+    .fill(white);
+  fakeDFAPointer.position.set(500, 400);
+  fakeDFAPointer.tint = black;
+  fakeDFAPointer.alpha = 0;
+  fakeDFA.graph.addChild(fakeDFAPointer);
+
+
+  const nfaContainer = new PIXI.Container();
+  nfaContainer.position.set(100, 100);
+  nfaContainer.alpha = 0;
+  GS.screen.addChild(nfaContainer);
+  const nfaApp = Screen.fakeApp(nfaContainer, 2000, 1600);
+  Object.values(convertTasks[0].nfa.nodes).forEach(node => {
+    node.x = node.x * gsc;
+    node.y = node.y * gsc - 400;
+  });
+  convertTasks[0].nfa.edges.forEach(edge => {
+    if (edge.style?.edgeAnchor) {
+      edge.style.edgeAnchor.x *= gsc;
+      edge.style.edgeAnchor.y *= gsc;
+    }
+  });
+  NFAConvert.loader(nfaApp, GS.easings, () => {}, () => {}, {hideBG: true, ...convertTasks[0]});
+  NFAConvert.GS.checkButton.alpha = 0;
+  NFAConvert.GS.containerClick(1, 0);
+  NFAConvert.GS.nodeClick('S');
+  NFAConvert.GS.nodeClick('A');
+  const nfaPointer = new PIXI.Graphics();
+  nfaPointer
+    .moveTo(0, 0)
+    .lineTo(0, 100)
+    .lineTo(Math.cos(3 * Math.PI / 8) * 60, Math.sin(3 * Math.PI / 8) * 60)
+    .lineTo(Math.cos(Math.PI / 4) * 100, Math.sin(Math.PI / 4) * 100)
+    .lineTo(0, 0)
+    .fill(white);
+  nfaPointer.position.set(500, 400);
+  nfaPointer.tint = black;
+  NFAConvert.GS.screen.addChild(nfaPointer);
+
+  const containerPos = (i, j) => {
+    return vectorCombine(
+      NFAConvert.GS.table.getElementPosition(i, j),
+      { x: NFAConvert.GS.table.position.x, y: NFAConvert.GS.table.position.y },
+      { x: 200, y: 50 },
+    )
+  }
+  const nodePos = (label) => {
+    return vectorCombine(
+      NFAConvert.GS.nfa.nodes[label].position,
+      {
+        x: NFAConvert.GS.nfa.graph.position.x,
+        y: NFAConvert.GS.nfa.graph.position.y,
+      }
+    )
+  }
+
+  const nfaConvertSet = delay(0)
+  .then(
+    movePointer(nfaPointer, containerPos(1, 1), 30),
+  )
+  .then(new ImmediateTween(() => NFAConvert.GS.containerClick(1, 1)), pointerClick(nfaPointer))
+  .then(movePointer(nfaPointer, nodePos('D'), 30))
+  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('D')), pointerClick(nfaPointer))
+  .then(movePointer(nfaPointer, containerPos(1, 2), 30))
+  .then(new ImmediateTween(() => NFAConvert.GS.containerClick(1, 2)), pointerClick(nfaPointer))
+  .then(movePointer(nfaPointer, nodePos('B'), 30))
+  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('B')), pointerClick(nfaPointer))
+  .then(movePointer(nfaPointer, nodePos('C'), 30))
+  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('C')), pointerClick(nfaPointer))
+  .then(movePointer(nfaPointer, nodePos('D'), 30))
+  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('D')), pointerClick(nfaPointer))
+
+  const regexContainer = new PIXI.Container();
+  regexContainer.position.set(1100, 1000);
+  regexContainer.alpha = 0;
+  GS.screen.addChild(regexContainer);
+  const regexApp = Screen.fakeApp(regexContainer, 2000, 1600);
+  RegexGame.loader(regexApp, GS.easings, () => {}, () => {}, {hideBG: true, steps: [], progress: {}});
+  RegexGame.showScreen(RegexGame.STATE_SLEUTH_GUESS);
+  RegexGame.setCodeRegex("a*b*c")
+  RegexGame.GS.sleuthGuesses = [new Regex("a*(b|c)*")]
+  RegexGame.GS.codeWordDistinguishes = ["abcbc"]
+  RegexGame.GS.screenContainers[RegexGame.STATE_SLEUTH_GUESS].onStart();
+  RegexGame.GS.sleuthGuesses.push(new Regex("abc*"))
+  RegexGame.GS.codeWordDistinguishes.push("aabc")
+  RegexGame.GS.screenContainers[RegexGame.STATE_SLEUTH_GUESS].onStart();
+  const regexWords = RegexGame.GS.wordContainer.children;
+  regexWords[0].position.set(1600, 1500);
+  const regexPointer = new PIXI.Graphics();
+  regexPointer
+    .moveTo(0, 0)
+    .lineTo(0, 100)
+    .lineTo(Math.cos(3 * Math.PI / 8) * 60, Math.sin(3 * Math.PI / 8) * 60)
+    .lineTo(Math.cos(Math.PI / 4) * 100, Math.sin(Math.PI / 4) * 100)
+    .lineTo(0, 0)
+    .fill(white);
+  regexPointer.tint = black;
+  regexPointer.position.set(1400, 700);
+  RegexGame.GS.screenContainers[RegexGame.STATE_SLEUTH_GUESS].addChild(regexPointer);
+  const moveRegexWord = new ValueTween({ x: 1400, y: 700}, {x: 1700, y: 500}, 30, GS.easings.easeInOutQuad, (pos) => {
+    regexPointer.position.set(pos.x, pos.y);
+  }).then(new ValueTween({ x: 1700, y: 500 }, { x: 2600, y: 1600 }, 60, GS.easings.easeInOutQuad, (pos) => {
+    regexWords[1].position.set(pos.x, pos.y);
+    regexPointer.position.set(pos.x, pos.y);
+  }), new ImmediateTween(() => regexPointer.tint = lightGrey))
+  .then(new ImmediateTween(() => regexPointer.tint = black));
+  const regexAnswer = RegexGame.GS.answerInput;
+  const setAnswer = delay(0).then(
+    new ImmediateTween(() => {regexAnswer.keyTyped("(")}),
+    delay(10).then(new ImmediateTween(() => regexAnswer.keyTyped("a"))),
+    delay(20).then(new ImmediateTween(() => regexAnswer.keyTyped("|"))),
+    delay(30).then(new ImmediateTween(() => regexAnswer.keyTyped("b"))),
+    delay(40).then(new ImmediateTween(() => regexAnswer.keyTyped(")"))),
+    delay(50).then(new ImmediateTween(() => regexAnswer.keyTyped("*"))),
+    delay(60).then(new ImmediateTween(() => regexAnswer.keyTyped("c"))),
+  );
+  regexAnswer.deactivate();
 
   // Start the cog rotations
   TweenManager.add(delay(0).then(rotateCog(300, 18000, leftCog), rotateCog(-300, 18000, rightCog)))
@@ -565,7 +725,58 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       delay(90).then(moveThroughToPos(thirdSprites[2], { x: 3250, y: 1950 })),
       delay(135).then(moveThroughToPos(thirdSprites[3], { x: 2700, y: 1600 })),
     )
+    .then(delay(60))
+    .then(
+      ...thirdSprites.map(w => fadeIn(false, w)),
+      fadeIn(false, numLangText),
+      fadeIn(false, finalContainer),
+      fadeIn(false, leftCog),
+      fadeIn(false, rightCog),
+    )
+    .then(delay(60))
+    .then(fadeIn(true, fakeDFAPointer))
+    .then(
+      movePointer(fakeDFAPointer, { x: 0, y: 0 }, 60)
+    )
+    .then(
+      fakeDFA.nodes['A'].tweenPop(60),
+      pointerClick(fakeDFAPointer)
+    )
+    .then(
+      movePointer(fakeDFAPointer, { x: 600, y: 0 }, 60)
+    )
+    .then(
+      fakeDFA.nodes['B'].tweenPop(60),
+      pointerClick(fakeDFAPointer)
+    )
+    .then(
+      movePointer(fakeDFAPointer, { x: 0, y: 0 }, 60)
+    )
+    .then(
+      new ImmediateTween(() => fakeDFAPointer.tint = lightGrey),
+      fakeDFA.edges[0].growEdgeTween(60, GS.easings.easeInOutQuad),
+      fakeDFA.edges[0].showLabelTween(60, GS.easings.easeInOutQuad),
+      movePointer(fakeDFAPointer, { x: 600, y: 0 }, 60)
+    )
+    .then(new ImmediateTween(() => fakeDFAPointer.tint = black))
+    .then(delay(60))
+    .then(
+      fadeIn(true, regexContainer),
+    )
+    .then(moveRegexWord)
+    .then(setAnswer)
+    .then(delay(60))
+    .then(fadeIn(true, nfaContainer))
+    .then(nfaConvertSet)
+    .then(delay(60))
+    .then(
+      fadeIn(false, regexContainer),
+      fadeIn(false, nfaContainer),
+      fadeIn(false, fakeDFA.graph),
+    )
   );
+
+  // TweenManager.skipSeconds(55);
 }
 
 const unloader = () => {}

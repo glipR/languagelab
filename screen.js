@@ -5,7 +5,7 @@ class Screen {
   static borderWidth = 5;
   static borderColor = 0x000000;
 
-  constructor(app) {
+  constructor(app, hideBG=false) {
     this.container = new PIXI.Container();
     const texture = PIXI.Texture.from('bg');
     this.bg = new PIXI.TilingSprite({
@@ -13,21 +13,35 @@ class Screen {
       width: app.renderer.width,
       height: app.renderer.height,
     })
-    // this.bg.alpha = 0;
+    if (hideBG) {
+      this.bg.alpha = 0;
+    }
     this.childElements = new PIXI.Container();
     this.container.addChild(this.childElements);
     app.stage.addChild(this.bg);
     app.stage.addChild(this.container);
-    const widthScaling = window.innerWidth / texture.width;
-    const heightScaling = window.innerHeight / texture.height;
-    // For 20% cover.
-    const actualScaling = Math.max(widthScaling, heightScaling) / 5;
-    this.bg.tileScale.x = actualScaling;
-    this.bg.tileScale.y = actualScaling;
-    // tilePosition is based on the texture coordinates
-    this.bg.tilePosition.x = -(app.canvas.getBoundingClientRect().x + window.scrollX)// / actualScaling;
-    this.bg.tilePosition.y = -(app.canvas.getBoundingClientRect().y + window.scrollY)// / actualScaling;
+    if (!hideBG) {
+      const widthScaling = window.innerWidth / texture.width;
+      const heightScaling = window.innerHeight / texture.height;
+      // For 20% cover.
+      const actualScaling = Math.max(widthScaling, heightScaling) / 5;
+      this.bg.tileScale.x = actualScaling;
+      this.bg.tileScale.y = actualScaling;
+      // tilePosition is based on the texture coordinates
+      this.bg.tilePosition.x = -(app.canvas.getBoundingClientRect().x + window.scrollX)// / actualScaling;
+      this.bg.tilePosition.y = -(app.canvas.getBoundingClientRect().y + window.scrollY)// / actualScaling;
+    }
 
+  }
+
+  static fakeApp(container, width, height) {
+    return {
+      renderer: {
+        width,
+        height,
+      },
+      stage: container,
+    }
   }
 
   setScreenSize(width, height) {

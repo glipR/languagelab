@@ -5,7 +5,7 @@ import { StepScenes } from '../utils.js';
 import { isComplete, markComplete } from '../tools/completion.js';
 import { green, purple, red } from '../colours.js';
 
-const convertTasks = [
+export const convertTasks = [
   {
     nfa: NFAConvertTasks.t1JSON,
     alphabet: ["a", "b"],

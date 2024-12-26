@@ -9,6 +9,8 @@ import TextChanger from "../tools/change_text.js";
 import { TweenManager } from "../tween.js";
 import Progress from "../tools/progress.js";
 
+const gsc = window.gameScaling ?? 1;
+
 const [
   STATE_MENU,
   STATE_CODEMASTER_ENTER,
@@ -19,13 +21,13 @@ const [
 
 const baseTextStyle = {
   fontFamily: "Ittybittynotebook",
-  fontSize: 32,
+  fontSize: 32 * gsc,
   fill: black,
   align: 'center',
 };
 const baseButtonOpts = {
-  width: 150,
-  height: 75,
+  width: 150 * gsc,
+  height: 75 * gsc,
 }
 
 const guessRegex = [
@@ -241,42 +243,42 @@ const buildScreenMenu = () => {
     label: { text: "CPU" },
     bg: { fill: GS.codeMasterCPU ? green : red }
   })
-  codeMasterCPUButton.position.set(100, 300);
+  codeMasterCPUButton.position.set(100 * gsc, 300 * gsc);
   const codeMasterPlayerButton = new FloatingButton({
     ...baseButtonOpts,
     label: { text: "Player" },
     bg: { fill: GS.codeMasterCPU ? red : green }
   });
-  codeMasterPlayerButton.position.set(100, 400);
+  codeMasterPlayerButton.position.set(100 * gsc, 400 * gsc);
   const codeMasterHeader = new PIXI.Text({ text: "CodeMaster", style: {
     ...baseTextStyle,
   }});
   codeMasterHeader.anchor.set(0.5, 0.5);
-  codeMasterHeader.position.set(175, 200);
+  codeMasterHeader.position.set(175 * gsc, 200 * gsc);
   const sleuthCPUButton = new FloatingButton({
     ...baseButtonOpts,
     label: { text: "CPU" },
     bg: { fill: GS.sleuthCPU ? green : red }
   })
-  sleuthCPUButton.position.set(750, 300);
+  sleuthCPUButton.position.set(750 * gsc, 300 * gsc);
   const sleuthPlayerButton = new FloatingButton({
     ...baseButtonOpts,
     label: { text: "Player" },
     bg: { fill: GS.sleuthCPU ? red : green }
   });
-  sleuthPlayerButton.position.set(750, 400);
+  sleuthPlayerButton.position.set(750 * gsc, 400 * gsc);
   const sleuthHeader = new PIXI.Text({ text: "Sleuth", style: {
     ...baseTextStyle,
   }});
   sleuthHeader.anchor.set(0.5, 0.5);
-  sleuthHeader.position.set(825, 200);
+  sleuthHeader.position.set(825 * gsc, 200 * gsc);
 
   const playGame = new FloatingButton({
     ...baseButtonOpts,
     label: { text: "Play" },
     bg: { fill: bg_dark }
   });
-  playGame.position.set(425, 250);
+  playGame.position.set(425 * gsc, 250 * gsc);
   GS.screenContainers[STATE_MENU].addChild(codeMasterCPUButton);
   GS.screenContainers[STATE_MENU].addChild(codeMasterPlayerButton);
   GS.screenContainers[STATE_MENU].addChild(codeMasterHeader);
@@ -319,7 +321,7 @@ const buildScreenCodeMasterEnter = () => {
     ...baseTextStyle,
   }});
   header.anchor.set(0.5, 0.5);
-  header.position.set(500, 100);
+  header.position.set(500 * gsc, 100 * gsc);
   GS.screenContainers[STATE_CODEMASTER_ENTER].addChild(header);
 
   const input = new TextEdit('a*(b|c)*', {
@@ -327,10 +329,10 @@ const buildScreenCodeMasterEnter = () => {
     maxLength: 12,
   });
   input.pivot.set(0, input.height / 2);
-  input.position.set(500, 300);
+  input.position.set(500 * gsc, 300 * gsc);
   input.deactivate();
   const inputCover = new RectangleCover(input, { width: 250, points: 20, randMult: 0.1 });
-  inputCover.position.set(500, 300);
+  inputCover.position.set(500 * gsc, 300 * gsc);
   GS.screenContainers[STATE_CODEMASTER_ENTER].addChild(inputCover);
   GS.screenContainers[STATE_CODEMASTER_ENTER].addChild(input);
 
@@ -346,7 +348,7 @@ const buildScreenCodeMasterEnter = () => {
     label: { text: "Submit" },
     bg: { fill: bg_dark }
   });
-  submitButton.position.set(425, 400);
+  submitButton.position.set(425 * gsc, 400 * gsc);
   GS.screenContainers[STATE_CODEMASTER_ENTER].addChild(submitButton);
 
   const submit = async () => {
@@ -374,15 +376,17 @@ const buildScreenSleuthGuess = () => {
     ...baseTextStyle,
   }});
   header.anchor.set(0.5, 0.5);
-  header.position.set(150, 50);
+  header.position.set(150 * gsc, 50 * gsc);
   const answerInput = new TextEdit('', {
     allowedChars: ['a', 'b', 'c', '*', '|', '(', ')'],
     maxLength: 12,
   });
+  // Expose for the intro sequence.
+  GS.answerInput = answerInput;
   answerInput.pivot.set(0, answerInput.height / 2);
-  answerInput.position.set(150, 100);
+  answerInput.position.set(150 * gsc, 100 * gsc);
   answerInput.deactivate();
-  const inputCover = new RectangleCover(answerInput, { width: 250, points: 20, randMult: 0.1 });
+  const inputCover = new RectangleCover(answerInput, { width: 250 * gsc, points: 20, randMult: 0.1 });
   inputCover.position.set(answerInput.position.x, answerInput.position.y);
   const submitButton = new FloatingButton({
     ...baseButtonOpts,
@@ -390,13 +394,13 @@ const buildScreenSleuthGuess = () => {
     bg: { fill: bg_dark }
   });
   submitButton.pivot.set(submitButton.width / 2, submitButton.height / 2);
-  submitButton.position.set(150, 180);
+  submitButton.position.set(150 * gsc, 180 * gsc);
   const guessList = new PIXI.Container();
-  guessList.position.set(575, 25)
+  guessList.position.set(575 * gsc, 25 * gsc)
   const incorrectBorder = new PIXI.Graphics();
-  incorrectBorder.rect(50, 250, 900, 300).fill(red).stroke({ color: black, width: 5 });
+  incorrectBorder.rect(50 * gsc, 250 * gsc, 900 * gsc, 300 * gsc).fill(red).stroke({ color: black, width: 5 * gsc });
   const correctBorder = new PIXI.Graphics();
-  correctBorder.rect(525, 275, 400, 250).fill(green).stroke({ color: black, width: 5 });
+  correctBorder.rect(525 * gsc, 275 * gsc, 400 * gsc, 250 * gsc).fill(green).stroke({ color: black, width: 5 * gsc });
   GS.screenContainers[STATE_SLEUTH_GUESS].addChild(incorrectBorder);
   GS.screenContainers[STATE_SLEUTH_GUESS].addChild(correctBorder);
   GS.screenContainers[STATE_SLEUTH_GUESS].addChild(guessList);
@@ -409,15 +413,15 @@ const buildScreenSleuthGuess = () => {
     ...baseTextStyle,
   }});
   newDerivationHeader.anchor.set(0.5, 0.5);
-  newDerivationHeader.position.set(425, 70);
+  newDerivationHeader.position.set(425 * gsc, 70 * gsc);
   GS.screenContainers[STATE_SLEUTH_GUESS].addChild(newDerivationHeader);
 
   const guessListBG = new PIXI.Graphics();
-  guessListBG.rect(0, 0, 375, 200).fill(bg).stroke({ color: black, width: 5 });
+  guessListBG.rect(0, 0, 375 * gsc, 200 * gsc).fill(bg).stroke({ color: black, width: 5 * gsc });
   guessList.addChild(guessListBG);
   const guessContainer = new PIXI.Container();
-  guessContainer.bg = new PIXI.Graphics().rect(0, 0, 375, 2000).fill(bg);
-  guessContainer.mask = new PIXI.Graphics().rect(0, 0, 375, 200).fill(0x000000);
+  guessContainer.bg = new PIXI.Graphics().rect(0, 0, 375 * gsc, 2000 * gsc).fill(bg);
+  guessContainer.mask = new PIXI.Graphics().rect(0, 0, 375 * gsc, 200 * gsc).fill(0x000000);
   guessContainer.interactive = true;
   guessContainer.addChild(guessContainer.mask);
   guessContainer.addChild(guessContainer.bg);
@@ -436,22 +440,22 @@ const buildScreenSleuthGuess = () => {
     guessContainer.listChildren?.forEach(c => guessContainer.removeChild(c));
     guessContainer.listChildren = [];
     GS.sleuthGuesses.forEach((guess, i) => {
-      const text = new TextChanger(guess.s, { align: 'left' });
-      text.position.set(5, i * 40 + 5);
+      const text = new TextChanger(guess.s, { align: 'left', text: {...baseTextStyle} });
+      text.position.set(5 * gsc, (i * 40 + 5) * gsc);
       guessContainer.addChild(text);
       guessContainer.listChildren.push(text);
     });
     GS.codeWordDistinguishes.forEach((distinguish, i) => {
-      const text = new TextChanger(distinguish, { align: 'left', text: { fill: GS.codeRegexDFA.simulateWord(distinguish) === "Accept" ? green : red } });
+      const text = new TextChanger(distinguish, { align: 'left', text: { ...baseTextStyle, fill: GS.codeRegexDFA.simulateWord(distinguish) === "Accept" ? green : red } });
       text.pivot.set(text.width, 0);
-      text.position.set(370, i * 40 + 5);
+      text.position.set(370 * gsc, (i * 40 + 5) * gsc);
       guessContainer.addChild(text);
       guessContainer.listChildren.push(text);
     });
   }
   buildGuestList();
-  const wordContainer = new PIXI.Container();
-  GS.screenContainers[STATE_SLEUTH_GUESS].addChild(wordContainer);
+  GS.wordContainer = new PIXI.Container();
+  GS.screenContainers[STATE_SLEUTH_GUESS].addChild(GS.wordContainer);
 
   GS.screenContainers[STATE_SLEUTH_GUESS].onStart = () => {
     answerInput.clear();
@@ -460,14 +464,14 @@ const buildScreenSleuthGuess = () => {
     if (GS.codeWordDistinguishes.length > 0) {
       newDerivationHeader.alpha = 1;
       // Add a new draggable word to the screen
-      const derivationWord = new TextChanger(GS.codeWordDistinguishes[GS.codeWordDistinguishes.length - 1]);
+      const derivationWord = new TextChanger(GS.codeWordDistinguishes[GS.codeWordDistinguishes.length - 1], { text: {...baseTextStyle}});
       derivationWord.pivot.set(0, derivationWord.height / 2);
-      const derivationCover = new RectangleCover(derivationWord, { width: Math.max(derivationWord.width * 1.2, 20), height: 50, points: 20, randMult: 0.1 });
+      const derivationCover = new RectangleCover(derivationWord, { text: {...baseTextStyle}, width: Math.max(derivationWord.width * 1.2, 20), height: 50 * gsc, points: 20, randMult: 0.1 });
       const derivationContainer = new PIXI.Container();
-      derivationContainer.position.set(300+250/2, 125);
+      derivationContainer.position.set(300 * gsc+250/2 * gsc, 125 * gsc);
       derivationContainer.addChild(derivationCover);
       derivationContainer.addChild(derivationWord);
-      wordContainer.addChild(derivationContainer);
+      GS.wordContainer.addChild(derivationContainer);
 
       derivationContainer.interactive = true;
       derivationContainer.cursor = "pointer";
@@ -540,7 +544,7 @@ const buildScreenDistinguish = () => {
   }});
   secretHeader.anchor.set(0, 0.5);
   secretHeader.position.set(50, 100);
-  const secretText = new TextChanger(GS.codeRegex.s, { align: 'left' }); // left align for x:0 start
+  const secretText = new TextChanger(GS.codeRegex.s, { align: 'left', text: {...baseTextStyle} }); // left align for x:0 start
   secretText.pivot.set(0, secretText.height / 2);
   secretText.position.set(300, 100);
   const secretCover = new RectangleCover(secretText, { width: 250, height: 50, points: 20, randMult: 0.1 });
@@ -551,7 +555,7 @@ const buildScreenDistinguish = () => {
   }});
   guessHeader.anchor.set(0, 0.5);
   guessHeader.position.set(50, 200);
-  const guessText = new TextChanger(GS.sleuthGuesses[GS.sleuthGuesses.length - 1]?.s || '', { align: 'left' });
+  const guessText = new TextChanger(GS.sleuthGuesses[GS.sleuthGuesses.length - 1]?.s || '', { align: 'left', text: {...baseTextStyle} });
   guessText.pivot.set(0, guessText.height / 2);
   guessText.position.set(300, 200);
   const guessCover = new RectangleCover(guessText, { width: 250, height: 50, points: 20, randMult: 0.1 });
@@ -640,9 +644,9 @@ const pointerMove = (e) => {
 const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.opts = opts;
   GS.easings = easings;
-  GS.screen = new Screen(app);
+  GS.screen = new Screen(app, opts.hideBG);
   GS.screen.setScreenSize(app.renderer.width, app.renderer.height);
-  GS.screen.setGameSize(1000, 600);
+  GS.screen.setGameSize(1000 * gsc, 600 * gsc);
   GS.screen.scaleToFit();
   GS.curState = STATE_MENU;
   GS.progress = new Progress(opts.steps, {onSuccess, ...opts.progress}, GS);
@@ -650,8 +654,11 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   resetGame();
 
   // For the modal.
-  document.getElementById("warningClose").onclick = () => {
-    document.getElementById("warningModal").style.display = "none";
+  const close = document.getElementById("warningClose")
+  if (close) {
+    close.onclick = () => {
+      document.getElementById("warningModal").style.display = "none";
+    }
   }
 
   document.addEventListener('wheel', (e) => {
@@ -669,4 +676,10 @@ const unloader = () => {
   Object.values(GS.screenContainers).forEach(cont => cont.clear());
 };
 
-export default { loader, unloader };
+export default {
+  loader, unloader,
+  GS,
+  showScreen,
+  setCodeRegex,
+  STATE_CODEMASTER_ENTER, STATE_CODE_DISTINGUISH, STATE_CODE_WAIT, STATE_MENU, STATE_SLEUTH_GUESS
+};

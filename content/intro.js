@@ -13,8 +13,8 @@ NOTE: This is placeholder content and intended to change. The introduction page 
 
 What's in a language, and why on earth do we care about them in computer science?
 
-Surprising as it may be, the study of languages underpins a large amount of <span class="highlight-small highlight-blue-long">computational complexity theory</span>, and even separately from that is practically rather useful as well.
-
+Surprising as it may be, the study of languages underpins a large amount of <span class="highlight-small highlight-blue-long">computational complexity theory</span>, and even separately from that is practically useful as well.
+<br>
 Understanding languages helps us understand:
 
 <ul>
@@ -25,13 +25,13 @@ Understanding languages helps us understand:
 
 <h2>What is a language?</h2>
 
-While there are some similarities between the languages we speak and the languages we use in computer science, it's important we clarify what we mean when we talk about a language in this context.
+While there are some similarities between the languages we speak and the languages we use in computer science, it's important we clarify exactly what we mean when we talk about a language in this context.
 <br>
 A language is defined over an <span class="highlight highlight-orange">alphabet</span>, which is a set of symbols. Alphabets mean very much the same thing in both contexts - words in the language are composed of symbols in the alphabet.
 
-Considering all possible combinations of symbols in the alphabet, we can form words. These symbols could be letters like a and b, but they could also be numbers, emojis, or even <span class="highlight-small highlight-purple-long">entire strings themselves</span>.
+Considering all possible combinations of symbols in the alphabet, we can form words. These symbols could be letters like 'a' and 'b', but they could also be numbers, emojis, or even <span class="highlight-small highlight-purple-long">entire strings themselves</span>.
 <br>
-A language is simply a <span class="highlight highlight-orange">collection</span> of these words. There is no rule on the conjugation of these words, no such thing as 'sentences' or 'grammar' in the context of languages in computer science.
+A language is simply a <span class="highlight highlight-orange">collection</span> of these words. There is no rule on the conjugation of these words, no such thing as 'sentences' or 'grammar' - just a collection, which splits the words into those that are in the language, and those that are not.
 
 <img src="/img/intro/languageTypes.png"/>
 
@@ -74,6 +74,8 @@ This course is about exploring the theory of more and more complex languages, al
 We'll start with relatively simple algorithms/languages, and use this to build towards the tough questions you've seen above.
 
 But more importantly than anything else, <span class="highlight-small highlight-green-long">we'll have fun doing it!</span> This course is interactive wherever possible, so you'll have the opportunity to execute, design, and explore the algorithms and languages provided.
+
+<img src="/img/intro/gameExamples.png"/>
 `
 
 const addContent = () => {

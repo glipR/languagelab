@@ -1,6 +1,8 @@
 import { black, white, red, lightGrey } from "./colours.js";
 import { mergeDeep } from "./utils.js";
 
+const gsc = window.gameScaling ?? 1;
+
 class KeyEntryModal extends PIXI.Container {
   static acceptedCharacters = "abcdefghiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -106,15 +108,15 @@ class FloatingButton extends PIXI.Container {
       label: {
         text: "",
         fill: black,
-        fontSize: 24,
+        fontSize: 24 * gsc,
       },
       bg: {
         fill: white,
         disabledFill: lightGrey,
         stroke: { color: black, width: 2 },
       },
-      width: 100,
-      height: 100,
+      width: 100 * gsc,
+      height: 100 * gsc,
     }, opts);
     this.disabled = false;
     this.bg = new PIXI.Graphics()

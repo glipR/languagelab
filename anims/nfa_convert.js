@@ -8,6 +8,8 @@ import Progress from "../tools/progress.js";
 import { FloatingButton } from "../ui.js";
 import NodeGroup from "../tools/node_group.js";
 
+const gsc = window.gameScaling ?? 1;
+
 const GS = {
   data: [],
   curSelected: { x: 0, y: 0 },
@@ -19,21 +21,21 @@ const GS = {
 
 const baseStyle = {
   fontFamily: "Ittybittynotebook",
-  fontSize: 32,
+  fontSize: 32 * gsc,
   fill: black,
   align: 'center',
 };
 
 const baseNodeGroupOptions = {
   node: { isEntry: false },
-  frameWidth: 75,
-  maxSpacing: 50,
+  frameWidth: 75 * gsc,
+  maxSpacing: 50 * gsc,
   scaling: 0.66,
   textScaling: 0.8,
   cross: {
     visible: false,
-    size: 15,
-    stroke: 5,
+    size: 15 * gsc,
+    stroke: 5 * gsc,
     color: red,
   },
   animSpeed: 15,
@@ -61,8 +63,8 @@ function highlightBorder(i, j, color) {
   if (!container.border) {
     container.border = new PIXI.Graphics();
     container.border
-      .rect(-120/2, -70/2, 120, 70)
-      .stroke({ color, width: 5 });
+      .rect(-120/2 * gsc, -70/2 * gsc, 120 * gsc, 70 * gsc)
+      .stroke({ color, width: 5 * gsc });
     container.addChild(container.border);
   }
   TweenManager.add(new ValueTween(container.border.alpha, 1, 30, GS.easings.easeInOutQuad, (v) => {
@@ -342,10 +344,24 @@ const makeContainerClick = (i, j) => {
   }
 }
 
+const nodeClick = (n) => {
+  toggleNode(GS.nfa.nodes[n]);
+  GS.progress.checkCompleted();
+  checkExtraLineCreation();
+}
+GS.nodeClick = nodeClick;
+
+// Just used in the intro video.
+const containerClick = (i, j, e_overwrite={}) => {
+  const e = {...e_overwrite}
+  makeContainerClick(i, j)(e);
+}
+GS.containerClick = containerClick;
+
 const loader = (app, easings, onSuccess, onFailure, opts) => {
-  GS.screen = new Screen(app);
+  GS.screen = new Screen(app, opts.hideBG);
   GS.screen.setScreenSize(app.renderer.width, app.renderer.height);
-  GS.screen.setGameSize(1000, 600);
+  GS.screen.setGameSize(1000 * gsc, 600 * gsc);
   GS.screen.scaleToFit();
   GS.easings = easings;
   GS.matched = false;
@@ -354,7 +370,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
 
   GS.nfa = new NFA();
   GS.nfa.fromJSON(opts.nfa);
-  GS.nfa.graph.position.set(750, 300);
+  GS.nfa.graph.position.set(750 * gsc, 300 * gsc);
   GS.nfa.edges.forEach(e => e.labelBG.alpha = 1);
   GS.screen.addChild(GS.nfa.graph);
 
@@ -363,7 +379,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.nfa.graph.addChild(GS.highlightContainer);
 
   // Make a big table
-  GS.table = new Table({ itemHeight: 70 });
+  GS.table = new Table({ itemHeight: 70 * gsc });
   GS.table.resize(5, 2);
   GS.data = Array.from({length: 6}, () => Array.from({length: 3}, () => []));
   GS.nodeGroups = Array.from({length: 6}, () => Array.from({length: 3}, () => new NodeGroup(baseNodeGroupOptions, GS.nfa, [])));
@@ -372,7 +388,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       GS.table.getContainer(i, j).contents.addChild(ng);
     });
   });
-  GS.table.position.set(50, 25);
+  GS.table.position.set(50 * gsc, 25 * gsc);
   GS.screen.addChild(GS.table);
 
   GS.checkButton = new FloatingButton({
@@ -382,9 +398,9 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     bg: {
       fill: bg_dark,
     },
-    height: 50,
+    height: 50 * gsc,
   });
-  GS.checkButton.position.set(890, 540);
+  GS.checkButton.position.set(890 * gsc, 540 * gsc);
   GS.checkButton.onClick = () => {
     const error = GS.validConversion();
     if (error) {
@@ -397,9 +413,9 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   }
   GS.screen.addChild(GS.checkButton);
   GS.checkButtonArrow = new PIXI.Graphics();
-  GS.checkButtonArrow.rect(-12.5, -10, 25, 20).fill(green);
-  GS.checkButtonArrow.moveTo(-20, 10).lineTo(20, 10).lineTo(0, 25).lineTo(-20, 10).fill(green);
-  GS.checkButtonArrow.position.set(940, 510);
+  GS.checkButtonArrow.rect(-12.5 * gsc, -10 * gsc, 25 * gsc, 20 * gsc).fill(green);
+  GS.checkButtonArrow.moveTo(-20, 10 * gsc).lineTo(20 * gsc, 10 * gsc).lineTo(0, 25 * gsc).lineTo(-20 * gsc, 10 * gsc).fill(green);
+  GS.checkButtonArrow.position.set(940 * gsc, 510 * gsc);
   GS.checkButtonArrow.alpha = 0;
   GS.screen.addChild(GS.checkButtonArrow);
 
@@ -431,9 +447,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
 
   Object.values(GS.nfa.nodes).forEach((n) => {
     n.subscribe('click', () => {
-      toggleNode(n)
-      GS.progress.checkCompleted();
-      checkExtraLineCreation();
+      nodeClick(n.label);
     });
   });
 
@@ -446,4 +460,4 @@ const unloader = () => {
 
 }
 
-export default { loader, unloader };
+export default { loader, unloader, GS };
