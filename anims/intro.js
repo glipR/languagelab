@@ -2,12 +2,13 @@ import { black, blue, green, highlightColours, lightGrey, red, white } from "../
 import Regex from "../regex.js";
 import Screen from "../screen.js";
 import { RectangleCover } from "../tools/paper_cover.js";
-import { delay, ImmediateTween, interpValue, TweenManager, ValueTween } from "../tween.js";
+import { delay, ImmediateTween, interpValue, randomDelay, TweenManager, ValueTween } from "../tween.js";
 import RegexGame from './regex_game.js'
 import NFAConvert from './nfa_convert.js';
 import { convertTasks } from '../content/nfa_convert.js';
 import { vectorCombine } from "../utils.js";
 import DFA from "../dfa.js";
+import { DrawnBezier } from "../tools/drawnBezier.js";
 
 const gsc = window.gameScaling ?? 1;
 
@@ -403,9 +404,55 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
 
   // This course is about exploring the theory of more and more complex languages, algorithms for identifying words in those languages, and the limitations of those algorithms.
 
-  // TODO: Show Regex/NFA/CFG/Turing Machine
-
   // We'll start with relatively simple algorithms/languages, and use this to build towards the tough questions you've seen above.
+
+  const regular = new PIXI.Text({ text: "Regular", style: baseStyle});
+  const contextFree = new PIXI.Text({ text: "Context Free", style: baseStyle});
+  const decidable = new PIXI.Text({ text: "Decidable", style: baseStyle});
+  const undecidable = new PIXI.Text({ text: "Undecidable", style: baseStyle});
+  const p = new PIXI.Text({ text: "P", style: baseStyle});
+  const np = new PIXI.Text({ text: "NP", style: baseStyle});
+  const npComplete = new PIXI.Text({ text: "NP-Complete", style: baseStyle});
+  const languages = [regular, contextFree, decidable, undecidable, p, np, npComplete];
+  const covers = languages.map((l) => {
+    const cover = new RectangleCover(l, { points: 20, randMult: 0.1 });
+    l.anchor.set(0.5, 0.5);
+    l.alpha = 0;
+    cover.alpha = 0;
+    GS.screen.addChild(cover);
+    GS.screen.addChild(l);
+    return cover;
+  });
+
+  regular.position.set(300, 1200);
+  contextFree.position.set(1200, 1200);
+  decidable.position.set(2300, 800);
+  undecidable.position.set(2300, 1600);
+  p.position.set(3500, 600);
+  np.position.set(3500, 1200);
+  npComplete.position.set(3500, 1800);
+  covers.forEach((c, i) => c.position.set(languages[i].position.x, languages[i].position.y));
+
+  const bezOpts = { points: 3}
+  const edge1 = new DrawnBezier(bezOpts, [{ x: 600, y: 1200 }, { x: 750, y: 1200 }], 1);
+  const edge2 = new DrawnBezier(bezOpts, [{ x: 1700, y: 1200 }, { x: 1850, y: 1200 }], 1);
+  const edge3 = new DrawnBezier(bezOpts, [{ x: 2800, y: 1200 }, { x: 2950, y: 1200 }], 1);
+  const edges = [edge1, edge2, edge3];
+  const arrowHeads = edges.map((edge) => {
+    const arrow = new PIXI.Graphics();
+    arrow
+      .moveTo(0, -25)
+      .lineTo(50, 0)
+      .lineTo(0, 25)
+      .fill(black);
+    const points = edge.getDrawnPoints()
+    arrow.position.set(points[points.length-1].x, points[points.length-1].y);
+    GS.screen.addChild(arrow);
+    GS.screen.addChild(edge);
+    edge.alpha = 0;
+    arrow.alpha = 0;
+    return arrow;
+  });
 
   // But more importantly than anything else, <span class="highlight-small highlight-green-long">we'll have fun doing it!</span> This course is interactive wherever possible, so you'll have the opportunity to execute, design, and explore the algorithms and languages provided.
 
@@ -692,6 +739,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       fadeIn(true, leftCog),
       fadeIn(true, rightCog),
     )
+    .then(delay(240))
     .then(
       moveThroughToPos(evenWords[0], { x: 800, y: 1900 }),
       delay(45).then(moveThroughToPos(evenWords[1], { x: 2400, y: 2100 })),
@@ -699,33 +747,33 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       delay(135).then(moveThroughToPos(evenWords[3], { x: 2700, y: 1600 })),
       delay(180).then(moveThroughToPos(evenWords[4], { x: 1300, y: 1550 })),
     )
-    .then(delay(60))
+    .then(delay(630))
     .then(
       ...evenWords.map(w => fadeIn(false, w)),
       fadeIn(false, evenLangText),
       fadeIn(true, validLangText),
     )
-    .then(delay(30))
+    .then(delay(30 + 7*60))
     .then(
       moveThroughToPos(secondSprites[0], { x: 2700, y: 1600 }),
       delay(45).then(moveThroughToPos(secondSprites[1], { x: 1300, y: 1550 })),
       delay(90).then(moveThroughToPos(secondSprites[2], { x: 3250, y: 1850 })),
       delay(135).then(moveThroughToPos(secondSprites[3], { x: 1100, y: 2000 })),
     )
-    .then(delay(60))
+    .then(delay(14*60))
     .then(
       ...secondSprites.map(w => fadeIn(false, w)),
       fadeIn(false, validLangText),
       fadeIn(true, numLangText),
     )
-    .then(delay(60))
+    .then(delay(3 * 60))
     .then(
       moveThroughToPos(thirdSprites[0], { x: 1500, y: 1650 }),
       delay(45).then(moveThroughToPos(thirdSprites[1], { x: 800, y: 1800 })),
       delay(90).then(moveThroughToPos(thirdSprites[2], { x: 3250, y: 1950 })),
       delay(135).then(moveThroughToPos(thirdSprites[3], { x: 2700, y: 1600 })),
     )
-    .then(delay(60))
+    .then(delay(18 * 60))
     .then(
       ...thirdSprites.map(w => fadeIn(false, w)),
       fadeIn(false, numLangText),
@@ -734,6 +782,31 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       fadeIn(false, rightCog),
     )
     .then(delay(60))
+    .then(fadeIn(true, regular), fadeIn(true, covers[0]))
+    .then(delay(60))
+    .then(fadeIn(true, contextFree), fadeIn(true, covers[1]))
+    .then(delay(60))
+    .then(...[fadeIn(true, decidable), fadeIn(true, undecidable), fadeIn(true, covers[2]), fadeIn(true, covers[3])])
+    .then(delay(60))
+    .then(...[fadeIn(true, p), fadeIn(true, np), fadeIn(true, npComplete), fadeIn(true, covers[4]), fadeIn(true, covers[5]), fadeIn(true, covers[6])])
+    .then(delay(60))
+    .then(fadeIn(true, edge1), fadeIn(true, arrowHeads[0]))
+    .then(delay(60))
+    .then(fadeIn(true, edge2), fadeIn(true, arrowHeads[1]))
+    .then(delay(60))
+    .then(fadeIn(true, edge3), fadeIn(true, arrowHeads[2]))
+    .then(
+      fadeIn(false, regular),
+      fadeIn(false, contextFree),
+      fadeIn(false, decidable),
+      fadeIn(false, undecidable),
+      fadeIn(false, p),
+      fadeIn(false, np),
+      fadeIn(false, npComplete),
+      ...covers.map(c => fadeIn(false, c)),
+      ...edges.map(e => fadeIn(false, e)),
+      ...arrowHeads.map(a => fadeIn(false, a)),
+    )
     .then(fadeIn(true, fakeDFAPointer))
     .then(
       movePointer(fakeDFAPointer, { x: 0, y: 0 }, 60)
@@ -774,6 +847,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       fadeIn(false, nfaContainer),
       fadeIn(false, fakeDFA.graph),
     )
+    .then(fadeTitle(true))
   );
 
   // TweenManager.skipSeconds(55);

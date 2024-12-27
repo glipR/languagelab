@@ -18,7 +18,7 @@ Surprising as it may be, the study of languages underpins a large amount of <spa
 Understanding languages helps us understand:
 
 <ul>
-  <li>How Computers can understand interpreted code and turn this into instructions</li>
+  <li>How computers recognise interpreted code and turn this into instructions</li>
   <li>How to write expressions to search for patterns in text</li>
   <li>What problems computers will never be able to solve!</li>
 </ul>
