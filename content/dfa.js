@@ -1,11 +1,8 @@
-import { addScene, registerScene } from '../templates/scene.js';
-import dfaIntro from '../anims/dfa_intro.js'
-import { markComplete } from '../tools/completion.js';
 import { addIcon } from '../templates/icons.js';
 
 const contentText = `
 <div class="aspect-ratio">
-<iframe src="https://www.youtube.com/embed/k9LmFzXPcYM?si=3AQBjp0p4NXKk07L" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/MWuXe744N_Q?si=n8x2aZMMoonuhuqS" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
 <h2>Deterministic Finite Automaton (DFA)</h2>
@@ -114,12 +111,6 @@ The transitions for the 'a' character aren't that much more complicated - if we 
 Our start state is the same as our only accepting state - ${addIcon('e')}.
 
 <img src="/img/dfaIntro/e2p2.png" class="small" />
-
-<h2>What's next?</h2>
-
-As you can see, some languages are much easier to define with regular expressions, whereas in other cases they're easier to define as Deterministic Finite Automata.
-
-<img src="/img/dfaIntro/compare.png" />
 
 In these next few worksheets, let's explore the limits of Deterministic Finite Automata, how to use them, and how to create them ourselves.
 `

@@ -1,13 +1,7 @@
-import { addIcon } from '../templates/icons.js';
-
-// TODO: Correct video
-
 const contentText = `
 <div class="aspect-ratio">
-<iframe src="https://www.youtube.com/embed/k9LmFzXPcYM?si=3AQBjp0p4NXKk07L" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/c38KiIPjZTs?si=aHXDzL6j10UZPyvA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
-
-NOTE: This is placeholder content and intended to change. The introduction page here is a WIP.
 
 <h2>Why Languages?</h2>
 
