@@ -172,6 +172,10 @@ footer {
   margin-block-start: 0.5em;
   margin-block-end: 0.5em;
 }
+a.projTitle {
+  text-decoration: none;
+  color: white;
+}
 
 .scrolled .projTitle {
   font-size: 28px;
@@ -183,17 +187,31 @@ footer {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  user-select: none;
 }
 
 .pageDropdownPreview {
-  background-image: url('/img/backgrounds/cardboard-small.png');
-  background-size: 100%;
-  width: 190px;
+  background-image: url('/img/backgrounds/cardboard.png');
+  background-position-x: -140px;
+  background-position-y: -160px;
+  width: 175px;
   height: 30px;
-  padding: 10px 20px 10px 50px;
+  padding: 10px 30px 10px 65px;
   border-radius: 10px;
   line-height: 30px;
   cursor: pointer;
+  position: relative;
+}
+
+.pageDropdownPreview::after {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 257px;
+  height: 38px;
+  border-radius: 10px;
+  border: 2px dashed #eeeeee;
+  content: "";
 }
 
 .pageDropdownResults {
@@ -219,15 +237,100 @@ footer {
 }
 
 .pageDropdownSection {
-  padding: 10px 20px;
-  background-size: 100%;
-  border-radius: 10px;
-  margin-block-start: 20px;
+  padding: 3px 20px 10px 20px;
+  margin: 10px 10px -10px 10px;
+  position: relative;
+}
+.pageDropdownSectionTab {
+  position: absolute;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  top: 0;
+  left: 10px;
+  width: 60px;
+  height: 10px;
+  transform: translate(0, -100%);
+}
+.section1 {
+  background-color: #DF9391;
+}
+.section2 {
+  background-color: #EFC1A3;
+}
+.section3 {
+  background-color: #ECD394;
+}
+.section4 {
+  background-color: #A0ED9A;
+}
+.section5 {
+  background-color: #8EC4E9;
+}
+.section6 {
+  background-color: #DA95C2;
+}
+
+.pageDropdownChapterContainer {
+  max-height: 1200px;
+  transition: all 0.25s ease-out;
+  overflow-y: clip;
+  padding-top: 5px;
+}
+
+.pageDropdownChapterContainer.hidden {
+  max-height: 0px;
 }
 
 .pageDropdownSectionTitle {
   margin-block-start: 0px;
   margin-block-end: 0px;
+}
+
+.pageDropdownChapter {
+  padding: 10px 20px;
+  margin-block-start: 20px;
+  background-size: cover;
+  background-repeat: round;
+}
+
+.pageDropdownPage {
+  margin: 5px -10px;
+  padding: 3px 10px;
+  background: linear-gradient(to bottom, #eeeeee, #eeeeee 96%, #4c4cdb 98%, #eeeeee);
+  background-size: 100% 26.5px;
+  transition: all 0.25s ease-out;
+  max-height: 300px;
+  overflow-y: clip;
+}
+
+.pageDropdownPage.hidden {
+  max-height: 0px;
+  padding: 0px 10px;
+}
+
+.pageDropdownChapter.chapter1 {
+  background-image: url('/img/nav/binder-1-fill.png');
+}
+.pageDropdownChapter.chapter1.empty {
+  background-image: url('/img/nav/binder-1.png');
+}
+.pageDropdownChapter.chapter2 {
+  background-image: url('/img/nav/binder-2-fill.png');
+}
+.pageDropdownChapter.chapter2.empty {
+  background-image: url('/img/nav/binder-2.png');
+}
+.pageDropdownChapter.chapter3 {
+  background-image: url('/img/nav/binder-3-fill.png');
+}
+.pageDropdownChapter.chapter3.empty {
+  background-image: url('/img/nav/binder-3.png');
+}
+.pageDropdownChapter.chapter4 {
+  background-image: url('/img/nav/binder-4-fill.png');
+}
+.pageDropdownChapter.chapter4.empty {
+  background-image: url('/img/nav/binder-4.png');
 }
 
 a.pageDropdownItem {

@@ -130,6 +130,28 @@ const renderItem = (key) => {
   </a>`
 }
 
+const pageHidden = (key, section) => {
+  return key.startsWith(section) ? "" : "hidden";
+}
+
+const sectionsHidden = (key, chapter) => {
+  switch (chapter) {
+    case "Regular Languages":
+      return key.startsWith("dfa") || key.startsWith("regex") || key.startsWith("nfa") ? "" : "hidden";
+    case "Context Free Languages":
+      return key.startsWith("cfg") ? "" : "hidden";
+    case "Decidability":
+      return key.startsWith("dec") ? "" : "hidden";
+    case "Complexity Classes":
+      return key.startsWith("cc") ? "" : "hidden";
+  }
+  return "hidden";
+}
+
+const chapterEmpty = (key, chapter) => {
+  return sectionsHidden(key, chapter) === "hidden" ? "" : "empty";
+}
+
 const navContent = (key) => `
 <div class="navHeader">
   <div class="floatingThread"></div>
@@ -137,53 +159,73 @@ const navContent = (key) => `
     <div class="projLogo">
       <img src="/icon.png" alt="Language Lab Logo" />
     </div>
-    <h1 class="projTitle">Language Lab</h1>
+    <a class="projTitle" href="/"><h1 class="projTitle">Language Lab</h1></a>
     <div class="pageDropdown">
       <div class="pageDropdownPreview">
         ${contentMapping[key].title}
       </div>
       <div class="pageDropdownResults">
-        <div class="pageDropdownSection smallSection">
-          ${renderItem('intro')}
+        <div class="pageDropdownChapter chapter1 ${chapterEmpty(key, 'Regular Languages')}">
+          <div class="chapterTitle">Regular Languages</div>
         </div>
-        <div class="pageDropdownSection dfaSection">
-          <h4 class="iconSection pageDropdownSectionTitle"> DFA</h4>
-          <hr />
-          ${renderItem('dfaIntro')}
-          ${renderItem('dfaExecute')}
-          ${renderItem('dfaCategorise')}
-          ${renderItem('dfaTheory')}
-          ${renderItem('dfaCreate')}
-          ${renderItem('dfaMatch')}
-          ${renderItem('dfaAlgorithm')}
-          ${renderItem('dfaModify')}
+        <div class="pageDropdownChapterContainer ${sectionsHidden(key, 'Regular Languages')}">
+          <div class="pageDropdownSection section1">
+            <div class="pageDropdownSectionTab section1"></div>
+            <div class="sectionTitle">Intro</div>
+            <div class="pageDropdownPage ${pageHidden(key, 'intro')}">
+              ${renderItem('intro')}
+            </div>
+          </div>
+          <div class="pageDropdownSection section2">
+            <div class="pageDropdownSectionTab section2"></div>
+            <div class="sectionTitle">DFA</div>
+            <div class="pageDropdownPage ${pageHidden(key, 'dfa')}">
+              ${renderItem('dfaIntro')}
+              ${renderItem('dfaExecute')}
+              ${renderItem('dfaCategorise')}
+              ${renderItem('dfaTheory')}
+              ${renderItem('dfaCreate')}
+              ${renderItem('dfaMatch')}
+              ${renderItem('dfaAlgorithm')}
+              ${renderItem('dfaModify')}
+            </div>
+          </div>
+          <div class="pageDropdownSection section3">
+            <div class="pageDropdownSectionTab section3"></div>
+            <div class="sectionTitle">Regular Expressions</div>
+            <div class="pageDropdownPage ${pageHidden(key, 'regex')}">
+              ${renderItem('regexIntro')}
+              ${renderItem('regexClassify')}
+              ${renderItem('regexMatch')}
+              ${renderItem('regexGame')}
+            </div>
+          </div>
+          <div class="pageDropdownSection section4">
+            <div class="pageDropdownSectionTab section4"></div>
+            <div class="sectionTitle">NFA</div>
+            <div class="pageDropdownPage ${pageHidden(key, 'nfa')}">
+              ${renderItem('nfaIntro')}
+              ${renderItem('nfaSimulate')}
+              ${renderItem('nfaCategorise')}
+              ${renderItem('nfaMatch')}
+              ${renderItem('nfaAlgorithm')}
+              ${renderItem('nfaConvert')}
+              ${renderItem('nfaTheory')}
+            </div>
+          </div>
+          <div class="pageDropdownSection section5">
+            <div class="pageDropdownSectionTab section5"></div>
+            <div class="sectionTitle">🚧 Converting and Proving</div>
+          </div>
         </div>
-        <div class="pageDropdownSection regexSection">
-          <h4 class="iconSection pageDropdownSectionTitle">
-            Regex
-          </h4>
-          <hr />
-          ${renderItem('regexIntro')}
-          ${renderItem('regexClassify')}
-          ${renderItem('regexMatch')}
-          ${renderItem('regexGame')}
+        <div class="pageDropdownChapter chapter2">
+          🚧 Context Free Languages
         </div>
-        <div class="pageDropdownSection nfaSection">
-          <h4 class="iconSection pageDropdownSectionTitle"> NFA</h4>
-          <hr />
-          ${renderItem('nfaIntro')}
-          ${renderItem('nfaSimulate')}
-          ${renderItem('nfaCategorise')}
-          ${renderItem('nfaMatch')}
-          ${renderItem('nfaAlgorithm')}
-          ${renderItem('nfaConvert')}
-          ${renderItem('nfaTheory')}
+        <div class="pageDropdownChapter chapter3">
+          🚧 Decidability
         </div>
-        <div class="pageDropdownSection smallSection">
-          <h4 class="iconWIP pageDropdownSectionTitle"> Translating</h4>
-        </div>
-        <div class="pageDropdownSection smallSection">
-          <h4 class="iconWIP pageDropdownSectionTitle"> Proving Stuff!</h4>
+        <div class="pageDropdownChapter chapter4">
+          🚧 Complexity Classes
         </div>
       </div>
 
@@ -231,6 +273,19 @@ const updateNavHeightWithScroll = () => {
 
 const addNav = (key) => {
   document.body.insertAdjacentHTML('afterbegin', navContent(key));
+  document.querySelectorAll('.sectionTitle').forEach((el) => {
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', () => {
+      el.parentElement.querySelector('.pageDropdownPage').classList.toggle('hidden');
+    });
+  });
+  document.querySelectorAll('.chapterTitle').forEach((el) => {
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', () => {
+      el.parentElement.classList.toggle('empty');
+      el.parentElement.nextElementSibling.classList.toggle('hidden');
+    });
+  });
 
   if (trueOnce(contentMapping[key].type)) {
     const modal = makeModal(firstTimeModalContents[contentMapping[key].type]);
@@ -238,13 +293,14 @@ const addNav = (key) => {
   }
 
   // Add click logic to dropdown
+  const entireDropdown = document.querySelector(".pageDropdown");
   const dropdown = document.querySelector(".pageDropdownPreview");
   const dropdownResults = document.querySelector(".pageDropdownResults");
   dropdown.addEventListener("click", () => {
     dropdownResults.classList.toggle("active");
   });
   window.addEventListener("click", (e) => {
-    if (!dropdown.contains(e.target)) {
+    if (!entireDropdown.contains(e.target)) {
       dropdownResults.classList.remove("active");
     }
   });
