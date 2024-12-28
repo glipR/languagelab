@@ -50,6 +50,8 @@ Look at the following Regular Expressions and drag the words into the accepted/r
 Remember that the character 'ε' represents the empty string (i.e. is this regex accepting of an empty string?).
 <br>
 Additionally, we are allowing regex to include an extra symbol '+' to represent <span class="highlight-small highlight-blue">one</span> or more of the preceding character, this is done purely to simplify the expressions.
+
+So 'aa*' is equivalent to 'a+'.
 `
 
 const addContent = () => {

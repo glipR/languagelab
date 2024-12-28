@@ -17,6 +17,7 @@ class TextEdit extends TextChanger {
     const pos = this.transform(this.curText, this.cursorIndex);
     this.cursor.position.set(pos.x, pos.y);
     this.addChild(this.cursor);
+    this.active = true;
 
     const makeTween = (target, duration) => {
       return new ImmediateTween(() => {
@@ -36,7 +37,9 @@ class TextEdit extends TextChanger {
       } else if (e.key === "Backspace") {
         this.deletePressed();
       } else if (e.key === "Enter") {
-        this.onEnter?.();
+        if (this.active) {
+          this.onEnter?.();
+        }
       } else if (e.key.length === 1) {
         this.keyTyped(e.key);
       }
@@ -92,10 +95,12 @@ class TextEdit extends TextChanger {
 
   activate() {
     window.addEventListener("keydown", this.onKeyDown);
+    this.active = true;
   }
 
   deactivate() {
     window.removeEventListener("keydown", this.onKeyDown);
+    this.active = false;
   }
 
   destroy(options) {
