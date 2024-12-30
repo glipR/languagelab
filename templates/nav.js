@@ -57,7 +57,7 @@ export const contentMapping = {
   regexClassify: {
     title: "Analysing Regex",
     type: "game",
-    href: "/pages/regex_classify",
+    href: "/pages/regex_categorise",
   },
 
   regexMatch: {
@@ -159,9 +159,9 @@ const navContent = (key) => `
     <div class="projLogo">
       <img src="/icon.png" alt="Language Lab Logo" />
     </div>
-    <a class="projTitle" href="/"><h1 class="projTitle">Language Lab</h1></a>
+    <a class="projTitle" href="/"><h1>Language Lab</h1></a>
     <div class="pageDropdown">
-      <div class="pageDropdownPreview">
+      <div class="pageDropdownPreview ${iconMap(contentMapping[key].type)}">
         ${contentMapping[key].title}
       </div>
       <div class="pageDropdownResults">
