@@ -1,7 +1,7 @@
 import easings from 'https://cdn.jsdelivr.net/npm/easings.net@1.0.3/+esm';
 import { black, darkPurple, purple } from "../colours.js";
 import { interpValue, ValueTween } from "../tween.js";
-import { mergeDeep } from "../utils.js";
+import { combineEasing, mergeDeep, reverseEasing } from "../utils.js";
 import { RectangleCover } from "./paper_cover.js";
 
 const gsc = window.gameScaling ?? 1;
@@ -88,4 +88,49 @@ export class NodePointer extends PIXI.Graphics {
   }
 }
 
-export default { Word, NodePointer }
+export const GS = {};
+
+export const flashEasing = () => combineEasing([
+  easings.easeInOutQuad,
+  (t) => 1,
+  reverseEasing(easings.easeInOutQuad),
+], [
+  1,
+  0.5,
+  1,
+]);
+
+export const moveBetween = (l1, l2, duration, graph, nodePointer, wordPointer, word) => {
+  const edge = graph.edgeMap[`${l1}->${l2}`];
+  if (!edge) return new ValueTween(0, 1, 60, easings.easeInOutQuad, () => {});
+  const tween = new ValueTween(0, 1, duration, easings.easeInOutQuad, (v) => {
+    const pos = edge.bezierEdgeInterp(v).position;
+    if (nodePointer) nodePointer.position.set(pos.x, pos.y - 60 * gsc);
+  })
+  .during(edge.colorEdgeTween(purple, duration, flashEasing(), false));
+
+  if ((!!wordPointer || !!word) && edge.style.edgeLabel != 'ε') {
+    const oldWordIndex = GS.curWordIndex;
+    const curWordPos = word ? wordIndexPosition(GS.curWordIndex, word) : 0;
+    GS.curWordIndex++;
+    if (word && GS.curWordIndex >= word.length) {
+      GS.curWordIndex--;
+    }
+    const newWordIndex = GS.curWordIndex;
+    const newWordPos = word ? wordIndexPosition(GS.curWordIndex, word) : 0;
+    if (oldWordIndex != newWordIndex) {
+      if (wordPointer) tween.during(new ValueTween(curWordPos, newWordPos, duration, easings.easeInOutQuad, (v) => {
+        wordPointer.position.set(v.x, v.y);
+      }));
+      if (word) tween.during(new ValueTween(black, purple, duration, easings.easeInOutQuad, (v) => {
+        word[newWordIndex].style.fill = v;
+      }));
+    }
+    if (word) tween.during(new ValueTween(purple, bg_dark, duration, easings.easeInOutQuad, (v) => {
+      word[oldWordIndex].style.fill = v;
+    }));
+  }
+  return tween;
+};
+
+export default { Word, NodePointer, GS, moveBetween };

@@ -24,6 +24,92 @@ const fade = (obj, show=true, duration=60) => (new ValueTween(show ? 0 : 1, show
   }
  }));
 
+export class Highlight extends PIXI.Graphics {
+  constructor(style) {
+    super();
+    this.style = mergeDeep({
+      color: purple,
+      xShift: 0,
+      yShift: 0,
+      widthShift: 0,
+      heightShift: 20,
+      fillAlpha: 0.2,
+      strokeAlpha: 0.8,
+    }, style);
+  }
+
+  setConfig(start, end, opts={}) {
+    this.style = mergeDeep(this.style, opts);
+    this.setTransform(this.computeTransform(start, end));
+  }
+
+  setTransform(transform) {
+    this.curTransform = transform;
+    this.clear();
+    this.rect(this.curTransform.x, this.curTransform.y, this.curTransform.width, this.curTransform.height)
+      .fill({ color: this.style.color, alpha: this.style.fillAlpha })
+      .stroke({ color: this.style.color, width: 5, alpha: this.style.strokeAlpha });
+  }
+
+  computeTransform(start, end) {
+    const x = start.x + this.style.xShift;
+    const y = start.y + this.style.yShift;
+    const width = end.x - start.x + end.width + this.style.widthShift;
+    const height = end.height + this.style.heightShift;
+    return { x, y, width, height };
+  }
+}
+
+export class UnderLine extends PIXI.Graphics {
+  constructor(style) {
+    super();
+    this.style = mergeDeep({
+      color: purple,
+      xShift: 0,
+      yShift: 50,
+      widthShift: 0,
+      strokeWidth: 10,
+    }, style);
+  }
+
+  setConfig(start, end, opts={}) {
+    this.style = mergeDeep(this.style, opts);
+    this.setTransform(this.computeTransform(start, end));
+  }
+
+  setTransform(transform) {
+    this.curTransform = transform;
+    this.clear();
+    this.moveTo(this.curTransform.x, this.curTransform.y)
+    this.lineTo(this.curTransform.x + this.curTransform.width, this.curTransform.y)
+    this.stroke({ color: this.style.color, width: this.style.strokeWidth });
+  }
+
+  computeTransform(start, end) {
+    const x = start.x + this.style.xShift;
+    const y = start.y + this.style.yShift;
+    const width = end.x - start.x + end.width + this.style.widthShift;
+    return { x, y, width };
+  }
+
+  midPoint() {
+    return {
+      x: this.position.x + this.curTransform.x + this.curTransform.width / 2,
+      y: this.position.y + this.curTransform.y,
+    }
+  }
+}
+
+export const makeHighlight = (word, start, end, opts) => {
+  const startTransform = word.transform(word.curText, start);
+  const endTransform = word.transform(word.curText, end-1);
+  const highlight = new Highlight(opts);
+  highlight.setConfig(startTransform, endTransform);
+  highlight.alpha = 0;
+  word.addChild(highlight);
+  return highlight;
+}
+
 const loader = (app, easings, onSuccess, onFailure, opts) => {
 
   GS.opts = opts;
@@ -106,92 +192,6 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.screen.addChild(basic);
 
   const addStar = basic.changeText("aa*b")
-
-  class Highlight extends PIXI.Graphics {
-    constructor(style) {
-      super();
-      this.style = mergeDeep({
-        color: purple,
-        xShift: 0,
-        yShift: 0,
-        widthShift: 0,
-        heightShift: 20,
-        fillAlpha: 0.2,
-        strokeAlpha: 0.8,
-      }, style);
-    }
-
-    setConfig(start, end, opts={}) {
-      this.style = mergeDeep(this.style, opts);
-      this.setTransform(this.computeTransform(start, end));
-    }
-
-    setTransform(transform) {
-      this.curTransform = transform;
-      this.clear();
-      this.rect(this.curTransform.x, this.curTransform.y, this.curTransform.width, this.curTransform.height)
-        .fill({ color: this.style.color, alpha: this.style.fillAlpha })
-        .stroke({ color: this.style.color, width: 5, alpha: this.style.strokeAlpha });
-    }
-
-    computeTransform(start, end) {
-      const x = start.x + this.style.xShift;
-      const y = start.y + this.style.yShift;
-      const width = end.x - start.x + end.width + this.style.widthShift;
-      const height = end.height + this.style.heightShift;
-      return { x, y, width, height };
-    }
-  }
-
-  class UnderLine extends PIXI.Graphics {
-    constructor(style) {
-      super();
-      this.style = mergeDeep({
-        color: purple,
-        xShift: 0,
-        yShift: 50,
-        widthShift: 0,
-        strokeWidth: 10,
-      }, style);
-    }
-
-    setConfig(start, end, opts={}) {
-      this.style = mergeDeep(this.style, opts);
-      this.setTransform(this.computeTransform(start, end));
-    }
-
-    setTransform(transform) {
-      this.curTransform = transform;
-      this.clear();
-      this.moveTo(this.curTransform.x, this.curTransform.y)
-      this.lineTo(this.curTransform.x + this.curTransform.width, this.curTransform.y)
-      this.stroke({ color: this.style.color, width: this.style.strokeWidth });
-    }
-
-    computeTransform(start, end) {
-      const x = start.x + this.style.xShift;
-      const y = start.y + this.style.yShift;
-      const width = end.x - start.x + end.width + this.style.widthShift;
-      return { x, y, width };
-    }
-
-    midPoint() {
-      return {
-        x: this.position.x + this.curTransform.x + this.curTransform.width / 2,
-        y: this.position.y + this.curTransform.y,
-      }
-    }
-  }
-
-  const makeHighlight = (word, start, end, opts) => {
-    const startTransform = word.transform(word.curText, start);
-    const endTransform = word.transform(word.curText, end-1);
-    const highlight = new Highlight(opts);
-    highlight.setConfig(startTransform, endTransform);
-    highlight.alpha = 0;
-    word.addChild(highlight);
-    return highlight;
-  }
 
   const starHighlights = [
     makeHighlight(basic, 1, 3),

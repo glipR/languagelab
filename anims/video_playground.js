@@ -30,11 +30,11 @@ const baseTextStyle = {
   align: 'center',
 };
 
-const GS = {
+export const GS = {
 
 };
 
-const starTransition = () => {
+export const starTransition = () => {
   const dfa1 = new NFA();
   dfa1.fromJSON({
     nodes: {
@@ -64,7 +64,7 @@ const starTransition = () => {
   return delay(0)
 }
 
-const wordGroups = () => {
+export const wordGroups = () => {
   const words = [ "aba", "aa", "baaa" ];
   const NFAJSON = { nodes: {}, edges: [] };
   const nfa = new NFA();
@@ -113,7 +113,7 @@ const wordGroups = () => {
   }))
 }
 
-const extraAccepting = () => {
+export const extraAccepting = () => {
   const nfa = new NFA();
   nfa.fromJSON({
     nodes: {
@@ -162,7 +162,7 @@ const extraAccepting = () => {
   ))
 }
 
-const allPaths = () => {
+export const allPaths = () => {
   const nfa = new NFA();
   nfa.fromJSON({
     nodes: {
@@ -364,7 +364,7 @@ const allPaths = () => {
     )
 }
 
-const gridNFA = () => {
+export const gridNFA = () => {
   const nfa = new NFA();
   const NFAJSON = { nodes: {}, edges: [] };
   for (let i=0; i<3; i++) {
@@ -410,6 +410,7 @@ const gridNFA = () => {
     n.separatedGraphic.alpha = 0;
     n.actualLabel = n.label;
     n.label = n.label.split(":")[1];
+    n.labelText.text = n.label;
     n.updateGraphic();
   });
   nfa.edges.forEach(e => { e.drawnAmount = 0; e.updateGraphic(); });

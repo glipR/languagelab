@@ -106,6 +106,46 @@ export const contentMapping = {
     title: "Understanding NFAs",
     type: "questions",
     href: "/pages/nfa_theory",
+  },
+  regularConversionTheory: {
+    title: "It's all connected",
+    type: "worded",
+    href: "/pages/regular/conversion_theory",
+  },
+  regularConversionAlgorithm: {
+    title: "Executing the algorithm",
+    type: "game",
+    href: "/pages/regular/conversion_algorithm",
+  },
+  regularFAForm: {
+    title: "The definitive form",
+    type: "worded",
+    href: "/pages/regular/fa_form",
+  },
+  regularFAMinimisation: {
+    title: "Minimising DFAs",
+    type: "game",
+    href: "/pages/regular/fa_minimisation",
+  },
+  regularTheory: {
+    title: "Regular Quiz",
+    type: "questions",
+    href: "/pages/regular/theory",
+  },
+  regularPumping: {
+    title: "When isn't it regular?",
+    type: "worded",
+    href: "/pages/regular/pumping",
+  },
+  regularPumpingGame: {
+    title: "Pumping Lemma",
+    type: "game",
+    href: "/pages/regular/pumping_game",
+  },
+  regularPumpingTheory: {
+    title: "More Pumping Lemma",
+    type: "questions",
+    href: "/pages/regular/pumping_theory",
   }
 }
 
@@ -137,7 +177,7 @@ const pageHidden = (key, section) => {
 const sectionsHidden = (key, chapter) => {
   switch (chapter) {
     case "Regular Languages":
-      return key.startsWith("dfa") || key.startsWith("regex") || key.startsWith("nfa") ? "" : "hidden";
+      return key.startsWith("dfa") || key.startsWith("regex") || key.startsWith("nfa") || key.startsWith("regular") ? "" : "hidden";
     case "Context Free Languages":
       return key.startsWith("cfg") ? "" : "hidden";
     case "Decidability":
@@ -216,6 +256,16 @@ const navContent = (key) => `
           <div class="pageDropdownSection section5">
             <div class="pageDropdownSectionTab section5"></div>
             <div class="sectionTitle">🚧 Converting and Proving</div>
+            <div class="pageDropdownPage ${pageHidden(key, 'regular')}">
+              ${renderItem('regularConversionTheory')}
+              ${renderItem('regularConversionAlgorithm')}
+              ${renderItem('regularFAForm')}
+              ${renderItem('regularFAMinimisation')}
+              ${renderItem('regularTheory')}
+              ${renderItem('regularPumping')}
+              ${renderItem('regularPumpingGame')}
+              ${renderItem('regularPumpingTheory')}
+            </div>
           </div>
         </div>
         <div class="pageDropdownChapter chapter2">

@@ -79,7 +79,7 @@ class Node {
     this.innerCircle.clear();
     this.entry.clear();
     this.labelText.style = {...labelFontStyle, ...this.style.labelStyle ?? {}};
-    this.labelText.text = this.style.showLabel ? this.label : '';
+    this.labelText.text = this.style.showLabel ? (this.labelText.text ? this.labelText.text : this.label) : '';
     this.graphic.position.set(this.position.x, this.position.y);
     this.separatedGraphic.position.set(this.position.x, this.position.y);
     this.circle.circle(0, 0, this.style.radius);
@@ -150,9 +150,10 @@ class Node {
 class AbstractEdge {
 
   baseStyle() {
+    const dist = magnitude(vectorCombine(negate(this.from.position), this.to.position));
     return {
-      points: 6,
-      maxLineDist: 6 * gsc,
+      points: dist > 100 * gsc ? 6 : 3,
+      maxLineDist: dist > 100 * gsc ? 6 * gsc : 2 * gsc,
       forcedDistance: 0.8,
       stroke: {
         width: 5 * gsc,
@@ -400,9 +401,12 @@ class AbstractEdge {
   }
 
   hideEdgeTween(duration, easing) {
-    return new ValueTween(1, 0, duration, easing, (t) => {
-      this.drawnAmount = t;
+    return new ValueTween(0, 1, duration, easing, (t) => {
+      this.drawnAmount = interpValue(this.startingDrawnAmount, this.endingDrawnAmount, t);
       this.updateGraphic();
+    }, () => {
+      this.startingDrawnAmount = this.drawnAmount;
+      this.endingDrawnAmount = 0;
     });
   }
 
@@ -643,6 +647,7 @@ class Graph {
         y: get(state, 'position')?.y ?? 0,
         start: get(state, 'starting'),
         accepting: get(state, 'accepting'),
+        style: get(state, 'style') ?? {},
       }
     });
     get(data, "transitions").forEach((transition) => {
@@ -650,7 +655,7 @@ class Graph {
         from: get(transition, 'from'),
         to: get(transition, 'to'),
         label: get(transition, 'label'),
-        style: {},
+        style: get(transition, 'style') ?? {},
       };
       if (get(transition, 'style')?.edgeAnchor) {
         e.style.edgeAnchor = get(transition, 'style').edgeAnchor;
@@ -677,13 +682,14 @@ class Graph {
   addEdge(edge) {
     this.edges.push(edge);
     this.edgeContainer.addChild(edge.graphic);
-    this.edgeMap[`${edge.from.label}->${edge.to.label}`] = edge;
+    edge.labelKey = `${edge.from.label}->${edge.to.label}`
+    this.edgeMap[edge.labelKey] = edge;
   }
 
   removeEdge(edge) {
     this.edgeContainer.removeChild(edge.graphic);
     this.edges = this.edges.filter((e) => e !== edge);
-    delete this.edgeMap[`${edge.from.label}->${edge.to.label}`];
+    delete this.edgeMap[edge.labelKey];
     edge.destroy();
   }
 

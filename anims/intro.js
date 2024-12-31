@@ -19,7 +19,79 @@ const baseStyle = {
   align: 'center',
 };
 
-const GS = {};
+export const GS = {};
+
+const movePointer = (pointer, pos, duration) => new ValueTween(0, 1, duration, GS.easings.easeInOutQuad, (v) => {
+  const pos = interpValue(pointer.startPos, pointer.endPos, v);
+  pointer.position.set(pos.x, pos.y);
+}, () => {
+  pointer.startPos = {x: pointer.position.x, y: pointer.position.y};
+  pointer.endPos = pos;
+});
+const pointerClick = (pointer) => new ValueTween(lightGrey, black, 25, GS.easings.easeInOutQuad, (v) => pointer.tint = v);
+
+export const createFakeNFAEnvironment = (nfaApp) => {
+  Object.values(convertTasks[0].nfa.nodes).forEach(node => {
+    node.x = node.x * gsc;
+    node.y = node.y * gsc - 400;
+  });
+  convertTasks[0].nfa.edges.forEach(edge => {
+    if (edge.style?.edgeAnchor) {
+      edge.style.edgeAnchor.x *= gsc;
+      edge.style.edgeAnchor.y *= gsc;
+    }
+  });
+  NFAConvert.loader(nfaApp, GS.easings, () => {}, () => {}, {hideBG: true, ...convertTasks[0]});
+  NFAConvert.GS.checkButton.alpha = 0;
+  NFAConvert.GS.containerClick(1, 0);
+  NFAConvert.GS.nodeClick('S');
+  NFAConvert.GS.nodeClick('A');
+  const nfaPointer = new PIXI.Graphics();
+  nfaPointer
+    .moveTo(0, 0)
+    .lineTo(0, 100)
+    .lineTo(Math.cos(3 * Math.PI / 8) * 60, Math.sin(3 * Math.PI / 8) * 60)
+    .lineTo(Math.cos(Math.PI / 4) * 100, Math.sin(Math.PI / 4) * 100)
+    .lineTo(0, 0)
+    .fill(white);
+  nfaPointer.position.set(500, 400);
+  nfaPointer.tint = black;
+  NFAConvert.GS.screen.addChild(nfaPointer);
+
+  const containerPos = (i, j) => {
+    return vectorCombine(
+      NFAConvert.GS.table.getElementPosition(i, j),
+      { x: NFAConvert.GS.table.position.x, y: NFAConvert.GS.table.position.y },
+      { x: 200, y: 50 },
+    )
+  }
+  const nodePos = (label) => {
+    return vectorCombine(
+      NFAConvert.GS.nfa.nodes[label].position,
+      {
+        x: NFAConvert.GS.nfa.graph.position.x,
+        y: NFAConvert.GS.nfa.graph.position.y,
+      }
+    )
+  }
+
+  const nfaConvertSet = delay(0)
+  .then(
+    movePointer(nfaPointer, containerPos(1, 1), 30),
+  )
+  .then(new ImmediateTween(() => NFAConvert.GS.containerClick(1, 1)), pointerClick(nfaPointer))
+  .then(movePointer(nfaPointer, nodePos('D'), 30))
+  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('D')), pointerClick(nfaPointer))
+  .then(movePointer(nfaPointer, containerPos(1, 2), 30))
+  .then(new ImmediateTween(() => NFAConvert.GS.containerClick(1, 2)), pointerClick(nfaPointer))
+  .then(movePointer(nfaPointer, nodePos('B'), 30))
+  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('B')), pointerClick(nfaPointer))
+  .then(movePointer(nfaPointer, nodePos('C'), 30))
+  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('C')), pointerClick(nfaPointer))
+  .then(movePointer(nfaPointer, nodePos('D'), 30))
+  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('D')), pointerClick(nfaPointer))
+  return nfaConvertSet;
+}
 
 const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.easings = easings;
@@ -455,16 +527,6 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   });
 
   // But more importantly than anything else, <span class="highlight-small highlight-green-long">we'll have fun doing it!</span> This course is interactive wherever possible, so you'll have the opportunity to execute, design, and explore the algorithms and languages provided.
-
-  const movePointer = (pointer, pos, duration) => new ValueTween(0, 1, duration, GS.easings.easeInOutQuad, (v) => {
-    const pos = interpValue(pointer.startPos, pointer.endPos, v);
-    pointer.position.set(pos.x, pos.y);
-  }, () => {
-    pointer.startPos = {x: pointer.position.x, y: pointer.position.y};
-    pointer.endPos = pos;
-  });
-  const pointerClick = (pointer) => new ValueTween(lightGrey, black, 25, GS.easings.easeInOutQuad, (v) => pointer.tint = v);
-
   const fakeDFAJSON = {
     nodes: {
       A: { x: 0, y: 0, start: true, style: {radius: 90, entryWidth: 15} },
@@ -506,65 +568,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   nfaContainer.alpha = 0;
   GS.screen.addChild(nfaContainer);
   const nfaApp = Screen.fakeApp(nfaContainer, 2000, 1600);
-  Object.values(convertTasks[0].nfa.nodes).forEach(node => {
-    node.x = node.x * gsc;
-    node.y = node.y * gsc - 400;
-  });
-  convertTasks[0].nfa.edges.forEach(edge => {
-    if (edge.style?.edgeAnchor) {
-      edge.style.edgeAnchor.x *= gsc;
-      edge.style.edgeAnchor.y *= gsc;
-    }
-  });
-  NFAConvert.loader(nfaApp, GS.easings, () => {}, () => {}, {hideBG: true, ...convertTasks[0]});
-  NFAConvert.GS.checkButton.alpha = 0;
-  NFAConvert.GS.containerClick(1, 0);
-  NFAConvert.GS.nodeClick('S');
-  NFAConvert.GS.nodeClick('A');
-  const nfaPointer = new PIXI.Graphics();
-  nfaPointer
-    .moveTo(0, 0)
-    .lineTo(0, 100)
-    .lineTo(Math.cos(3 * Math.PI / 8) * 60, Math.sin(3 * Math.PI / 8) * 60)
-    .lineTo(Math.cos(Math.PI / 4) * 100, Math.sin(Math.PI / 4) * 100)
-    .lineTo(0, 0)
-    .fill(white);
-  nfaPointer.position.set(500, 400);
-  nfaPointer.tint = black;
-  NFAConvert.GS.screen.addChild(nfaPointer);
-
-  const containerPos = (i, j) => {
-    return vectorCombine(
-      NFAConvert.GS.table.getElementPosition(i, j),
-      { x: NFAConvert.GS.table.position.x, y: NFAConvert.GS.table.position.y },
-      { x: 200, y: 50 },
-    )
-  }
-  const nodePos = (label) => {
-    return vectorCombine(
-      NFAConvert.GS.nfa.nodes[label].position,
-      {
-        x: NFAConvert.GS.nfa.graph.position.x,
-        y: NFAConvert.GS.nfa.graph.position.y,
-      }
-    )
-  }
-
-  const nfaConvertSet = delay(0)
-  .then(
-    movePointer(nfaPointer, containerPos(1, 1), 30),
-  )
-  .then(new ImmediateTween(() => NFAConvert.GS.containerClick(1, 1)), pointerClick(nfaPointer))
-  .then(movePointer(nfaPointer, nodePos('D'), 30))
-  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('D')), pointerClick(nfaPointer))
-  .then(movePointer(nfaPointer, containerPos(1, 2), 30))
-  .then(new ImmediateTween(() => NFAConvert.GS.containerClick(1, 2)), pointerClick(nfaPointer))
-  .then(movePointer(nfaPointer, nodePos('B'), 30))
-  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('B')), pointerClick(nfaPointer))
-  .then(movePointer(nfaPointer, nodePos('C'), 30))
-  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('C')), pointerClick(nfaPointer))
-  .then(movePointer(nfaPointer, nodePos('D'), 30))
-  .then(new ImmediateTween(() => NFAConvert.GS.nodeClick('D')), pointerClick(nfaPointer))
+  const nfaAnim = createFakeNFAEnvironment(nfaApp);
 
   const regexContainer = new PIXI.Container();
   regexContainer.position.set(1100, 1000);
@@ -840,7 +844,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     .then(setAnswer)
     .then(delay(60))
     .then(fadeIn(true, nfaContainer))
-    .then(nfaConvertSet)
+    .then(nfaAnim)
     .then(delay(60))
     .then(
       fadeIn(false, regexContainer),

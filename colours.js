@@ -18,3 +18,5 @@ export const darkGrey = new PIXI.Color(0x4a5759);
 export const highlightColours = [
   green, orange, red, blue, purple
 ]
+
+export const rainbow = (v) => new PIXI.Color({ h: v, s: 80, l: 65 })

@@ -1,3 +1,4 @@
+import easings from 'https://cdn.jsdelivr.net/npm/easings.net@1.0.3/+esm';
 import { mergeDeep } from "./utils.js";
 
 class TweenManager {
@@ -56,6 +57,12 @@ class TweenManager {
       curT += fixedDT;
     }
     this.update((endT - curT) / TweenManager.curSpeed);
+  }
+
+  static skipToEnd() {
+    while (this.tweens.length > 0) {
+      this.update(100000);
+    }
   }
 
   static clear() {
@@ -237,8 +244,26 @@ const randomDelay = (tweens, maxDelay=20) => {
   randoms[maxIndex] = maxDelay;
   return delay(0).then(...tweens.map((tween, i) => delay(randoms[i]).then(tween)))
 };
+const fade = (object, show=true, duration=60) => new ValueTween(0, 1, duration, easings.easeInOutQuad, (v) => {
+  if (object.length !== undefined) {
+    object.forEach(o => o.alpha = interpValue(o.startAlpha, o.endAlpha, v));
+  } else {
+    object.alpha = interpValue(object.startAlpha, object.endAlpha, v);
+  }
+}, () => {
+  if (object.length !== undefined) {
+    object.forEach(o => {
+      o.startAlpha = o.alpha;
+      o.endAlpha = show ? 1 : 0;
+    });
+  } else {
+    object.startAlpha = object.alpha;
+    object.endAlpha = show ? 1 : 0;
+  }
+});
+const repeatTween = (fn, duration) => new Tween(duration, t => t, fn)
 
 export {
   TweenManager, Tween, PropertyTween, ValueTween, ImmediateTween,
-  interpValue, delay, chain, atOnce, randomDelay
+  interpValue, delay, chain, atOnce, randomDelay, fade, repeatTween
 };
