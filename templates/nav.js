@@ -120,7 +120,7 @@ export const contentMapping = {
   regularFAForm: {
     title: "The definitive form",
     type: "worded",
-    href: "/pages/regular/fa_form",
+    href: "/pages/regular/dfa_form",
   },
   regularFAMinimisation: {
     title: "Minimising DFAs",

@@ -28,20 +28,19 @@ class DFADraw {
 
     this.curState = DFADraw.SELECT_EMPTY;
     this.nodeLabelModal = new KeyEntryModal("Enter a label for the node", 1);
-    this.transitionLabelModal = new KeyEntryModal("Enter a label for the transition (or delete)", 20, "abcdefghijklmnopqrstuvwxyz0123456789, .");
+    this.transitionLabelModal = new KeyEntryModal("Enter a label for the transition (or delete)", opts.maxLength || 20, opts.alphabet || "abcdefghijklmnopqrstuvwxyz0123456789, ;");
     this.fakeTargetNode = new Node("ABCDEF", { x: 0, y: 0 }, {...DFADraw.baseStyle});
     this.fakeTargetNode.graphic.visible = false;
     this.fakeEdge = AbstractEdge.decide(this.fakeTargetNode, this.fakeTargetNode, {...DFADraw.baseEdgeStyle});
     this.fakeEdge.edgeLine.interactive = false;
     this.nodeLabelModal.textMap = (text) => text.toUpperCase();
     this.transitionLabelModal.validation = (text) => {
-      if (text === "ab")
-        return "Bad transition label";
+      // TODO (Maybe)
     };
 
     this.dfa = new DFA();
-    this.nodeLabelModal.setDimensions(1000, 600);
-    this.transitionLabelModal.setDimensions(1000, 600);
+    this.nodeLabelModal.setDimensions(this.screen.gameWidth, this.screen.gameHeight);
+    this.transitionLabelModal.setDimensions(this.screen.gameWidth, this.screen.gameHeight);
     this.bg_rect = new PIXI.Graphics().rect(0, 0, this.screen.gameWidth, this.screen.gameHeight).fill(bg);
     this.bg_rect.interactive = true;
     this.bg_rect.buttonMode = true;
@@ -57,6 +56,9 @@ class DFADraw {
       }
     });
     this.bg_rect.on("pointermove", (e) => {
+      const pos = this.screen.globalToLocal(e.data.global.x, e.data.global.y);
+      pos.x = Math.min(Math.max(pos.x, 0), this.screen.gameWidth);
+      pos.y = Math.min(Math.max(pos.y, 0), this.screen.gameHeight);
       if (this.curState === DFADraw.DRAW_EDGE) {
         this.draggingLeftNode = true;
 
@@ -67,13 +69,11 @@ class DFADraw {
           this.fakeEdge.edgeLine.interactive = false;
           this.dfa.edgeContainer.addChild(this.fakeEdge.graphic);
         }
-        const pos = this.screen.globalToLocal(e.data.global.x, e.data.global.y);
         this.fakeTargetNode.position = pos;
         this.fakeTargetNode.style.radius = 0;
         this.fakeEdge.to = this.fakeTargetNode;
         this.fakeEdge.updateGraphic();
       } else if (this.curState === DFADraw.DRAG_EDGE) {
-        const pos = this.screen.globalToLocal(e.data.global.x, e.data.global.y);
         const dist = Math.sqrt((pos.x - this.draggingEdgeCenter.x) ** 2 + (pos.y - this.draggingEdgeCenter.y) ** 2);
         this.draggingEdgeMaxDist = Math.max(this.draggingEdgeMaxDist, dist);
         if (this.selectedEdge.from.label === this.selectedEdge.to.label) {
@@ -83,7 +83,7 @@ class DFADraw {
         }
         this.fakeEdge.updateGraphic();
       } else if (this.curState === DFADraw.DRAG_NODE) {
-        this.selectedNode.position = this.screen.globalToLocal(e.data.global.x, e.data.global.y);
+        this.selectedNode.position = pos;
         this.selectedNode.updateGraphic();
         this.dfa.updateEdges(this.selectedNode);
       }
@@ -256,6 +256,9 @@ class DFADraw {
       }
     });
     node.subscribe('pointermove', (e) => {
+      const pos = this.screen.globalToLocal(e.data.global.x, e.data.global.y);
+      pos.x = Math.min(Math.max(pos.x, 0), this.screen.gameWidth);
+      pos.y = Math.min(Math.max(pos.y, 0), this.screen.gameHeight);
       if (this.curState === DFADraw.DRAW_EDGE) {
         if (this.selectedNode !== node || this.draggingLeftNode) {
           // We should make/modify the fake edge.
@@ -272,7 +275,7 @@ class DFADraw {
         }
       }
       if (this.curState === DFADraw.DRAG_NODE) {
-        this.selectedNode.position = this.screen.globalToLocal(e.data.global.x, e.data.global.y);
+        this.selectedNode.position = pos;
         this.selectedNode.updateGraphic();
         this.dfa.updateEdges(this.selectedNode);
       }

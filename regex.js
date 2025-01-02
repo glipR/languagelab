@@ -144,7 +144,7 @@ export class Regex {
     }
     // Finally, combine adjacent elements into a concat object.
     if (tree.length === 1) {
-      return tree[0];
+      return (typeof tree[0] !== 'string') ? this.subParse(tree[0]) : tree[0];
     }
     const concat = {type: 'concat', values: tree.map(e => e.length === undefined ? e : this.subParse(e))};
     return concat;

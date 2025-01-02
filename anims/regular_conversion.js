@@ -3,7 +3,7 @@ import NFA from "../nfa.js";
 import Screen from "../screen.js";
 import TextChanger from "../tools/change_text.js";
 import { RectangleCover } from "../tools/paper_cover.js";
-import { delay, fade, ImmediateTween, interpValue, repeatTween, TweenManager, ValueTween } from "../tween.js";
+import { delay, fade, ImmediateTween, interpValue, tweenFunction, TweenManager, ValueTween } from "../tween.js";
 import { wordGroups, gridNFA, extraAccepting, GS as playgroundGS } from "./video_playground.js";
 import { makeHighlight, UnderLine } from "./regex_intro.js";
 import { DrawnBezier } from "../tools/drawnBezier.js";
@@ -1404,7 +1404,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
           y: 0
         };
       }),
-      repeatTween(() => {selectEdges(GS.mother, mergeOriginal).forEach(e => e.updateGraphic())}, 60)
+      tweenFunction(() => {selectEdges(GS.mother, mergeOriginal).forEach(e => e.updateGraphic())}, 60)
     );
   }
 
@@ -1675,7 +1675,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         }),
         fade(GS.mother.edgeMap["mergeOriginal3->mergeOriginal3"].graphic, true, 15),
       ),
-      repeatTween(() => {
+      tweenFunction(() => {
         selectEdges(GS.mother, mergeNewTransitionsWithDupe).forEach(e => e.updateGraphic());
         selectEdges(GS.mother, mergeNewTransitionsWithoutDupe).forEach(e => e.updateGraphic());
       }, 60),

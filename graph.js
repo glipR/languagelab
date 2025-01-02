@@ -610,7 +610,7 @@ class Graph {
         accepting: !!node.style.doubleBorder,
         starting: !!node.style.isEntry,
       })),
-      alphabet: this.collectAlphabet(),
+      alphabet: this.collectAlphabet?.(),
       transitions: this.edges.map((edge) => {
         const e = {
           from: edge.from.label,

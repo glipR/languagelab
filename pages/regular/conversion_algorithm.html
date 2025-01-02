@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Conversion - Theory</title>
+  <title>Conversion - Algorithm</title>
   <script>var exports = {};</script>
   <script src="https://pixijs.download/release/pixi.js"></script>
   <script src="https://unpkg.com/@pixi/sound/dist/pixi-sound.js"></script>
@@ -25,16 +25,16 @@
   <script type="module">
     import { TweenManager } from '/tween.js';
     import { Scene, SceneManager } from '/scene.js';
-    import addContent from '/content/regular_conversion.js';
+    import addContent from '/content/regular_conversion_algorithm.js';
     import addNextButton from '/templates/next.js';
     import addNav from '/templates/nav.js';
     import addFooter from '/templates/footer.js';
     import load from '/tools/loading.js';
 
     // Content
-    addNav('regularConversionTheory');
+    addNav('regularConversionAlgorithm');
     addContent();
-    addNextButton('/pages/regular/conversion_algorithm')
+    addNextButton('/pages/regular/dfa_form')
     addFooter();
 
     load();

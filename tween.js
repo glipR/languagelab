@@ -43,6 +43,9 @@ class TweenManager {
       this.tweens[i].update(dtScaled);
       if (this.tweens[i].finished) {
         to_remove.push(i);
+        // Just in case this gets added again (probably still broken for most tweens)
+        this.tweens[i].elapsed = 0;
+        this.tweens[i].finished = false;
       }
     }
     this.tweens = this.tweens.filter((_, i) => !to_remove.includes(i));
@@ -261,9 +264,9 @@ const fade = (object, show=true, duration=60) => new ValueTween(0, 1, duration, 
     object.endAlpha = show ? 1 : 0;
   }
 });
-const repeatTween = (fn, duration) => new Tween(duration, t => t, fn)
+const tweenFunction = (fn, duration) => new Tween(duration, t => t, fn);
 
 export {
   TweenManager, Tween, PropertyTween, ValueTween, ImmediateTween,
-  interpValue, delay, chain, atOnce, randomDelay, fade, repeatTween
+  interpValue, delay, chain, atOnce, randomDelay, fade, tweenFunction
 };

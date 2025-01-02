@@ -153,6 +153,11 @@ class FloatingButton extends PIXI.Container {
       this.bg.tint = this.opts.bg.fill;
     }
   }
+
+  setFill(color) {
+    this.bg.tint = color;
+    this.opts.bg.fill = color;
+  }
 }
 
 class Checkbox extends PIXI.Container {

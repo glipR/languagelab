@@ -54,9 +54,10 @@ class Progress {
 
   checkCompleted = () => {
     for (let i=0; i<this.instructions.length; i++) {
-      if (!this.complete[i] && this.instructions[i].isComplete?.(this.GS, this.instructions[i], this)) {
-        if (this.current === i || this.allowSkipping)
+      if (this.current === i || this.allowSkipping) {
+        if (!this.complete[i] && this.instructions[i].isComplete?.(this.GS, this.instructions[i], this)) {
           this.completeInstruction(i);
+        }
       }
       if (this.complete[i] && this.instructions[i].isComplete?.(this.GS, this.instructions[i], this) === false) {
         this.uncompleteInstruction(i);
