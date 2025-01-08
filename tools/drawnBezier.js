@@ -133,9 +133,10 @@ export class DrawnBezier extends PIXI.Graphics {
       return acc;
     }, [0]).slice(1);
     const filteredBeziers = beziers.filter((_, index) => index === 0 || cumulativeLengths[index-1] < targetLength);
-    const finalRatio = (bezierLengths[filteredBeziers.length-1] - (cumulativeLengths[filteredBeziers.length-1] - targetLength))/bezierLengths[filteredBeziers.length-1];
+    const finalRatio = Math.min(1, (bezierLengths[filteredBeziers.length-1] - (cumulativeLengths[filteredBeziers.length-1] - targetLength))/bezierLengths[filteredBeziers.length-1]);
     const finalRateFunc = inverseBezierRateFunction(...filteredBeziers[filteredBeziers.length-1]);
     filteredBeziers[filteredBeziers.length-1] = partialBezier(finalRateFunc(finalRatio), ...filteredBeziers[filteredBeziers.length-1]);
+    this.finalRatio = finalRatio;
     return filteredBeziers;
   }
 
@@ -143,8 +144,13 @@ export class DrawnBezier extends PIXI.Graphics {
     t /= this.drawnAmount;
     t = Math.min(Math.max(t, 0), 1-1e-9);
     const beziers = this.generateDrawnBeziers(this.drawnAmount);
-    const interpIndex = Math.floor(t * beziers.length);
-    const interpRatio = t * beziers.length - interpIndex;
+    const actualLength = (beziers.length - 1 + this.finalRatio)
+    const interpIndex = Math.floor(t * actualLength);
+    let interpRatio = t * actualLength - interpIndex;
+    if (interpIndex === beziers.length - 1) {
+      interpRatio = interpRatio / this.finalRatio;
+    }
+    // console.log(interpRatio, ...beziers[interpIndex]);
     return bezier(interpRatio, ...beziers[interpIndex]);
   }
 
