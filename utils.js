@@ -1,5 +1,38 @@
 import { SceneManager } from './scene.js';
 import Progress from './tools/progress.js';
+import {rgb_to_oklab, oklab_to_rgb} from 'https://cdn.jsdelivr.net/npm/oklab.ts@2.2.7/+esm'
+
+// Keys ignored from deep merge.
+const IGNORED_KEYS = [
+  "physicsArea",
+]
+
+export const color_to_lch = (color) => {
+  const {L, a, b} = rgb_to_oklab({r: color.red * 255, g: color.green * 255, b: color.blue * 255});
+  const C = Math.sqrt(a ** 2 + b ** 2);
+  const h = Math.atan2(b, a);
+  return {L, C, h};
+}
+export const lch_to_color = ({L, C, h}) => {
+  const a = C * Math.cos(h);
+  const b = C * Math.sin(h);
+  const rgb = oklab_to_rgb({L, a, b});
+  return new PIXI.Color(rgb);
+}
+
+export const average_color = (colors, weights) => {
+
+  weights = weights ?? colors.map(() => 1);
+  const lch = colors.map(color_to_lch);
+  const { L, C, h } = lch.reduce((acc, color, i) => {
+    acc.L += color.L * weights[i];
+    acc.C += color.C * weights[i];
+    acc.h += color.h * weights[i];
+    return acc;
+  }, { L: 0, C: 0, h: 0 });
+  const totalWeight = weights.reduce((acc, weight) => acc + weight, 0);
+  return lch_to_color({ L: L / totalWeight, C: C / totalWeight, h: h / totalWeight });
+}
 
 export const magnitude = (vector) => {
   return Math.sqrt(vector.x ** 2 + vector.y ** 2);
@@ -19,6 +52,19 @@ export const vectorCombine = (...vectors) => {
 
 export const negate = (vector) => {
   return { x: -vector.x, y: -vector.y };
+}
+
+export const multiply = (vector, scalar) => {
+  return { x: vector.x * scalar, y: vector.y * scalar };
+}
+
+export const rotate = (vector, angle) => {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  return {
+    x: vector.x * cos - vector.y * sin,
+    y: vector.x * sin + vector.y * cos,
+  };
 }
 
 export const bezier = (t, ...points) => {
@@ -83,7 +129,10 @@ export const inverseBezierRateFunction = (...points) => {
         right = mid;
       }
     }
-    const ratio = (targetLength - lengths[left-1]) / (lengths[left] - lengths[left-1]);
+    let ratio = (targetLength - lengths[left-1]) / (lengths[left] - lengths[left-1]);
+    if (lengths[left] === lengths[left-1]) {
+      ratio = 0;
+    }
     return (left - 1 + ratio) / steps;
   }
 }
@@ -148,7 +197,7 @@ export const mergeDeep = (target, ...sources) => {
     for (const key in source) {
       if (isColor(source[key])) {
         target[key] = new PIXI.Color(source[key]);
-      } else if (isObject(source[key])) {
+      } else if (isObject(source[key]) && !IGNORED_KEYS.includes(key)) {
         if (!target[key]) target[key] = {};
         mergeDeep(target[key], source[key]);
       } else {

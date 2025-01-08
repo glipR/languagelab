@@ -84,7 +84,7 @@ const addContent = () => {
 
   registerScene(regexGame.loader, regexGame.unloader, 'regex_game', opts, () => {
     markComplete('regexGame');
-    // TODO: Redirect to next page
+    window.location.href = "/pages/nfa_intro";
   }, null);
 }
 

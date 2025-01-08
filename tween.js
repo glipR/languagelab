@@ -1,5 +1,5 @@
 import easings from 'https://cdn.jsdelivr.net/npm/easings.net@1.0.3/+esm';
-import { mergeDeep } from "./utils.js";
+import { mergeDeep, color_to_lch, lch_to_color, average_color } from "./utils.js";
 
 class TweenManager {
   static curSpeed = 1;
@@ -197,12 +197,7 @@ const interpValue = (start, end, t, tweenObj=false) => {
     };
   }
   else if (start.red !== undefined) {
-    return new PIXI.Color([
-      start.red + (end.red - start.red) * t,
-      start.green + (end.green - start.green) * t,
-      start.blue + (end.blue - start.blue) * t,
-      start.alpha + (end.alpha - start.alpha) * t,
-    ])
+    return average_color([start, end], [1-t, t]);
   }
   else if (Array.isArray(start)) {
     return start.map((s, i) => s + (end[i] - s) * t);

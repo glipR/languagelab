@@ -1,7 +1,6 @@
 // Other scripts can add functions to this array to be called after the assets are loaded
 window.afterAssetLoad = [];
 
-// TODO: Split up manifest bundles
 const manifest = {
   bundles: [
     {

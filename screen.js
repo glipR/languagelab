@@ -1,11 +1,13 @@
 // Frames the screen so that graph descriptions can be screen size agnostic.
 
+import { black } from "./colours.js";
+
 
 class Screen {
   static borderWidth = 5;
   static borderColor = 0x000000;
 
-  constructor(app, hideBG=false) {
+  constructor(app, hideBG=false, showBorder=false) {
     this.container = new PIXI.Container();
     const texture = PIXI.Texture.from('bg');
     this.bg = new PIXI.TilingSprite({
@@ -16,6 +18,9 @@ class Screen {
     if (hideBG) {
       this.bg.alpha = 0;
     }
+    this.border = new PIXI.Graphics();
+    this.container.addChild(this.border);
+    this.border.alpha = showBorder ? 1 : 0;
     this.childElements = new PIXI.Container();
     this.container.addChild(this.childElements);
     app.stage.addChild(this.bg);
@@ -52,6 +57,8 @@ class Screen {
   setGameSize(width, height) {
     this.gameWidth = width;
     this.gameHeight = height;
+
+    this.border.rect(0, 0, this.gameWidth, this.gameHeight).stroke({ color: black, width: 5 });
   }
 
   scaleToFit(stretch=false) {
@@ -72,6 +79,10 @@ class Screen {
 
   addChild(child) {
     this.childElements.addChild(child);
+  }
+
+  addChildAt(child, index) {
+    this.childElements.addChildAt(child, index);
   }
 
   globalToLocal(x, y) {

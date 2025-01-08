@@ -32,9 +32,10 @@ export class Highlight extends PIXI.Graphics {
       xShift: 0,
       yShift: 0,
       widthShift: 0,
-      heightShift: 20,
+      heightShift: 5 * gsc,
       fillAlpha: 0.2,
       strokeAlpha: 0.8,
+      strokeWidth: 1.25 * gsc,
     }, style);
   }
 
@@ -48,7 +49,7 @@ export class Highlight extends PIXI.Graphics {
     this.clear();
     this.rect(this.curTransform.x, this.curTransform.y, this.curTransform.width, this.curTransform.height)
       .fill({ color: this.style.color, alpha: this.style.fillAlpha })
-      .stroke({ color: this.style.color, width: 5, alpha: this.style.strokeAlpha });
+      .stroke({ color: this.style.color, width: this.style.strokeWidth, alpha: this.style.strokeAlpha });
   }
 
   computeTransform(start, end) {
