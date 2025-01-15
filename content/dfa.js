@@ -47,8 +47,10 @@ While everything I said above is true, we can be a bit mathematically clearer in
 
 You definitely won't need to memorize this for anything else on this site, but it's good to know.
 
-A DFA is a collection of 5 things:
+<div class="definitionBlock">
+<h3>What is a DFA Mathematically?</h3>
 
+A DFA is a collection of 5 things:
 <ul>
   <li>A set of states, \\(Q\\)</li>
   <li>An alphabet, $\\Sigma$</li>
@@ -56,6 +58,7 @@ A DFA is a collection of 5 things:
   <li>A start state, $q_0 \\in Q$</li>
   <li>A set of accepting states, $F \\subseteq Q$</li>
 </ul>
+</div>
 
 <img src="/img/dfaIntro/formal.png" class="small" />
 

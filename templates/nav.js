@@ -117,15 +117,15 @@ export const contentMapping = {
     type: "game",
     href: "/pages/regular/conversion_algorithm",
   },
-  regularFAForm: {
+  regularDFAForm: {
     title: "The definitive form",
     type: "worded",
     href: "/pages/regular/dfa_form",
   },
-  regularFAMinimisation: {
+  regularDFAMinimisation: {
     title: "Minimising DFAs",
     type: "game",
-    href: "/pages/regular/fa_minimisation",
+    href: "/pages/regular/dfa_minimise",
   },
   regularTheory: {
     title: "Regular Quiz",
@@ -259,8 +259,8 @@ const navContent = (key) => `
             <div class="pageDropdownPage ${pageHidden(key, 'regular')}">
               ${renderItem('regularConversionTheory')}
               ${renderItem('regularConversionAlgorithm')}
-              ${renderItem('regularFAForm')}
-              ${renderItem('regularFAMinimisation')}
+              ${renderItem('regularDFAForm')}
+              ${renderItem('regularDFAMinimisation')}
               ${renderItem('regularTheory')}
               ${renderItem('regularPumping')}
               ${renderItem('regularPumpingGame')}

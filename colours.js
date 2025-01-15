@@ -19,4 +19,5 @@ export const highlightColours = [
   green, orange, red, blue, purple
 ]
 
+// TODO: Redo me with LCh space.
 export const rainbow = (v) => new PIXI.Color({ h: v, s: 80, l: 65 })

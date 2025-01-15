@@ -864,6 +864,43 @@ code {
   outline: none!important;
 }
 
+.definitionBlock {
+  max-width: 800px;
+  padding: 30px 40px;
+  background: url('/img/backgrounds/soft-paper.jpg');
+  margin: auto;
+  font-family: 'Firasans Regular';
+  box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.24), 0 0 0 1px rgba(0, 0, 0, 0.16);
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.definitionBlock h3 {
+  margin-block-start: 0.2em;
+  margin-block-end: 0.75em;
+}
+
+.definitionBlock ol {
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.red {
+  color: #fb6f92;
+}
+.green {
+  color: #60d394;
+}
+.blue {
+  color: #70d6ff;
+}
+.purple {
+  color: #b388eb;
+}
+.orange {
+  color: #e76f51;
+}
+
 /* DFA Intro HTML Elements */
 
 .properties {
@@ -875,4 +912,35 @@ code {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.checkmark {
+  display:inline-block;
+  width: 66px;
+  height:66px;
+  background: #60d394;
+  border-radius:50%;
+  -ms-transform: rotate(45deg); /* IE 9 */
+  -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
+  transform: rotate(45deg);
+}
+
+.checkmark:before{
+  content:"";
+  position: absolute;
+  width:9px;
+  height:27px;
+  background-color:#fff;
+  left:33px;
+  top:18px;
+}
+
+.checkmark:after{
+  content:"";
+  position: absolute;
+  width:9px;
+  height:9px;
+  background-color:#fff;
+  left:24px;
+  top:36px;
 }

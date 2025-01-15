@@ -1,5 +1,5 @@
 import { interpValue, ValueTween, Tween } from './tween.js';
-import { magnitude, vectorCombine, negate, bezier, partialBezier, mergeDeep } from './utils.js';
+import { magnitude, vectorCombine, negate, bezier, partialBezier, mergeDeep, multiply, rotate } from './utils.js';
 import { CircleCover, RectangleCover } from './tools/paper_cover.js';
 import easings from 'https://cdn.jsdelivr.net/npm/easings.net@1.0.3/+esm';
 import { DrawnBezier } from './tools/drawnBezier.js';
@@ -150,10 +150,11 @@ class Node {
 class AbstractEdge {
 
   baseStyle() {
-    const dist = magnitude(vectorCombine(negate(this.from.position), this.to.position));
+    const dist = magnitude(vectorCombine(negate(this.from.position), this.to.position)) - (this.from.style?.radius ?? 0) - (this.to.style?.radius ?? 0);
     return {
       points: dist > 100 * gsc ? 6 : 3,
-      maxLineDist: dist > 100 * gsc ? 6 * gsc : 2 * gsc,
+      maxLineDist: dist > 100 * gsc ? 6 * gsc : 3 * gsc,
+      toRadius: false,
       forcedDistance: 0.8,
       stroke: {
         width: 5 * gsc,
@@ -227,12 +228,32 @@ class AbstractEdge {
     this.graphic.destroy();
   }
 
+  getEdgeStartCenter() {
+    return this.from.graphic?.position ?? this.from.position;
+  }
+
+  getEdgeEndCenter() {
+    return this.to.graphic?.position ?? this.to.position;
+  }
+
   getEdgeStart() {
-    return this.from.position;
+    const centerFrom = this.getEdgeStartCenter();
+    if (this.style.toRadius) {
+      const wanted = this.getEdgeEndCenter();
+      const towards = vectorCombine(negate(centerFrom), wanted);
+      return vectorCombine(centerFrom, multiply(towards, this.from.style.radius / magnitude(towards)));
+    }
+    return centerFrom;
   }
 
   getEdgeEnd() {
-    return this.to.position;
+    const centerTo = this.getEdgeEndCenter();
+    if (this.style.toRadius) {
+      const wanted = this.getEdgeStartCenter();
+      const towards = vectorCombine(negate(centerTo), wanted);
+      return vectorCombine(centerTo, multiply(towards, this.to.style.radius / magnitude(towards)));
+    }
+    return centerTo;
   }
 
   edgeInterp(t) {
@@ -251,7 +272,7 @@ class AbstractEdge {
 
   getArrowTransform(position) {
     if (position === "middle") {
-      return this.edgeInterp(0.5);
+      return this.edgeInterp(0.5 * this.drawnAmount);
     } else if (position === "end") {
       const interp = this.findRadiusRatio(false, this.to.style.radius);
       const t = Math.min(
@@ -288,17 +309,19 @@ class AbstractEdge {
     }
   }
 
-  findRadiusRatio(start, radius) {
+  findRadiusRatio(start, radius, interpFunc, drawnAmount) {
     // Binary searches to find the ratio of edgeInterp that sits on the radius.
+    interpFunc = interpFunc === undefined ? ((v) => this.edgeInterp(v).position) : interpFunc;
+    drawnAmount = drawnAmount === undefined ? this.drawnAmount : drawnAmount;
     // Can be done from the start or end of the edge.
     let lo, hi;
-    const comp = (v) => magnitude(vectorCombine(this.edgeInterp(v).position, negate((start ? this.from : this.to).position))) < radius;
+    const comp = (v) => magnitude(vectorCombine(interpFunc(v), negate(start ? this.getEdgeStartCenter() : this.getEdgeEndCenter()))) < radius;
     if (start) {
       lo = 0;
-      hi = 0.5 * this.drawnAmount;
+      hi = 0.5 * drawnAmount;
     } else {
-      lo = 0.5 * this.drawnAmount;
-      hi = 1 * this.drawnAmount;
+      lo = 0.5 * drawnAmount;
+      hi = 1 * drawnAmount;
     }
     while (hi - lo > 1e-6) {
       const mid = (lo + hi) / 2;
@@ -345,6 +368,13 @@ class AbstractEdge {
     const arrowSize = arrowStyle.size;
     const arrowStroke = arrowStyle.stroke ?? this.style.stroke.color;
     const arrowTransform = this.getArrowTransform(arrowStyle.position);
+
+    if (arrowStyle.position === "middle") {
+      // The arrowTransform is where the tip of the arrow will be.
+      // So move the arrowTransform forward by half the arrowSize.
+      arrowTransform.position.x += Math.cos(arrowTransform.angle) * arrowSize / 4;
+      arrowTransform.position.y += Math.sin(arrowTransform.angle) * arrowSize / 4;
+    }
 
     this.arrowGraphic
           .moveTo(
@@ -455,20 +485,41 @@ class CurveEdge extends AbstractEdge {
     }
   }
 
-  getBezierPoints() {
-    const vertexMidpoint = interpValue(this.getEdgeStart(), this.getEdgeEnd(), 0.5);
+  getEdgeStart() {
+    if (this.style.toRadius) {
+      const bezierPoints = this.getBezierPoints(true);
+      const interp = this.findRadiusRatio(true, this.from.style.radius, (v) => bezier(v, ...bezierPoints).position, 1);
+      return bezier(interp, ...bezierPoints).position;
+    }
+    return this.getEdgeStartCenter();
+  }
+
+  getEdgeEnd() {
+    if (this.style.toRadius) {
+      const bezierPoints = this.getBezierPoints(true);
+      const func = (v) => bezier(v, ...bezierPoints).position;
+      const interp = this.findRadiusRatio(false, this.to.style.radius, func, 1);
+      return bezier(interp, ...bezierPoints).position;
+    }
+    return this.getEdgeEndCenter();
+  }
+
+  getBezierPoints(forceCenter=false) {
+    const start = forceCenter ? this.getEdgeStartCenter() : this.getEdgeStart();
+    const end = forceCenter ? this.getEdgeEndCenter() : this.getEdgeEnd();
+    const centerStart = this.getEdgeStartCenter();
+    const centerEnd = this.getEdgeEndCenter();
+    const vertexMidpoint = interpValue(centerStart, centerEnd, 0.5);
     const anchorAngle = Math.atan2(this.style.edgeAnchor.y, this.style.edgeAnchor.x);
     const anchorOffset = {
       x: Math.cos(anchorAngle + Math.PI/2) * magnitude(this.style.edgeAnchor) * this.style.anchorOffsetMult,
       y: Math.sin(anchorAngle + Math.PI/2) * magnitude(this.style.edgeAnchor) * this.style.anchorOffsetMult,
     }
-    const startDist = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, anchorOffset, negate(this.getEdgeStart())));
-    const endDist = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, anchorOffset, negate(this.getEdgeEnd())));
-    const start = this.getEdgeStart();
+    const startDist = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, anchorOffset, negate(centerStart)));
+    const endDist = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, anchorOffset, negate(centerEnd)));
     const fullAnchor1 = vectorCombine(vertexMidpoint, this.style.edgeAnchor, startDist < endDist ? anchorOffset : negate(anchorOffset));
     const fullAnchor2 = vectorCombine(vertexMidpoint, this.style.edgeAnchor, startDist < endDist ? negate(anchorOffset) : anchorOffset);
-    const fullEnd = this.getEdgeEnd();
-    return [start, fullAnchor1, fullAnchor2, fullEnd];
+    return [start, fullAnchor1, fullAnchor2, end];
   }
 
 }
@@ -487,8 +538,28 @@ class LoopEdge extends AbstractEdge {
     }
   }
 
+  getEdgeStart() {
+    const center = this.getEdgeStartCenter();
+    if (this.style.toRadius) {
+      const loopOffset = this.style.loopOffset;
+      const rotated = rotate(loopOffset, -Math.PI/8);
+      return vectorCombine(center, multiply(rotated, this.from.style.radius / magnitude(rotated)));
+    }
+    return center;
+  }
+
+  getEdgeEnd() {
+    const center = this.getEdgeEndCenter();
+    if (this.style.toRadius) {
+      const loopOffset = this.style.loopOffset;
+      const rotated = rotate(loopOffset, +Math.PI/8);
+      return vectorCombine(center, multiply(rotated, this.to.style.radius / magnitude(rotated)));
+    }
+    return center;
+  }
+
   getBezierPoints() {
-    const loopOffset = this.style.loopOffset ?? {x: 0, y: -75};
+    const loopOffset = this.style.loopOffset;
     const loopAngle = Math.atan2(loopOffset.y, loopOffset.x);
     const midLoop = interpValue(this.getEdgeStart(), this.getEdgeEnd(), 0.5);
     const anchorPoint = {
