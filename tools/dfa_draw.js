@@ -98,7 +98,7 @@ class DFADraw {
         }
         this.dfa.removeEdge(this.selectedEdge);
         this.removeFakeEdge();
-        this.createEdge(this.selectedEdge.from, this.selectedEdge.to, newStyle);
+        this.createEdge(this.selectedEdge.from, this.selectedEdge.to, newStyle, true);
         this.curState = DFADraw.SELECT_EMPTY;
       } else if (this.curState === DFADraw.DRAG_NODE) {
         this.curState = DFADraw.SELECT_EMPTY;
@@ -225,7 +225,7 @@ class DFADraw {
       if (transition.style?.edgeAnchor) {
         e.style.edgeAnchor = transition.style.edgeAnchor;
       }
-      this.createEdge(e.from, e.to, e.style);
+      this.createEdge(e.from, e.to, e.style, true);
     });
   }
 
@@ -287,7 +287,7 @@ class DFADraw {
       } else if (this.curState === DFADraw.SELECT_EMPTY) {
         // Do nothing
       } else {
-        this.createEdge(this.selectedNode, node);
+        this.createEdge(this.selectedNode, node, false);
         this.removeFakeEdge();
         this.curState = DFADraw.SELECT_EMPTY;
       }
@@ -297,7 +297,7 @@ class DFADraw {
     return node;
   }
 
-  createEdge (from, to, extraStyle) {
+  createEdge (from, to, extraStyle, hideTransitionModal) {
     const edge = AbstractEdge.decide(from, to, mergeDeep({...DFADraw.baseEdgeStyle}, extraStyle ?? {}));
     edge.labelBG.alpha = 1;
     edge.subscribe('pointerdown', (e) => {
@@ -305,28 +305,34 @@ class DFADraw {
         this.startDraggingEdge(edge, this.screen.globalToLocal(e.data.global.x, e.data.global.y));
       }
     });
+    const openTransitionModal = () => {
+      this.transitionLabelModal.onEnter = (text) => {
+        this.dfa.changeEdgeLabel(edge, text);
+        this.onEdgeStateChange?.(edge, this.dfa);
+      };
+      this.transitionLabelModal.onExtraBackspace = () => {
+        this.dfa.removeEdge(edge);
+        this.onEdgeDelete?.(edge, this.dfa);
+      }
+      this.transitionLabelModal.activate(edge.style.edgeLabel);
+      this.curState = DFADraw.SELECT_EMPTY;
+    }
     edge.subscribe('pointerup', (e) => {
       if (this.curState === DFADraw.DRAG_EDGE) {
         if (this.draggingEdgeMaxDist < 10) {
           this.removeFakeEdge();
-          // Enter label modal
-          this.transitionLabelModal.onEnter = (text) => {
-            this.dfa.changeEdgeLabel(edge, text);
-            this.onEdgeStateChange?.(edge, this.dfa);
-          };
-          this.transitionLabelModal.onExtraBackspace = () => {
-            this.dfa.removeEdge(edge);
-            this.onEdgeDelete?.(edge, this.dfa);
-          }
-          this.transitionLabelModal.activate(edge.style.edgeLabel);
-          this.curState = DFADraw.SELECT_EMPTY;
+          openTransitionModal();
         }
       } else {
         this.genericMouseUp(e);
       }
-    })
+    });
     this.dfa.addEdge(edge);
     this.onEdgeCreate?.(edge, this.dfa);
+    // On draw, immediately open the transition modal.
+    if (!hideTransitionModal) {
+      openTransitionModal();
+    }
     return edge;
   }
 

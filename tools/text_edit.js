@@ -40,6 +40,8 @@ class TextEdit extends TextChanger {
         this.tryMoveCursor(-1);
       } else if (e.key === "ArrowRight") {
         this.tryMoveCursor(1);
+      } else if (e.key === "Escape") {
+        this.onEscape?.();
       } else if (e.key === "Backspace") {
         this.deletePressed();
       } else if (e.key === "Enter") {

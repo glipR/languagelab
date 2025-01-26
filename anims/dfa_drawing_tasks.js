@@ -123,7 +123,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   }
   GS.dfa.onEdgeStateChange = (edge, dfa) => {
     const existingEdge = GS.oldEdgeStates.find((e) => e.from === edge.from.label && e.to === edge.to.label);
-    if (edge.labelText.text !== "" && existingEdge && existingEdge.label !== edge.labelText.text) {
+    if (existingEdge && existingEdge.label !== "" && existingEdge.label !== edge.labelText.text) {
       GS.progress.markCompleted(5);
     }
     resetEdgeStates();

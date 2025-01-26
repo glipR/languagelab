@@ -39,6 +39,10 @@ class KeyEntryModal extends PIXI.Container {
         this.deactivate();
       }
     }
+    this.enteredText.onEscape = () => {
+      this.onEscape?.();
+      this.deactivate();
+    }
     this.enteredText.onExtraBackspace = () => {
       this.onExtraBackspace?.();
       this.deactivate();
