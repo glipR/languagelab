@@ -69,7 +69,7 @@ class DFADraw {
           this.fakeEdge.edgeLine.interactive = false;
           this.dfa.edgeContainer.addChild(this.fakeEdge.graphic);
         }
-        this.fakeTargetNode.position = pos;
+        this.fakeTargetNode.moveTo(pos);
         this.fakeTargetNode.style.radius = 0;
         this.fakeEdge.to = this.fakeTargetNode;
         this.fakeEdge.updateGraphic();
@@ -128,7 +128,7 @@ class DFADraw {
     this.curState = DFADraw.DRAW_EDGE;
     this.selectedNode = node;
     this.draggingLeftNode = false;
-    this.fakeTargetNode.position = {...node.position};
+    this.fakeTargetNode.moveTo(node.position);
     this.fakeEdge = AbstractEdge.decide(node, this.fakeTargetNode, {...DFADraw.baseEdgeStyle});
     this.fakeEdge.edgeLine.interactive = false;
     this.dfa.edgeContainer.addChild(this.fakeEdge.graphic);
