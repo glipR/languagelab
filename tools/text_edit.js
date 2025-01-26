@@ -1,19 +1,25 @@
 import { black } from "../colours.js";
 import { delay, ImmediateTween, TweenManager } from "../tween.js";
+import { mergeDeep } from "../utils.js";
 import TextChanger from "./change_text.js";
 
 class TextEdit extends TextChanger {
   constructor (text = "", style = {}) {
-    super(text, {
+    const actualStyle = mergeDeep({
       tweenDuration: 0,
       moveDelay: 0,
       insertDelay: 0,
       deleteDelay: 0,
-      ...style
-    });
+      keyMap: (key) => { if (key === ";") return "ε"; return key; },
+      allowedChars: undefined,
+      maxLength: undefined,
+      textMap: (text) => text,
+      cursor: { fill: black },
+    }, style);
+    super(text, actualStyle);
     this.cursorIndex = text.length;
     this.cursor = new PIXI.Graphics();
-    this.cursor.rect(0, 0, 2, this.style.charHeight).fill(black);
+    this.cursor.rect(0, 0, 2, this.style.charHeight).fill(this.style.cursor.fill);
     const pos = this.transform(this.curText, this.cursorIndex);
     this.cursor.position.set(pos.x, pos.y);
     this.addChild(this.cursor);
@@ -42,6 +48,7 @@ class TextEdit extends TextChanger {
         }
       } else if (e.key.length === 1) {
         this.keyTyped(e.key);
+        e.preventDefault();
       }
     }
     this.activate();
@@ -59,9 +66,10 @@ class TextEdit extends TextChanger {
   }
   deletePressed() {
     if (this.cursorIndex === 0) {
+      this.onExtraBackspace?.();
       return;
     }
-    const newText = this.curText.slice(0, this.cursorIndex-1) + this.curText.slice(this.cursorIndex);
+    const newText = this.style.textMap(this.curText.slice(0, this.cursorIndex-1) + this.curText.slice(this.cursorIndex));
     TweenManager.add(this.changeText(newText));
     this.cursorIndex -= 1;
     const pos = this.transform(this.curText, this.cursorIndex);
@@ -69,23 +77,32 @@ class TextEdit extends TextChanger {
     this.cursor.alpha = 1;
   }
   keyTyped(key) {
-    if (key === ";") key = "ε";
+    key = this.style.keyMap(key);
     if (this.style.allowedChars && !this.style.allowedChars.includes(key)) {
       return;
     }
     if (this.style.maxLength && this.curText.length >= this.style.maxLength) {
       return
     }
-    const newText = this.curText.slice(0, this.cursorIndex) + key + this.curText.slice(this.cursorIndex);
+    const newText = this.style.textMap(this.curText.slice(0, this.cursorIndex) + key + this.curText.slice(this.cursorIndex));
     TweenManager.add(this.changeText(newText));
     this.cursorIndex += 1;
+    const pos = this.transform(this.curText, this.cursorIndex);
+    this.cursor.position.set(pos.x, pos.y);
+    this.cursor.alpha = 1;
+    this.onChange?.(newText);
+  }
+
+  forceText(text, cursorIndex) {
+    TweenManager.add(this.changeText(this.style.textMap(text)));
+    this.cursorIndex = cursorIndex === undefined ? text.length : cursorIndex;
     const pos = this.transform(this.curText, this.cursorIndex);
     this.cursor.position.set(pos.x, pos.y);
     this.cursor.alpha = 1;
   }
 
   clear() {
-    TweenManager.add(this.changeText(""));
+    TweenManager.add(this.changeText(this.style.textMap("")));
     this.curText = "";
     this.cursorIndex = 0;
     const pos = this.transform(this.curText, this.cursorIndex);

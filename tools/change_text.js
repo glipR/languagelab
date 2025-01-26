@@ -146,6 +146,9 @@ export class TextChanger extends PIXI.Container {
       " ": {
         width: 10 * gsc,
       },
+      ",": {
+        width: 5 * gsc,
+      },
       "r": {
         width: 11 * gsc,
       },

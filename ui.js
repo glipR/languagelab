@@ -1,4 +1,6 @@
 import { black, white, red, lightGrey } from "./colours.js";
+import TextEdit from "./tools/text_edit.js";
+import { TweenManager } from "./tween.js";
 import { mergeDeep } from "./utils.js";
 
 const gsc = window.gameScaling ?? 1;
@@ -17,59 +19,33 @@ class KeyEntryModal extends PIXI.Container {
     this.prompt = new PIXI.Text({ text: prompt, style: { ...promptStyle, fill: white, fontSize: 48 } });
     this.prompt.anchor.set(0.5, 0.5);
     this.showText = showText === undefined ? this.maxKeyLength > 1 : showText;
-    this.enteredText = new PIXI.Text({ text: "", style: { fill: white, fontSize: 36 } });
-    this.enteredText.anchor.set(0.5, 0.5);
-    this.validationText = new PIXI.Text({ text: "", style: { fill: red, fontSize: 24 } });
-    this.validationText.anchor.set(0.5, 0.5);
+    this.enteredText = new TextEdit("", {
+      maxLength: this.maxKeyLength,
+      allowedChars: this.acceptedCharacters,
+      text: { fill: white },
+      cursor: { fill: white },
+    });
     this.addChild(this.bg);
     this.addChild(this.prompt);
     this.addChild(this.enteredText);
-    this.addChild(this.validationText);
 
-    // Extra features:
-    // Map text
-    this.textMap = (text) => text;
-    this.validation = (text) => null;
-
-    this.keydownListener = (e) => {
-      if (!this.visible) return;
-      if (e.key === "Backspace") {
-        this.validationText.text = "";
-        if (this.curText.length > 0) {
-          this.curText = this.curText.slice(0, -1)
-          this.curText = this.textMap(this.curText);
-          this.onChange?.(this.curText);
-        } else {
-          this.onExtraBackspace?.();
-          this.deactivate();
-        }
-      } else if (this.acceptedCharacters.includes(e.key) && this.curText.length < this.maxKeyLength) {
-        const addedChar = e.key === ";" ? "ε" : e.key;
-        this.validationText.text = "";
-        this.curText = this.curText + addedChar;
-        this.curText = this.textMap(this.curText);
-        this.onChange?.(this.curText);
-        if (this.maxKeyLength == 1) {
-          this.onEnter?.(this.curText);
-          this.deactivate();
-        }
-        e.preventDefault();
-      } else if (e.key === "Enter") {
-        const curValidation = this.validation(this.curText);
-        if (curValidation) {
-          this.validationText.text = curValidation;
-        } else {
-          this.onEnter?.(this.curText);
-          this.deactivate();
-        }
-      } else if (e.key === "Escape") {
+    this.enteredText.onEnter = () => {
+      this.onEnter?.(this.enteredText.curText);
+      this.deactivate();
+    }
+    this.enteredText.onChange = (newText) => {
+      if (this.maxKeyLength === 1 && newText.length === 1) {
+        this.onEnter?.(newText);
         this.deactivate();
       }
-      if (this.showText) {
-        this.enteredText.text = this.curText;
-      }
-    };
-    window.addEventListener("keydown", this.keydownListener);
+    }
+    this.enteredText.onExtraBackspace = () => {
+      this.onExtraBackspace?.();
+      this.deactivate();
+    }
+
+    this.deactivate();
+
     this.setDimensions(400, 400);
   }
 
@@ -80,23 +56,22 @@ class KeyEntryModal extends PIXI.Container {
     this.bg.rect(0, 0, width, height).fill(black);
     this.prompt.position.set(width / 2, height / 2);
     this.enteredText.position.set(width / 2, height / 2 + 60);
-    this.validationText.position.set(width / 2, height / 2 + 100);
     // For some reason this depends on the previous width/height?
     this.scale.set(1);
   }
 
-  activate() {
+  activate(curText="") {
     this.visible = true;
-    this.curText = "";
-    this.enteredText.text = this.curText;
+    this.enteredText.forceText(curText);
+    this.enteredText.activate();
   }
 
   deactivate() {
     this.visible = false;
+    this.enteredText.deactivate();
   }
 
   destroy() {
-    window.removeEventListener("keydown", this.keydownListener);
     super.destroy();
   }
 }

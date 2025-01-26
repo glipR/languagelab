@@ -603,6 +603,7 @@ class Graph {
     this.nodes[newLabel] = this.nodes[oldLabel];
     delete this.nodes[oldLabel];
     this.nodes[newLabel].label = newLabel;
+    this.nodes[newLabel].labelText.text = newLabel;
     this.nodes[newLabel].updateGraphic();
   }
 

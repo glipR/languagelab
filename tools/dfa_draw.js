@@ -33,10 +33,7 @@ class DFADraw {
     this.fakeTargetNode.graphic.visible = false;
     this.fakeEdge = AbstractEdge.decide(this.fakeTargetNode, this.fakeTargetNode, {...DFADraw.baseEdgeStyle});
     this.fakeEdge.edgeLine.interactive = false;
-    this.nodeLabelModal.textMap = (text) => text.toUpperCase();
-    this.transitionLabelModal.validation = (text) => {
-      // TODO (Maybe)
-    };
+    this.nodeLabelModal.enteredText.style.textMap = (text) => text.toUpperCase();
 
     this.dfa = new DFA();
     this.nodeLabelModal.setDimensions(this.screen.gameWidth, this.screen.gameHeight);
@@ -321,7 +318,7 @@ class DFADraw {
             this.dfa.removeEdge(edge);
             this.onEdgeDelete?.(edge, this.dfa);
           }
-          this.transitionLabelModal.activate();
+          this.transitionLabelModal.activate(edge.style.edgeLabel);
           this.curState = DFADraw.SELECT_EMPTY;
         }
       } else {
