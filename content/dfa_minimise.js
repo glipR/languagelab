@@ -238,8 +238,7 @@ const addContent = () => {
   const steps = new StepScenes(minimiseContainer, "dfa_minimise", minimiseTasks, () => {
     markComplete('regularDFAMinimisation');
     // Redirect to next page
-    // TODO: Next page.
-    window.location.href = "/pages/regular/dfa_form";
+    window.location.href = "/pages/regular/pumping";
   }, true, null, { storageKey: 'regularDFAMinimisationProgress' });
   registerScene(dfaMinimise.loader, dfaMinimise.unloader, 'dfa_minimise', minimiseTasks[steps.progress.current], steps.makeOnSuccess(), steps.makeOnFailure());
 }

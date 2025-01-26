@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Minimising DFAs</title>
+  <title>The pumping lemma</title>
   <script>var exports = {};</script>
   <script src="https://pixijs.download/release/pixi.js"></script>
   <script src="https://unpkg.com/@pixi/sound/dist/pixi-sound.js"></script>
@@ -26,16 +26,16 @@
   <script type="module">
     import { TweenManager } from '/tween.js';
     import { Scene, SceneManager } from '/scene.js';
-    import addContent from '/content/dfa_minimise.js';
+    import addContent from '/content/regular_pumping.js';
     import addNextButton from '/templates/next.js';
     import addNav from '/templates/nav.js';
     import addFooter from '/templates/footer.js';
     import load from '/tools/loading.js';
 
     // Content
-    addNav('regularDFAMinimisation');
+    addNav('regularPumping');
     addContent();
-    addNextButton('/pages/regular/pumping')
+    addNextButton('/pages/regular/pumping_game')
     addFooter();
 
     load();

@@ -7,7 +7,11 @@ import { isComplete, markComplete } from '../tools/completion.js';
 
 const dummyPosition = { x: 0, y: 0 }
 
-const contentText = `TODO`
+const contentText = `
+Play the game below and get some intuition for using the pumping lemma from both perspectives - both from regular and irregular languages.
+
+If you think the language is regular, you should be able to always win as player 1, and if you think the language is irregular, you should be able to always win as player 2 (in our examples, not always).
+`
 
 export const tasks = [
   {

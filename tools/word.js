@@ -134,12 +134,16 @@ export const moveBetween = (l1, l2, duration, graph, nodePointer, wordPointer, w
       if (wordPointer) tween.during(new ValueTween(curWordPos, newWordPos, duration, easings.easeInOutQuad, (v) => {
         wordPointer.position.set(v.x, v.y);
       }));
-      if (word) tween.during(new ValueTween(black, wordColor, duration, easings.easeInOutQuad, (v) => {
-        word[newWordIndex].style.fill = v;
+      if (word) tween.during(new ValueTween(0, 1, duration, easings.easeInOutQuad, (v) => {
+        word[newWordIndex].style.fill = interpValue(word[newWordIndex].curFill, wordColor, v);
+      }, () => {
+        word[newWordIndex].curFill = word[newWordIndex].style.fill;
       }));
     }
-    if (word) tween.during(new ValueTween(wordColorPrev, bg_dark, duration, easings.easeInOutQuad, (v) => {
-      word[oldWordIndex].style.fill = v;
+    if (word) tween.during(new ValueTween(0, 1, duration, easings.easeInOutQuad, (v) => {
+      word[oldWordIndex].style.fill = interpValue(word[oldWordIndex].oldFill, bg_dark, v);
+    }, () => {
+      word[oldWordIndex].oldFill = word[oldWordIndex].style.fill;
     }));
   }
   return tween;

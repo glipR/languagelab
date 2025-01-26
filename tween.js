@@ -197,6 +197,25 @@ const interpValue = (start, end, t, tweenObj=false) => {
     };
   }
   else if (start.red !== undefined) {
+    const startLCH = color_to_lch(start);
+    const endLCH = color_to_lch(end);
+    if (Math.abs(startLCH.L - endLCH.L) > 0.4) {
+      // If the lightness changes a lot, then change the other two values in the lower light space.
+      let midColor;
+      let midTime;
+      if (startLCH.L > endLCH.L) {
+        midColor = lch_to_color({ L: endLCH.L, C: startLCH.C, H: startLCH.H });
+        midTime = 0.9;
+      } else {
+        midColor = lch_to_color({ L: startLCH.L, C: endLCH.C, H: endLCH.H });
+        midTime = 0.1;
+      }
+      if (t < midTime) {
+        return average_color([start, midColor], [1-t/midTime, t/midTime]);
+      } else {
+        return average_color([midColor, end], [(1-t)/(1-midTime), (t-midTime)/(1-midTime)]);
+      }
+    }
     return average_color([start, end], [1-t, t]);
   }
   else if (Array.isArray(start)) {

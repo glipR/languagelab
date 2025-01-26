@@ -137,6 +137,7 @@ export class TextChanger extends PIXI.Container {
         width: 13 * gsc,
         xOffset: 0,
         yOffset: 0,
+        scale: 1,
       },
       "l": {
         width: 10 * gsc,
@@ -189,6 +190,8 @@ export class TextChanger extends PIXI.Container {
     const c = new PIXI.Text({ text: char, style: this.style.text });
     const pos = this._computePosition(curText ?? this.curText, index);
     c.position.set(pos.x, pos.y);
+    const scale = this.style.transformOverwrites[char]?.scale ?? this.style.transformOverwrites.default.scale;
+    c.scale.set(scale);
     this.addChildAt(c, 0); // Add this to the back, so highlights work.
     return c;
   }
@@ -202,8 +205,12 @@ export class TextChanger extends PIXI.Container {
     for (let i=0; i<index; i++) {
       pos.x += this.style.transformOverwrites[text[i]]?.width ?? this.style.transformOverwrites.default.width;
     }
+    // Default is for 0 to be the leftmost character.
     if (this.style.align === 'center') {
       pos.x -= totalWidth / 2;
+    }
+    if (this.style.align === 'right') {
+      pos.x -= totalWidth;
     }
     return pos;
   }

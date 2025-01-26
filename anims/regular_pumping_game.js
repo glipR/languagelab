@@ -16,7 +16,7 @@ export const MENU_CHOOSE_SELECTION = "CHOOSE_SELECTION";
 export const MENU_CHOOSE_I = "CHOOSE_I";
 export const MENU_RESULT = "RESULT";
 
-// TODO: Use the summary screen to show moves as they are made, animate them, and then have a button to continue.
+// TODO: Improve the results page to use indicies correctly, and use colour!
 
 const gsc = window.gameScaling ?? 1;
 export const GS = {
@@ -46,7 +46,6 @@ export const GS = {
   shownSelection: false,
   shownI: false,
 };
-window.GS = GS;
 
 const baseStyle = {
   fontFamily: "Ittybittynotebook",
@@ -71,6 +70,7 @@ const resetGame = () => {
   GS.curState = MENU_PLAYER_PICK;
   showScreen(GS.curState);
 }
+GS.resetGame = resetGame;
 
 const showScreen = (state) => {
   GS.curState = state;
@@ -84,6 +84,7 @@ const showScreen = (state) => {
     }
   })
 }
+GS.showScreen = showScreen;
 
 const setAcceptDFA = (dfa) => {
   const dfaOBJ = new DFA();
@@ -91,7 +92,7 @@ const setAcceptDFA = (dfa) => {
   GS.gameAccept = (word) => dfaOBJ.simulateWord(word) === "Accept";
 }
 
-const startGame = () => {
+export const startGame = () => {
   if (GS.player1CPU) {
     setN(GS.opts.n);
   } else {
@@ -99,12 +100,12 @@ const startGame = () => {
   }
 }
 
-const setN = (value) => {
-  if (value <= 0) {
+export const setN = (value, skipCheck=false) => {
+  if (!skipCheck && value <= 0) {
     alert("Invalid n - must be positive.");
     return;
   }
-  if (value >= 10) {
+  if (!skipCheck && value >= 10) {
     alert("Invalid n - must be less than 10 (Just for this version of the game, not for the pumping lemma in general).");
     return;
   }
@@ -119,12 +120,12 @@ const setN = (value) => {
 }
 GS.setN = setN;
 
-const setWord = (word) => {
-  if (!GS.gameAccept(word)) {
+export const setWord = (word, skipCheck=false) => {
+  if (!skipCheck && !GS.gameAccept(word)) {
     alert("Invalid word - does not belong to the language.");
     return;
   }
-  if (word.length <= GS.nValue) {
+  if (!skipCheck && word.length <= GS.nValue) {
     alert("Word is too short. Needs to be longer than n.");
     return;
   }
@@ -159,7 +160,7 @@ const setWord = (word) => {
 }
 GS.setWord = setWord;
 
-const setSelection = (a, b) => {
+export const setSelection = (a, b) => {
   if (b > GS.nValue) {
     alert("Invalid selection - your selection must be over the first n characters at most.");
     return;
@@ -181,7 +182,7 @@ const setSelection = (a, b) => {
 }
 GS.setSelection = setSelection;
 
-const setI = (i) => {
+export const setI = (i) => {
   GS.i = i;
   GS.nextScreen = MENU_RESULT;
   showScreen(MENU_SUMMARY);
@@ -196,6 +197,7 @@ const addDescription = (container) => {
   description.anchor.set(0.5, 0.5);
   description.position.set(500 * gsc, 50 * gsc);
   container.addChild(description);
+  container.description = description;
 }
 
 GS.screenContainers[MENU_PLAYER_PICK].build = () => {
@@ -623,74 +625,86 @@ GS.screenContainers[MENU_SUMMARY].build = () => {
   iText.anchor.set(1, 0.5);
   GS.screenContainers[MENU_SUMMARY].addChild(iText);
 
+  GS.nText = nText;
+  GS.wordText = wordText;
+  GS.selectionText = selectionText;
+  GS.iText = iText;
+
   GS.screenContainers[MENU_SUMMARY].onStart = () => {
+    const buttonVertDiff = GS.opts.hideButtons ? 75 * gsc : 50 * gsc;
     const tween = delay(0);
     if (!GS.shownN && GS.nValue !== null) {
-      nText.text = nSelection();
-      const cover = new RectangleCover(nText, { points: 20, randMult: 0.1});
+      GS.nText.text = nSelection();
+      const cover = new RectangleCover(GS.nText, { points: 40, randMult: 0.04, width: GS.nText.width + 50 * gsc });
       cover.visible = false;
-      nText.visible = false;
+      GS.nText.visible = false;
+      GS.nText.cover = cover;
       GS.screenContainers[MENU_SUMMARY].addChildAt(cover, 0);
       tween.then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
-        nText.position.set(50 * gsc - (nText.width + 50 * gsc) * (1 - v), 150 * gsc)
-        cover.position.set(nText.position.x + nText.width / 2, nText.position.y);
-      }, () => { cover.visible = true; nText.visible = true; }));
+        GS.nText.position.set(50 * gsc - (GS.nText.width + 100 * gsc) * (1 - v), 150 * gsc)
+        cover.position.set(GS.nText.position.x + GS.nText.width / 2, GS.nText.position.y);
+      }, () => { cover.visible = true; GS.nText.visible = true; }));
       GS.shownN = true;
     }
     if (!GS.shownWord && GS.word !== null) {
-      wordText.text = wordSelection();
-      const cover = new RectangleCover(wordText, { points: 20, randMult: 0.1});
+      GS.wordText.text = wordSelection();
+      const cover = new RectangleCover(GS.wordText, { points: 40, randMult: 0.04, width: GS.wordText.width + 50 * gsc });
       cover.visible = false;
-      wordText.visible = false;
+      GS.wordText.visible = false;
+      GS.wordText.cover = cover;
       GS.screenContainers[MENU_SUMMARY].addChildAt(cover, 0);
       tween.then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
-        wordText.position.set(950 * gsc + (nText.width + 50 * gsc) * (1 - v), 200 * gsc)
-        cover.position.set(wordText.position.x - wordText.width / 2, wordText.position.y);
-      }, () => { cover.visible = true; wordText.visible = true; }));
+        GS.wordText.position.set(950 * gsc + (GS.wordText.width + 100 * gsc) * (1 - v), 150 * gsc + buttonVertDiff)
+        cover.position.set(GS.wordText.position.x - GS.wordText.width / 2, GS.wordText.position.y);
+      }, () => { cover.visible = true; GS.wordText.visible = true; }));
       GS.shownWord = true;
     }
     if (!GS.shownSelection && GS.selection !== null) {
-      selectionText.text = selectionSelection();
-      const cover = new RectangleCover(selectionText, { points: 20, randMult: 0.1});
+      GS.selectionText.text = selectionSelection();
+      const cover = new RectangleCover(GS.selectionText, { points: 40, randMult: 0.04, width: GS.selectionText.width + 50 * gsc });
       cover.visible = false;
-      selectionText.visible = false;
+      GS.selectionText.visible = false;
+      GS.selectionText.cover = cover;
       GS.screenContainers[MENU_SUMMARY].addChildAt(cover, 0);
       tween.then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
-        selectionText.position.set(50 * gsc - (selectionText.width + 50 * gsc) * (1 - v), 250 * gsc)
-        cover.position.set(selectionText.position.x + selectionText.width / 2, selectionText.position.y);
-      }, () => { cover.visible = true; selectionText.visible = true; }));
+        GS.selectionText.position.set(50 * gsc - (GS.selectionText.width + 100 * gsc) * (1 - v), 150 * gsc + buttonVertDiff * 2)
+        cover.position.set(GS.selectionText.position.x + GS.selectionText.width / 2, GS.selectionText.position.y);
+      }, () => { cover.visible = true; GS.selectionText.visible = true; }));
       GS.shownSelection = true;
     }
     if (!GS.shownI && GS.i !== null) {
-      iText.text = iSelection();
-      const cover = new RectangleCover(iText, { points: 20, randMult: 0.1});
+      GS.iText.text = iSelection();
+      const cover = new RectangleCover(GS.iText, { points: 40, randMult: 0.04, width: GS.iText.width + 50 * gsc });
       cover.visible = false;
-      iText.visible = false;
+      GS.iText.visible = false;
+      GS.iText.cover = cover;
       GS.screenContainers[MENU_SUMMARY].addChildAt(cover, 0);
       tween.then(new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
-        iText.position.set(950 * gsc + (iText.width + 50 * gsc) * (1 - v), 300 * gsc)
-        cover.position.set(iText.position.x - iText.width / 2, iText.position.y);
-      }, () => { cover.visible = true; iText.visible = true; }));
+        GS.iText.position.set(950 * gsc + (GS.iText.width + 100 * gsc) * (1 - v), 150 * gsc + buttonVertDiff * 3)
+        cover.position.set(GS.iText.position.x - GS.iText.width / 2, GS.iText.position.y);
+      }, () => { cover.visible = true; GS.iText.visible = true; }));
       GS.shownI = true;
     }
     TweenManager.add(tween);
   }
 
-  const nextButton = new FloatingButton({
-    label: {
-      text: "Next",
-      fill: white,
-    },
-    bg: {
-      fill: green,
-    },
-    width: 200 * gsc,
-    height: 100 * gsc,
-  });
-  nextButton.position.set(400 * gsc, 400 * gsc);
-  GS.screenContainers[MENU_SUMMARY].addChild(nextButton);
-  nextButton.onClick = () => {
-    showScreen(GS.nextScreen)
+  if (!GS.opts.hideButtons) {
+    const nextButton = new FloatingButton({
+      label: {
+        text: "Next",
+        fill: white,
+      },
+      bg: {
+        fill: green,
+      },
+      width: 200 * gsc,
+      height: 100 * gsc,
+    });
+    nextButton.position.set(400 * gsc, 400 * gsc);
+    GS.screenContainers[MENU_SUMMARY].addChild(nextButton);
+    nextButton.onClick = () => {
+      showScreen(GS.nextScreen)
+    }
   }
 
 }
@@ -699,7 +713,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
 
   GS.opts = opts;
   GS.easings = easings;
-  GS.screen = new Screen(app);
+  GS.screen = new Screen(app, opts.hideBG);
   GS.screen.setScreenSize(app.renderer.width, app.renderer.height);
   GS.screen.setGameSize(1000 * gsc, 600 * gsc);
   GS.screen.scaleToFit();

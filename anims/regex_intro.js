@@ -5,6 +5,7 @@ import { TweenManager, ValueTween, delay, interpValue } from "../tween.js";
 import { mergeDeep } from "../utils.js";
 import { RectangleCover } from "../tools/paper_cover.js"
 import DFA from '../dfa.js';
+import easings from 'https://cdn.jsdelivr.net/npm/easings.net@1.0.3/+esm';
 const gsc = window.gameScaling ?? 1;
 
 const baseStyle = {
@@ -59,6 +60,25 @@ export class Highlight extends PIXI.Graphics {
     const height = end.height + this.style.heightShift;
     return { x, y, width, height };
   }
+
+  move(start, end, newOpts={}) {
+    const sTransform = this.word.transform(this.word.curText, start);
+    const eTransform = this.word.transform(this.word.curText, end-1);
+    return new ValueTween(0, 1, 60, easings.easeInOutQuad, (v) => {
+      const newTransform = interpValue(this.startTransform, this.endTransform, v);
+      const opts = interpValue(this.startOpts, this.endOpts, v, true);
+      this.style = mergeDeep(this.style, opts);
+      this.setTransform(newTransform);
+    }, () => {
+      this.startOpts = {...this.style};
+      this.startTransform = {...this.curTransform}
+      this.endTransform = this.computeTransform(sTransform, eTransform);
+      if (start >= end) {
+        this.endTransform.width = 0;
+      }
+      this.endOpts = {...newOpts};
+    });
+  }
 }
 
 export class UnderLine extends PIXI.Graphics {
@@ -108,6 +128,7 @@ export const makeHighlight = (word, start, end, opts) => {
   highlight.setConfig(startTransform, endTransform);
   highlight.alpha = 0;
   word.addChild(highlight);
+  highlight.word = word;
   return highlight;
 }
 
