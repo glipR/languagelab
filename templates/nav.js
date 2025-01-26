@@ -129,7 +129,7 @@ export const contentMapping = {
   },
   regularTheory: {
     title: "Regular Quiz",
-    type: "questions",
+    type: "questions-wip",
     href: "/pages/regular/theory",
   },
   regularPumping: {
@@ -144,7 +144,7 @@ export const contentMapping = {
   },
   regularPumpingTheory: {
     title: "More Pumping Lemma",
-    type: "questions",
+    type: "questions-wip",
     href: "/pages/regular/pumping_theory",
   }
 }
@@ -255,7 +255,7 @@ const navContent = (key) => `
           </div>
           <div class="pageDropdownSection section5">
             <div class="pageDropdownSectionTab section5"></div>
-            <div class="sectionTitle">🚧 Converting and Proving</div>
+            <div class="sectionTitle">Converting and Proving</div>
             <div class="pageDropdownPage ${pageHidden(key, 'regular')}">
               ${renderItem('regularConversionTheory')}
               ${renderItem('regularConversionAlgorithm')}
