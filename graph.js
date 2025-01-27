@@ -481,7 +481,7 @@ class CurveEdge extends AbstractEdge {
     return {
       ...super.baseStyle(),
       edgeAnchor: { x: 0, y: -75 * gsc },
-      anchorOffsetMult: 2,
+      anchorOffsetMult: 0.25,
     }
   }
 
@@ -511,14 +511,16 @@ class CurveEdge extends AbstractEdge {
     const centerEnd = this.getEdgeEndCenter();
     const vertexMidpoint = interpValue(centerStart, centerEnd, 0.5);
     const anchorAngle = Math.atan2(this.style.edgeAnchor.y, this.style.edgeAnchor.x);
+    const startDistFromAnchor = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, negate(start)));
+    const endDistFromAnchor = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, negate(end)));
     const anchorOffset = {
-      x: Math.cos(anchorAngle + Math.PI/2) * magnitude(this.style.edgeAnchor) * this.style.anchorOffsetMult,
-      y: Math.sin(anchorAngle + Math.PI/2) * magnitude(this.style.edgeAnchor) * this.style.anchorOffsetMult,
+      x: Math.cos(anchorAngle + Math.PI/2) * this.style.anchorOffsetMult,
+      y: Math.sin(anchorAngle + Math.PI/2) * this.style.anchorOffsetMult,
     }
-    const startDist = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, anchorOffset, negate(centerStart)));
-    const endDist = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, anchorOffset, negate(centerEnd)));
-    const fullAnchor1 = vectorCombine(vertexMidpoint, this.style.edgeAnchor, startDist < endDist ? anchorOffset : negate(anchorOffset));
-    const fullAnchor2 = vectorCombine(vertexMidpoint, this.style.edgeAnchor, startDist < endDist ? negate(anchorOffset) : anchorOffset);
+    const start1 = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, anchorOffset, negate(centerStart)));
+    const start2 = magnitude(vectorCombine(vertexMidpoint, this.style.edgeAnchor, negate(anchorOffset), negate(centerStart)));
+    const fullAnchor1 = vectorCombine(vertexMidpoint, this.style.edgeAnchor, multiply(start1 < start2 ? anchorOffset : negate(anchorOffset), startDistFromAnchor));
+    const fullAnchor2 = vectorCombine(vertexMidpoint, this.style.edgeAnchor, multiply(start1 < start2 ? negate(anchorOffset) : anchorOffset, endDistFromAnchor));
     return [start, fullAnchor1, fullAnchor2, end];
   }
 
