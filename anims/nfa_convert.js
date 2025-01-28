@@ -335,7 +335,7 @@ const makeContainerClick = (i, j) => {
     TweenManager.add(GS.nodeGroups[i][j].setNodes(GS.data[i][j], baseNodeGroupOptions.animSpeed));
     if (GS.curSelected.y === 0) {
       // Header row, rerender the entire row
-      for (let k=1; k<=2; k++) {
+      for (let k=1; k<=GS.opts.alphabet.length; k++) {
         GS.nodeGroups[i][k].style.cross.visible = true;
         TweenManager.add(GS.nodeGroups[i][k].setNodes(GS.data[i][k], baseNodeGroupOptions.animSpeed));
       }
@@ -379,10 +379,11 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.nfa.graph.addChild(GS.highlightContainer);
 
   // Make a big table
-  GS.table = new Table({ itemHeight: 70 * gsc });
-  GS.table.resize(5, 2);
-  GS.data = Array.from({length: 6}, () => Array.from({length: 3}, () => []));
-  GS.nodeGroups = Array.from({length: 6}, () => Array.from({length: 3}, () => new NodeGroup(baseNodeGroupOptions, GS.nfa, [])));
+  const preferredWidth = 240 * gsc / GS.opts.alphabet.length;
+  GS.table = new Table({ itemHeight: 70 * gsc, itemWidth: Math.max(80 * gsc, Math.min(preferredWidth, 120 * gsc)) });
+  GS.table.resize(5, GS.opts.alphabet.length);
+  GS.data = Array.from({length: 6}, () => Array.from({length: GS.opts.alphabet.length + 1}, () => []));
+  GS.nodeGroups = Array.from({length: 6}, () => Array.from({length: GS.opts.alphabet.length + 1}, () => new NodeGroup(baseNodeGroupOptions, GS.nfa, [])));
   GS.nodeGroups.forEach((row, i) => {
     row.forEach((ng, j) => {
       GS.table.getContainer(i, j).contents.addChild(ng);
@@ -430,7 +431,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
 
   queueHighlight(queueHighlight, false);
 
-  const letters = opts.alphabet.map(c => {
+  const letters = GS.opts.alphabet.map(c => {
     const text = new PIXI.Text({ text: c, style: baseStyle });
     text.anchor.set(0.5, 0.5);
     return text;
@@ -440,7 +441,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   });
 
   for (let i=1; i<=5; i++) {
-    for (let j=0; j<=2; j++) {
+    for (let j=0; j<=GS.opts.alphabet.length; j++) {
       GS.table.getContainer(i, j).subscribe('click', makeContainerClick(i, j));
     }
   }
