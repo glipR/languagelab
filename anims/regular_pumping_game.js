@@ -4,7 +4,7 @@ import Screen from "../screen.js";
 import { FloatingButton } from "../ui.js";
 import TextEdit from "../tools/text_edit.js";
 import TextChanger from "../tools/change_text.js";
-import { delay, TweenManager, ValueTween } from "../tween.js";
+import { delay, ImmediateTween, TweenManager, ValueTween } from "../tween.js";
 import { Highlight } from "./regex_intro.js";
 import { RectangleCover } from "../tools/paper_cover.js";
 
@@ -453,7 +453,7 @@ GS.screenContainers[MENU_CHOOSE_I].build = () => {
   addDescription(GS.screenContainers[MENU_CHOOSE_I]);
 
   const instructions = new PIXI.Text({
-    text: `Enter a value to repeat the substring, i, from 0-10.`,
+    text: `Enter a value to repeat the substring, i, from 0-9.`,
     style: {...baseStyle},
   });
   instructions.anchor.set(0.5, 0.5);
@@ -471,8 +471,9 @@ GS.screenContainers[MENU_CHOOSE_I].build = () => {
   const highlight = new Highlight({ color: yellow });
   selection.addChild(highlight);
 
-  const iText = new TextEdit('0', {
+  const iText = new TextEdit('', {
     allowedChars: "0123456789",
+    maxLength: 1,
   });
   iText.position.set(500 * gsc, 300 * gsc);
   GS.screenContainers[MENU_CHOOSE_I].addChild(iText);
@@ -521,9 +522,9 @@ GS.screenContainers[MENU_RESULT].build = () => {
     const expected = (GS.opts.type === "Regular") === accept;
     return [
       `The word ${GS.word} was broken down into`,
-      `${GS.word.slice(0, GS.selection.a)}(${GS.word.slice(GS.selection.a, GS.selection.b)})^${GS.i}${GS.word.slice(GS.selection.b)}`,
-      `This word ${accept ? "is" : "is not"} in the language.`,
       ``,
+      `${GS.word.slice(0, GS.selection.a)}${GS.word.slice(GS.selection.a, GS.selection.b).repeat(GS.i)}${GS.word.slice(GS.selection.b)}`,
+      `This word ${accept ? "is" : "is not"} in the language.`,
       `Player ${accept ? 1 : 2} wins!`,
       `${expected ? 'This is expected, because' : "However, this isn't the expected result, because"} the language is ${GS.opts.type}.`
     ]
@@ -542,6 +543,22 @@ GS.screenContainers[MENU_RESULT].build = () => {
   });
   textContainer.position.set(500 * gsc, 100 * gsc);
   GS.screenContainers[MENU_RESULT].addChild(textContainer);
+
+  const smaller = {
+    width: 10 * gsc,
+    yOffset: -5 * gsc,
+    xOffset: -1 * gsc,
+    scale: 0.8,
+  }
+  const middleText = new TextChanger('', {
+    insertDelay: 0,
+    deleteDelay: 0,
+    moveDelay: 0,
+    tweenDuration: 0,
+    transformOverwrites: { 0: smaller, 1: smaller, 2: smaller, 3: smaller, 4: smaller, 5: smaller, 6: smaller, 7: smaller, 8: smaller, 9: smaller }
+  });
+  middleText.position.set(0, 1 * 50 * gsc);
+  textContainer.addChild(middleText);
 
   const playButton = new FloatingButton({
     label: {
@@ -566,7 +583,20 @@ GS.screenContainers[MENU_RESULT].build = () => {
       texts[i].text = line;
     });
 
+    const tween = middleText.changeText(`${GS.word.slice(0, GS.selection.a)}(${GS.word.slice(GS.selection.a, GS.selection.b)})${GS.i}${GS.word.slice(GS.selection.b)} = `).then(
+      new ImmediateTween(() => {middleText.pivot.set(0, middleText.height / 2);})
+    );
+    TweenManager.add(tween);
+
     const accept = GS.gameAccept(GS.word.slice(0, GS.selection.a) + GS.word.slice(GS.selection.a, GS.selection.b).repeat(GS.i) + GS.word.slice(GS.selection.b));
+
+    const cover = new RectangleCover(texts[2], { points: 20, randMult: 0.1, width: texts[2].width + 50 * gsc });
+    textContainer.addChildAt(cover, 0);
+    cover.position.set(texts[2].position.x, texts[2].position.y);
+    GS.resultCover = cover;
+
+    texts[2].style.fill = accept ? green : red;
+
     const expected = (GS.opts.type === "Regular") === accept;
     // If accepting - we expect player 1 to the be player
     // Otherwise - we expect player 2 to be the player.
@@ -575,7 +605,13 @@ GS.screenContainers[MENU_RESULT].build = () => {
     if (playerWon) {
       setTimeout(() => {
         GS.onSuccess?.('You correctly chose the role, and played the game to perfection!');
-      }, 1500);
+      }, 3000);
+    }
+  }
+
+  GS.screenContainers[MENU_RESULT].onEnd = () => {
+    if (GS.resultCover) {
+      textContainer.removeChild(GS.resultCover);
     }
   }
 }
