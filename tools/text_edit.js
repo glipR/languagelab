@@ -57,10 +57,10 @@ class TextEdit extends TextChanger {
     this.input = document.createElement("input");
     this.input.type = "text";
     this.input.style.position = "absolute";
-    this.input.style.top = "-100px";
-    this.input.style.left = "-100px";
-    this.input.style.width = "0px";
-    this.input.style.height = "0px";
+    this.input.style.top = "100px";
+    this.input.style.left = "100px";
+    this.input.style.width = "10px";
+    this.input.style.height = "10px";
     document.body.appendChild(this.input);
 
     this.activate();
