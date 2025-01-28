@@ -1,7 +1,3 @@
-// TODO: Use tools/dfa_draw.js to allow drawing, add a "Check" button to the screen and then call
-// GS.dfa.validate() when the button is pressed.
-// As well as GS.dfa.checkWordArray
-
 // In future, also implement the FA minimisation algorithm, and check the minimised FAs are the same.
 
 import DFADraw from "../tools/dfa_draw.js";
@@ -29,9 +25,19 @@ const check = () => {
     return;
   }
   // invalid dfa->nfa->valid dfa
-  const nfa = new NFA();
-  nfa.fromJSON(GS.dfa.dfa.toJSON());
-  const comparedDFA = nfa.toDFA();
+  try {
+    const nfa = new NFA();
+    nfa.fromJSON(GS.dfa.dfa.toJSON());
+    const comparedDFA = nfa.toDFA();
+    const error = comparedDFA.validate();
+    if (error !== null) {
+      throw new Error(error);
+    }
+  } catch (e) {
+    alert(`Your NFA is invalid: ${e}`);
+    GS.checkButton.setDisabled(false);
+    return;
+  }
   const word = GS.checkingDFA.combine(comparedDFA, (me, other) => me ^ other).findAcceptingString()
   const checkingAccepts = word !== null && GS.checkingDFA.simulateWord(word) === "Accept";
   if (word === null) {
