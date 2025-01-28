@@ -123,12 +123,14 @@ class TextEdit extends TextChanger {
   }
 
   activate() {
+    if (this.active) return;
     window.addEventListener("keydown", this.onKeyDown);
     this.active = true;
     this.input.focus();
   }
 
   deactivate() {
+    if (!this.active) return;
     window.removeEventListener("keydown", this.onKeyDown);
     this.active = false;
     this.input.blur();
