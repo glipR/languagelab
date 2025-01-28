@@ -34,7 +34,6 @@ class TextEdit extends TextChanger {
     }
     TweenManager.add(makeTween(1, 30));
 
-
     this.onKeyDown = (e) => {
       if (e.key === "ArrowLeft") {
         this.tryMoveCursor(-1);
@@ -53,6 +52,17 @@ class TextEdit extends TextChanger {
         e.preventDefault();
       }
     }
+
+    // Add an input to the screen to trigger onscreen keyboard for mobile
+    this.input = document.createElement("input");
+    this.input.type = "text";
+    this.input.style.position = "absolute";
+    this.input.style.top = "-100px";
+    this.input.style.left = "-100px";
+    this.input.style.width = "0px";
+    this.input.style.height = "0px";
+    document.body.appendChild(this.input);
+
     this.activate();
   }
 
@@ -115,11 +125,13 @@ class TextEdit extends TextChanger {
   activate() {
     window.addEventListener("keydown", this.onKeyDown);
     this.active = true;
+    this.input.focus();
   }
 
   deactivate() {
     window.removeEventListener("keydown", this.onKeyDown);
     this.active = false;
+    this.input.blur();
   }
 
   destroy(options) {
