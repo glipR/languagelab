@@ -670,7 +670,7 @@ class Graph {
         from: edge.from.label,
         to: edge.to.label,
         label: edge.style.edgeLabel,
-        style: {},
+        style: edgeStyle,
       });
     });
     return json;
