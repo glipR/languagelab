@@ -53,16 +53,6 @@ class TextEdit extends TextChanger {
       }
     }
 
-    // Add an input to the screen to trigger onscreen keyboard for mobile
-    this.input = document.createElement("input");
-    this.input.type = "text";
-    this.input.style.position = "absolute";
-    this.input.style.top = "100px";
-    this.input.style.left = "100px";
-    this.input.style.width = "10px";
-    this.input.style.height = "10px";
-    document.body.appendChild(this.input);
-
     this.activate();
   }
 
@@ -126,14 +116,12 @@ class TextEdit extends TextChanger {
     if (this.active) return;
     window.addEventListener("keydown", this.onKeyDown);
     this.active = true;
-    this.input.focus();
   }
 
   deactivate() {
     if (!this.active) return;
     window.removeEventListener("keydown", this.onKeyDown);
     this.active = false;
-    this.input.blur();
   }
 
   destroy(options) {
