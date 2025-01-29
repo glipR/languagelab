@@ -144,7 +144,7 @@ export const contentMapping = {
   },
   regularPumpingTheory: {
     title: "More Pumping Lemma",
-    type: "questions-wip",
+    type: "questions",
     href: "/pages/regular/pumping_theory",
   }
 }

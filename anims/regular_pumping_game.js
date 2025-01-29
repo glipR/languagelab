@@ -125,8 +125,8 @@ export const setWord = (word, skipCheck=false) => {
     alert("Invalid word - does not belong to the language.");
     return;
   }
-  if (!skipCheck && word.length <= GS.nValue) {
-    alert("Word is too short. Needs to be longer than n.");
+  if (!skipCheck && word.length < GS.nValue) {
+    alert("Word is too short. Needs to be at least as long as n.");
     return;
   }
   GS.word = word;
@@ -301,7 +301,7 @@ GS.screenContainers[MENU_CHOOSE_WORD].build = () => {
   GS.screenContainers[MENU_CHOOSE_WORD].addChild(wordInput);
 
   const enterText = new PIXI.Text({
-    text: `Enter word with more than ${GS.nValue} characters below, then press Enter.`,
+    text: `Enter word with at least ${GS.nValue} characters below, then press Enter.`,
     style: {...baseStyle},
   });
   enterText.anchor.set(0.5, 0.5);
@@ -324,7 +324,7 @@ GS.screenContainers[MENU_CHOOSE_WORD].build = () => {
 
   GS.screenContainers[MENU_CHOOSE_WORD].onStart = () => {
     wordInput.activate();
-    enterText.text = `Enter word with more than ${GS.nValue} characters below, then press Enter.`;
+    enterText.text = `Enter word with at least ${GS.nValue} characters below, then press Enter.`;
   }
   GS.screenContainers[MENU_CHOOSE_WORD].onEnd = () => {
     wordInput.deactivate();
