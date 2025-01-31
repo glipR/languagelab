@@ -3,7 +3,7 @@ import { highlight } from '../templates/colours.js';
 
 const contentText = `
 <div class="aspect-ratio">
-<iframe src="https://www.youtube.com/embed/WhLSMcmCWgs?si=8A6jRda8DaC1ALUQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/V3ydGFtbni4?si=sD3CZ0T4L_rtxza_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
 <h2>It's all connected</h2>

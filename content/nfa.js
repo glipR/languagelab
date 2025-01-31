@@ -2,7 +2,7 @@ import { addIcon } from '../templates/icons.js';
 
 const contentText = `
 <div class="aspect-ratio">
-<iframe src="https://www.youtube.com/embed/KnkxazZqMao?si=e1dVgnYF_F9_CJCP" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/qXSOMLpmuEM?si=GK9uZhb7H2_lP2eP" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
 <h2>Non-Deterministic Finite Automaton (NFA)</h2>

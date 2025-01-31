@@ -4,7 +4,7 @@ import { blue, red } from '../colours.js';
 
 const contentText = `
 <div class="aspect-ratio">
-<iframe src="https://www.youtube.com/embed/ghijz3XPRRQ?si=ixp0wtT-1IKNA3QJ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/00LugCMdEWE?si=_P5ZkUgJAYHTm9Lq" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
 <h2>Looking at property #2</h2>
