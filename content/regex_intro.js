@@ -1,3 +1,5 @@
+import { highlight } from '../templates/colours.js';
+
 const contentText = `
 <div class="aspect-ratio">
 <iframe src="https://www.youtube.com/embed/7aDmHqVjcOs?si=g7ZWixmR6mF0uKVN" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -62,7 +64,7 @@ So the end result is multiple of these 'fences', that are themselves fenced in b
 
 Notice that when using the kleene star to accept multiple copies of the fence, we don't have to use the same subword each time - as long as each subword matches the pattern, it works.
 
-In other words, we can make different 'choices' for each fence.
+In other words, we can make different ${highlight("'choices'", 'purple')} for each fence.
 
 The derivation of the word 'cbaaaaabcabbac' might look something like this:
 

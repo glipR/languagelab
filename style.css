@@ -40,7 +40,7 @@ h1, h2, h3 {
   padding-top: 120px;
   max-width: calc(min(1100px, 100% - 20px));
   margin: auto;
-  margin-bottom: 50px;
+  margin-bottom: 70px;
   min-height: calc(100vh - 120px);
 }
 
@@ -596,6 +596,10 @@ li.locked::before {
   background-image: linear-gradient(-5deg, #f3aebfc0 3%, #e3829ac0 7%, #e3829ac0 50%, #e67792c0 70%, #fb6f92C0 85%);
 }
 
+.modal.hidden {
+  opacity: 0.2;
+}
+
 .modal .imprint {
   position: absolute;
   top: 0px;
@@ -611,6 +615,15 @@ li.locked::before {
   left: 50%;
   transform: translateX(-50%);
   width: 50px;
+}
+
+.modal .iconEye {
+  position: absolute;
+  top: 5px;
+  right: 30px;
+  transform: translateX(50%);
+  width: 40px;
+  margin: 0px;
 }
 
 .modal .modalContent {
@@ -680,12 +693,14 @@ img.icon {
   margin-left: -8px;
   margin-right: -8px;
   padding: 0px 8px;
+  border-radius: 2px;
 }
 
 .highlight-small {
   margin-left: -4px;
   margin-right: -4px;
   padding: 0px 4px;
+  border-radius: 2px;
 }
 
 .highlight-red {

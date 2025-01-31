@@ -183,6 +183,10 @@ export const setSelection = (a, b) => {
 GS.setSelection = setSelection;
 
 export const setI = (i) => {
+  if (! (i >= 0 && i < 10)) {
+    alert("Invalid i - must be between 0 and 9.");
+    return;
+  }
   GS.i = i;
   GS.nextScreen = MENU_RESULT;
   showScreen(MENU_SUMMARY);

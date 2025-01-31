@@ -205,8 +205,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     ),
   );
 
-  const removeSecondEdge = GS.secondDFA.edgeMap['S->B'].hideEdgeTween(60, GS.easings.easeInOutQuad)
-    .during(GS.secondDFA.edgeMap['S->B'].hideLabelTween(60, GS.easings.easeInOutQuad));
+  const removeSecondEdge = GS.secondDFA.edgeMap['S->A'].hideEdgeTween(60, GS.easings.easeInOutQuad)
+    .during(GS.secondDFA.edgeMap['S->A'].hideLabelTween(60, GS.easings.easeInOutQuad));
 
   const fadeSecondDFA = new ValueTween(1, 0, 60, GS.easings.easeInOutQuad, (v) => {
     GS.secondDFA.graph.alpha = v;

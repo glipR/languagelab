@@ -620,7 +620,7 @@ const addContent = () => {
   const steps = new StepScenes(algorithmContainer, "conversion_algorithm", tasks, () => {
     markComplete('regularConversionAlgorithm');
     // Redirect to next page
-    window.location.href = "/pages/regular/dfa_form";
+    window.location.href = "/pages/regular/pumping";
   }, true, null, { storageKey: 'regularConversionProgress', resetOnComplete: true });
   registerScene(regexCategorise.loader, regexCategorise.unloader, 'conversion_algorithm', tasks[steps.progress.current], steps.makeOnSuccess(), steps.makeOnFailure());
 }

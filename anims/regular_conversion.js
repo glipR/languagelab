@@ -351,16 +351,26 @@ const splitNFATransitions = {
   states: [],
   transitions: [
     { from: "multiAcceptA", to: "multiAcceptA", label: "X" },
-    { from: "copyRightA", to: "copyRightA", label: "X" },
-    { from: "copyRightA", to: "copyRightE", label: "Y" },
-    { from: "copyRightE", to: "copyRightE", label: "Z" },
+    { from: "copyRightA", to: "copyRightA", label: "W" },
+    { from: "copyRightA", to: "copyRightE", label: "X", style: { edgeAnchor: { x: 0, y: -200 } } },
+    { from: "copyRightE", to: "copyRightE", label: "Y" },
+    { from: "copyRightE", to: "copyRightA", label: "Z", style: { edgeAnchor: { x: 0, y: 200 } } },
   ]
+}
+
+const extraLoopTransition = {
+  states: [
+    { name: "copyRightECopy", position: { x: 3200, y: 1000 }, starting: false, accepting: false },
+  ],
+  transitions: [
+    { from: "copyRightECopy", to: "copyRightECopy", label: "Z(W)*X", style: { loopOffset: { x: 100, y: -250 } } },
+  ],
 }
 
 const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.opts = opts;
   GS.easings = easings;
-  GS.screen = new Screen(app);
+  GS.screen = new Screen(app, true);
   GS.screen.setScreenSize(app.renderer.width, app.renderer.height);
   GS.screen.setGameSize(1000 * gsc, 600 * gsc);
   GS.screen.scaleToFit();
@@ -396,6 +406,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     multiAcceptNFAExtraState,
     copyRightNFA,
     splitNFATransitions,
+    extraLoopTransition,
   ));
 
   Object.values(GS.mother.nodes).forEach(n => {
@@ -1774,6 +1785,24 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       })
     )
 
+    GS.moveRightEdge = delay(0).then(
+      ...selectEdges(GS.mother, extraLoopTransition).map(e => {
+        return e.growEdgeTween(60, easings.easeInOutQuad)
+          .during(e.showLabelTween(60, easings.easeInOutQuad));
+      }),
+      new ValueTween({ x: 0, y: -300 }, { x: -100, y: -250 }, 60, GS.easings.easeInOutQuad, (v) => {
+        GS.mother.edgeMap["copyRightE->copyRightE"].style.loopOffset = v;
+        GS.mother.edgeMap["copyRightE->copyRightE"].updateGraphic();
+      }),
+      new ValueTween(1, 0, 60, GS.easings.easeInOutQuad, (v) => {
+        GS.mother.edgeMap["copyRightE->copyRightA"].graphic.alpha = v;
+      }),
+      new ValueTween({ x: 0, y: -200 }, { x: 0, y: -10 }, 60, GS.easings.easeInOutQuad, (v) => {
+        GS.mother.edgeMap["copyRightA->copyRightE"].style.edgeAnchor = v;
+        GS.mother.edgeMap["copyRightA->copyRightE"].updateGraphic();
+      }),
+    )
+
   }
 
   // If we have a single state, then our only transition is a loop one. Sounds like a job for the kleene star!
@@ -1781,7 +1810,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   {
     const rightRegex = new TextChanger("(X)*");
     const rightCover = new RectangleCover(rightRegex, {});
-    const leftRegex = new TextChanger("(X)*Y(Z)*");
+    const leftRegex = new TextChanger("(W)*X((Y)|(Z(W)*X))*");
     const leftCover = new RectangleCover(leftRegex, {});
     GS.screen.addChild(rightCover);
     GS.screen.addChild(leftCover);
@@ -1809,6 +1838,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
         ].map(s => fade([s.graphic, s.separatedGraphic], false)),
       ),
       ...selectEdges(GS.mother, splitNFATransitions).map(e => e.hideEdgeTween(60, easings.easeInOutQuad)
+        .during(e.hideLabelTween(60, easings.easeInOutQuad))),
+      ...selectEdges(GS.mother, extraLoopTransition).map(e => e.hideEdgeTween(60, easings.easeInOutQuad)
         .during(e.hideLabelTween(60, easings.easeInOutQuad))),
       fade([leftCover, leftRegex, rightCover, rightRegex], false),
     );
@@ -2042,6 +2073,8 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     .then(GS.drawEdgesSplit)
     .then(delay(60))
     .then(GS.fadeRegexRight)
+    .then(delay(60))
+    .then(GS.moveRightEdge)
     .then(delay(60))
     .then(GS.fadeRegexLeft)
     .then(delay(60))

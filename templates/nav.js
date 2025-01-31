@@ -127,11 +127,6 @@ export const contentMapping = {
     type: "game",
     href: "/pages/regular/dfa_minimise",
   },
-  regularTheory: {
-    title: "Regular Quiz",
-    type: "questions-wip",
-    href: "/pages/regular/theory",
-  },
   regularPumping: {
     title: "When isn't it regular?",
     type: "worded",
@@ -261,7 +256,6 @@ const navContent = (key) => `
               ${renderItem('regularConversionAlgorithm')}
               ${renderItem('regularDFAForm')}
               ${renderItem('regularDFAMinimisation')}
-              ${renderItem('regularTheory')}
               ${renderItem('regularPumping')}
               ${renderItem('regularPumpingGame')}
               ${renderItem('regularPumpingTheory')}

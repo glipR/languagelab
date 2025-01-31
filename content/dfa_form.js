@@ -12,7 +12,7 @@ const contentText = `
 Now that we've seen multiple distinct ways to define a language,
 let's think about what connects all three machines to inform some properties we can prove about regular languages.
 <br>
-The three machines we've seen so far are very different in their expression, but they all share one key feature - loops.
+The three machines we've seen so far are very different in their expression, but they all share one key feature - ${highlight('loops', 'purple', true)}.
 <br>
 In order to match words of arbitrary length, we need to be able to loop back to shared states, implying that in some sense we can "reduce" what we need to know about the string to a very small bit of information.
 
@@ -37,7 +37,7 @@ For example, take the language of words that contain 'abb' as a substring. A DFA
 
 After reading bbbbba, we're in state ${addIcon('a')}, and the same is true after reading aaaaa.
 <br>
-As such, if we have any word $w =$ 'bbbbba' $+\\ x$, where $x$ is a word, then this word will always land in the same state as $v =$ 'aaaaa' $+\\ x$, and so $w$ is accepted if and only if $v$ is accepted.
+As such, if we have any word $w =$ 'bbbbba' $+\\ x$, where $x$ is a word, then $w$ will always land in the same state as $v =$ 'aaaaa' $+\\ x$, and so $w$ is accepted if and only if $v$ is accepted.
 In other words, we can swap the prefix 'bbbbba' with 'aaaaa' and not change the outcome for the word.
 
 <div class="split-page">
@@ -108,7 +108,7 @@ The end result of these three properties is what I'm going to call "Globs" (but 
 
 Every word in the glob is prefix-equivalent to every other word in the glob, and no word outside the glob is prefix-equivalent to any word in the glob.
 <br>
-This is because as soon as one word is connected to a glob, by transitivity it's connected to all of the glob's words.
+This is because as soon as one word is connected to a glob, by transitivity it's connected to ${highlight('all', 'green', true)} of the glob's words.
 
 <h3>Globs and Regular Languages</h3>
 
@@ -138,7 +138,7 @@ Where we've got 5 groups:
 Notice that a and b are prefix-equivalent even though they end in different states,
 since after the first character is read, the only thing that determines acceptance is whether the next character is an a.
 
-So the language actually has four globs, which we can use to make an even simpler DFA:
+So the language actually has four globs, which we can use to make an even ${highlight('simpler DFA', 'blue')}:
 
 <img src="/img/regularMinimise/dfa-2nd-merged.png" />
 
@@ -174,14 +174,14 @@ The second property is a teensy bit harder. Consider the definition of $w$ and $
 
 We know the first property is true, and we want to prove the second.
 
-Since $x$ can be any word in the definition of prefix-equivalent, we can substitute the orange $x+y$ in the second box as the green $x$ in the first box, which tells us that $w+x+y$ is accepted if and only if $v+x+y$ is accepted, which is exactly what we wanted to prove!
+Since $x$ can be any word in the definition of prefix-equivalent, we can substitute the orange ${wrapColour('orange', '$x+y$')} in the second box as the green ${wrapColour('green', '$x$')} in the first box, which tells us that $w+x+y$ is accepted if and only if $v+x+y$ is accepted, which is exactly what we wanted to prove!
 
 <br>
 By having x be a single character in the second rule, we can see that adding some character to any word in a glob will deterministically move you to another glob.
 <br>
 For example in this group, representing the language of 'abb' again, consider the glob containing epsilon and b.
 <br>
-Taking any word in this glob and adding an 'a' to it will always lead us to a word in the red glob, and adding a 'b' will always take us to a word in our own glob.
+Taking any word in this glob and adding an 'a' to it will ${highlight('always', 'purple', true)} lead us to a word in the red glob, and adding a 'b' will ${highlight('always', 'purple', true)} take us to a word in our own glob.
 
 <img src="/img/regularMinimise/method1-arrows-again.png" />
 
@@ -204,7 +204,7 @@ What we often do have is a DFA, and we've shown that our DFA is essentially the 
 Can we figure out how to put them back together?
 <br>
 <br>
-Rather than trying to join them back bit-by-bit, let's just try to merge everything and then only split the states that we need to.
+Rather than trying to join them back bit-by-bit, let's just try to merge everything and then only split the states that we ${highlight('need to', 'red')}.
 
 We'll start with all of our states in a single glob. We're going to represent globs as colours in the left table:
 
@@ -230,7 +230,7 @@ In our example, B and C are two states that we want to look at.
 <br>
 For the 'a' transition, they both point to red states, which is good, but for the 'b' transition, B goes to A, which is a red state, whereas C goes to F, which is a purple state.
 <br>
-So B and C cannot be prefix-equivalent and therefore cannot be in the same glob.
+So B and C cannot be prefix-equivalent and therefore ${highlight('cannot be in the same glob', 'red', true, true)}.
 <br>
 So what we're going to do is select all states that have a 'b' transition to the purple state (so that's C and D), and move them into a separate glob.
 

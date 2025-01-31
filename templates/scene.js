@@ -12,6 +12,7 @@ const sceneHTML = (id, classes=[]) => `
       <p class="successMsg">You did the thing</p>
     </div>
     <img src="/img/pin.png" class="iconPin"></img>
+    <img src="/img/eye-outline.svg" class="iconEye" id="eye1"></img>
     <div class="modalActions">
       <button class="modalButton">Next</button>
     </div>
@@ -23,6 +24,7 @@ const sceneHTML = (id, classes=[]) => `
       <p class="failureMsg">You did the thing</p>
     </div>
     <img src="/img/pin.png" class="iconPin"></img>
+    <img src="/img/eye-outline.svg" class="iconEye" id="eye2"></img>
     <div class="modalActions">
       <button class="modalButton">Retry</button>
     </div>
@@ -32,6 +34,18 @@ const sceneHTML = (id, classes=[]) => `
 
 export const addScene = (id, div, classes=[]) => {
   div.insertAdjacentHTML('beforeend', sceneHTML(id, classes));
+  document.getElementById('eye1').addEventListener('pointerdown', () => {
+    div.querySelector('.successModal').classList.add('hidden');
+  });
+  document.getElementById('eye1').addEventListener('pointerup', () => {
+    div.querySelector('.successModal').classList.remove('hidden');
+  });
+  document.getElementById('eye2').addEventListener('pointerdown', () => {
+    div.querySelector('.failureModal').classList.add('hidden');
+  });
+  document.getElementById('eye2').addEventListener('pointerup', () => {
+    div.querySelector('.failureModal').classList.remove('hidden');
+  });
 }
 
 export const registerScene = (loader, unloader, id, sceneOpts, onSuccess, onFailure) => {

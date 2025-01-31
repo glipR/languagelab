@@ -30,7 +30,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
   GS.app = app;
   GS.opts = opts;
   GS.easings = easings;
-  GS.screen = new Screen(app, true, false);
+  GS.screen = new Screen(app, false, false);
   GS.screen.setScreenSize(app.renderer.width, app.renderer.height);
   GS.screen.setGameSize(1000 * gsc, 600 * gsc);
   GS.screen.scaleToFit();
@@ -1875,7 +1875,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     .then(GS.replaceI2)
     .then(delay(120))
     .then(GS.replaceI0)
-    .then(delay(60))
+    .then(delay(180))
     .then(fade(pumpingContainer, false), GS.hideResultAgain)
     .then(GS.showSets)
     .then(delay(60))

@@ -1,4 +1,5 @@
 import { addIcon } from '../templates/icons.js';
+import { highlight } from '../templates/colours.js';
 
 const contentText = `
 <div class="aspect-ratio">
@@ -20,7 +21,7 @@ For a particular regular expression, if we can find an NFA that accepts the same
   <div class="split-img"><img src="/img/regularConversion/simpleNFAConverted.png"/></div>
 </div>
 
-So let's try converting a regular expression to an NFA. Just as how we understood Regular Expressions originally, let's break apart and simplify the regular expression into smaller parts, and keep going until our transitions are just singular symbols.
+So let's try converting a regular expression to an NFA. Just as how we understood Regular Expressions originally, let's ${highlight('break apart and simplify', 'green', true, true)} the regular expression into smaller parts, and keep going until our transitions are just singular symbols.
 
 <img src="/img/regularConversion/example1.png" />
 
@@ -66,7 +67,7 @@ We've shown that:
 But are they <span class="highlight highlight-blue">equivalent</span>? Can we convert an NFA or DFA to a regular expression?
 
 Take the previous example of NFAs that allowed regular expressions on their transitions.
-Rather than trying to break apart these transitions into characters, let's go the other direction and try to compress the entire NFA into a single transition.
+Rather than trying to break apart these transitions into characters, let's go the other direction and try to ${highlight('compress', 'blue', true)} the entire NFA into a single transition.
 
 We can do this with two main operations:
 
@@ -122,11 +123,17 @@ But to fix this, we can consolidate our accepting states into a single one using
 This means that after executing our algorithm the starting and accepting states can be in one of two configurations:
 
 If the starting state is the accepting state, then we've only got a single state and one loop transition.
-Sounds like a job for the kleene star!
+<br>
+${highlight('Sounds like a job for the kleene star!', 'green', false, true)}
+
+<img class="small" src="/img/regularConversion/finalStep1.png"/>
 
 Otherwise, we've got a distinct start state and accepting state, with a transition between them, and maybe some loops on either state. This is also pretty simple to write as a regular expression!
 
-<img src="/img/regularConversion/finalStep.png"/>
+<div class="split-page">
+  <div class="split-img"><img src="/img/regularConversion/finalStep2.png"/></div>
+  <div class="split-img"><img src="/img/regularConversion/finalStep3.png"/></div>
+</div>
 
 So we can convert freely between NFAs, Regular Expressions, and DFAs, and so therefore all three of the structures we've looked at so far are <span class="highlight highlight-blue">equivalent</span>.
 This is a pretty neat fact, don't you think?

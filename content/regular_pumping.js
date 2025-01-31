@@ -38,7 +38,7 @@ Let's look at the path taken by this word on our DFA:
 Notice that in reading the first $n$ characters of the word, we will visit $n+1$ states (since we visit a state before reading any characters).
 Therefore, there must be at least one state that is ${highlight('visited twice or more', 'purple', true, true)} in the first $n$ characters being read.
 
-This corresponds to some substring of the first $n$ characters in the word:
+The space between these occurrences corresponds to some substring of the first $n$ characters in the word:
 
 <img src="/img/regularPump/partition.png">
 
@@ -97,7 +97,7 @@ Well, the game analogy from earlier might prove fruitful in determining what exa
 
 The game is played between two players, with no random elements, and no draws.
 So when played perfectly, either Player 1 will win or Player 2 will win.
-In other words, if there is no winning strategy for Player 1, then there must exist a winning strategy for Player 2.
+In other words, if there is no winning strategy for Player 1, then there must exist a ${highlight('winning strategy for Player 2', 'blue', true, true)}.
 
 What does this look like?
 

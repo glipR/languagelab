@@ -1091,7 +1091,7 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
       "S": ["ε"],
       "A": ["a"],
       "B": ["b"],
-      "C": ["aa", "ba", "aba"],
+      "C": ["aa", "ba", "baa"],
       "D": ["ab", "bb", "bbb"],
     }
     GS.secondGlobContainer = new PIXI.Container();
@@ -1491,7 +1491,6 @@ const loader = (app, easings, onSuccess, onFailure, opts) => {
     GS.rulesGlob.points.B.doubleBorderColor = lch_to_color({ L: BCol.L - 0.2, C: BCol.C, h: BCol.h });
     GS.rulesGlob.points.D.doubleBorderColor = lch_to_color({ L: DCol.L - 0.2, C: DCol.C, h: DCol.h });
     GS.doubleBorderGlobs = new ValueTween(0, 1, 60, GS.easings.easeInOutQuad, (v) => {
-      GS.rulesGlob.points.B.doubleBorderAlpha = v;
       GS.rulesGlob.points.D.doubleBorderAlpha = v;
     })
     GS.entryGlobs = delay(0).then(

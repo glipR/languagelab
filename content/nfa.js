@@ -14,8 +14,8 @@ First off, the requirement for there to be exactly one transition, per state and
 So you could have multiple 'a' transitions starting at a state, or none.
 
 <div class="split-page">
-<div class="split-img"><img src="/img/nfaIntro/rule-1.png"/></div>
-<div class="split-img"><img src="/img/nfaIntro/rule-2.png"/></div>
+<div class="split-img"><img style="max-height: 300px; width: unset;" src="/img/nfaIntro/rule-1.png"/></div>
+<div class="split-img"><img style="max-height: 300px; width: unset;" src="/img/nfaIntro/rule-2.png"/></div>
 </div>
 
 Additionally, NFAs allow a new kind of transition that we'll label with the Greek letter <span class='highlight highlight-green'>epsilon</span>, these epsilon transitions function like normal, but when moving across them, no character is read.
@@ -60,7 +60,7 @@ Where even though we don't care what happens after reading the first 'b', we sti
 
 In an NFA, we don't need this, but we can go further and remove the option of reading 'b' entirely.
 
-<img src="/img/nfaIntro/nfa-1.png"/>
+<img class="small" src="/img/nfaIntro/nfa-1.png"/>
 
 A cool use of epsilon transitions is in the language of alphabetically ordered strings.
 

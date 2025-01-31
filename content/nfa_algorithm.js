@@ -1,4 +1,5 @@
 import { addIcon } from '../templates/icons.js';
+import { highlight } from '../templates/colours.js';
 
 const contentText = `
 <div class="aspect-ratio">
@@ -7,7 +8,7 @@ const contentText = `
 
 <h2>The NFA Algorithm</h2>
 
-Now that we've got an understanding how NFAs work, let's work on an algorithm for classifying words accepted by the NFA, without just using trial and error.
+Now that we've got an understanding how NFAs work, let's work on an algorithm for classifying words accepted by the NFA, ${highlight('without just using trial and error', 'purple', true, true)}.
 <br>
 Let's figure out what to do to determine the answer for the word 'aabba'.
 
@@ -17,7 +18,7 @@ We can do this by simulating all possible paths <span class="highlight highlight
 We'll start by finding all states we can be in before reading any characters at all.
 In this example that's just the start state.
 <br>
-From here we will then want to find all states we can be in, after reading the first character, which is in this case, an 'a'.
+From here we will then want to find all states we can be in after reading the first character, which is in this case an 'a'.
 We do this by first taking any transitions labelled 'a',
 
 <img src="/img/nfaAlg/highlight-a.png" />
@@ -31,7 +32,7 @@ So after reading the character 'a', we could be in any state of this NFA.
 
 <img src="/img/nfaAlg/every-state.png" />
 
-What states can be in after reading another 'a'?
+What states can we be in after reading another 'a'?
 First, get rid of all pointers which don't have any 'a' transitions, and move the other pointers along the transitions.
 
 <img src="/img/nfaAlg/second-a.png" />
@@ -53,7 +54,7 @@ Do this again for 'b', and then again for 'a'.
 <div class="split-img"><img src="/img/nfaAlg/last.png"/></div>
 </div>
 
-From this, we know the only state we can end up in, after reading all the characters in the word, is D, an accepting state.
+From this, we know the only state we can end up in after reading all the characters in the word is D, an accepting state.
 
 This means there is a path from state A to state D, that reads all letters in the word, and so the NFA <span class="highlight highlight-green">accepts</span>.
 
@@ -100,7 +101,7 @@ Start at state A, and take each letter in the word and move to the associated co
 <img src="/img/nfaAlg/table-path.png" />
 
 But have you noticed? We've just <span class="highlight highlight-green">made a DFA!</span>
-All we need to do is make a node to represent that there are no states available, and we've got a full DFA, where moving through the DFA is the same as simulating all possible paths in the NFA.
+All we need to do is make a node to represent that there are no states available, and we've got a full DFA, where moving through the DFA is the same as simulating ${highlight('all possible', 'purple', true)} paths in the NFA.
 
 We accepted a word in the NFA if it could end on an accepting state, so make all nodes in the DFA accepting, if they include an accepting state in the collection.
 
@@ -108,7 +109,7 @@ We accepted a word in the NFA if it could end on an accepting state, so make all
 
 Now this DFA accepts exactly the same language as the NFA.
 
-So we've shown anything an NFA can do, we can also achieve with a DFA. Even though we removed a few rules!
+So we've shown anything an NFA can do, we can also achieve with a DFA. ${highlight('Even though we removed a few rules!', 'green', true, true)}
 `
 
 const addContent = () => {
