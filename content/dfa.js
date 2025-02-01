@@ -2,14 +2,14 @@ import { addIcon } from '../templates/icons.js';
 
 const contentText = `
 <div class="aspect-ratio">
-<iframe src="https://www.youtube.com/embed/MWuXe744N_Q?si=n8x2aZMMoonuhuqS" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/sPC8geaRpkk?si=z4HHsXuFdp3up2iX" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 
 <h2>Deterministic Finite Automaton (DFA)</h2>
 
 <img src="/img/dfaIntro/graph1.png" />
 
-Much like Regular Expressions, a DFA is a way to represent a language, but this representation is much closer to an algorithm than it is a description of the language.
+A DFA is a way to represent a language, but this representation is much closer to an algorithm than it is a description of the language.
 It's made up of <span class='highlight highlight-blue'>states</span>, and those states are connected by <span class='highlight highlight-blue'>transitions</span>, which have labels containing letters from the alphabet.
 <br>
 You've probably seen something similar when playing video games, and interacting with characters with a few basic behaviours.
