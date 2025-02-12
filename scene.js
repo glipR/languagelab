@@ -100,7 +100,10 @@ class Scene {
       height: this.parent.clientHeight,
       antialias: true,
       backgroundColor: new PIXI.Color(0xb2916b),
+      resolution: window.devicePixelRatio,
     });
+    app.canvas.style.width = this.parent.clientWidth + 'px';
+    app.canvas.style.height = this.parent.clientHeight + 'px';
     app.ticker.add(({deltaTime}) => {
       TweenManager.update(deltaTime);
     });
