@@ -153,7 +153,7 @@ class NFA extends Graph {
     },
     chanceIncludeEpsilon: 0.1,
     chanceAccepting: 0.5,
-    forceConnected: true, // TODO: Implement this
+    forceConnected: true,
     area: {
       width: 1000 * gsc,
       height: 600 * gsc,
@@ -166,7 +166,7 @@ class NFA extends Graph {
   static randomNFA(config={}, nodeStyle={}, edgeStyle={}) {
     const merged = mergeDeep({}, NFA.randomConfiguration, config);
     if (merged.alphabet === null) {
-      merged.alphabet = Array.from({length: Math.floor(Math.random() * 5) + 2}, (_, i) => String.fromCharCode(97 + i));
+      merged.alphabet = Array.from({length: Math.floor(Math.random() * 3) + 2}, (_, i) => String.fromCharCode(97 + i));
     }
     const nfa = new NFA();
     const g = createGraph();

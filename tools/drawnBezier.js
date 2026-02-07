@@ -1,7 +1,7 @@
 import easings from 'https://cdn.jsdelivr.net/npm/easings.net@1.0.3/+esm';
-import { black } from "../colours.js";
+import { black, green, white } from "../colours.js";
 import { interpValue } from "../tween.js";
-import { bezier, bezierLength, inverseBezierRateFunction, magnitude, mergeDeep, negate, partialBezier, vectorCombine } from "../utils.js";
+import { bezier, bezierLength, inverseBezierRateFunction, magnitude, mergeDeep, multiply, negate, partialBezier, vectorCombine } from "../utils.js";
 
 const gsc = window.gameScaling ?? 1;
 
@@ -23,6 +23,7 @@ export class DrawnBezier extends PIXI.Graphics {
 
     }, {...fixStyle});
     this.drawnAmount = drawnAmount;
+    this.startDrawnAmount = 0;
     this.generateDrawnRandoms();
     this.setDrawnBezier(bezier);
   }
@@ -105,45 +106,62 @@ export class DrawnBezier extends PIXI.Graphics {
       const prevPoint = points[index];
       const nextPoint = points[index+2];
       const controlVector = vectorCombine(nextPoint, negate(prevPoint));
-      return { x: controlVector.x * this.fixStyle.smoothScaling, y: controlVector.y * this.fixStyle.smoothScaling };
+      return multiply(controlVector, 1/magnitude(controlVector));
     });
     const firstControl = vectorCombine(points[1], negate(points[0]));
     const finalControl = vectorCombine(points[points.length-1], negate(points[points.length-2]));
     controlVectors = [
-      { x: firstControl.x * this.fixStyle.smoothScaling, y: firstControl.y * this.fixStyle.smoothScaling },
+      multiply(firstControl, 1/magnitude(firstControl)),
       ...controlVectors,
-      { x: finalControl.x * this.fixStyle.smoothScaling, y: finalControl.y * this.fixStyle.smoothScaling },
+      multiply(finalControl, 1/magnitude(finalControl)),
     ]
     for (let i=0; i<points.length-1; i++) {
-      const controlOut = vectorCombine(points[i], controlVectors[i]);
-      const controlIn = vectorCombine(points[i+1], negate(controlVectors[i+1]));
+      const dist = magnitude(vectorCombine(points[i], negate(points[i+1])));
+      const controlOut = vectorCombine(points[i], multiply(controlVectors[i], dist * this.fixStyle.smoothScaling));
+      const controlIn = vectorCombine(points[i+1], multiply(negate(controlVectors[i+1]), dist * this.fixStyle.smoothScaling));
       beziers.push([points[i], controlOut, controlIn, points[i+1]]);
     }
     this.fullBeziers = beziers;
     this.bezierLengths = beziers.map(bezier => bezierLength(...bezier));
   }
 
-  generateDrawnBeziers(t) {
+  generateDrawnBeziers(t1, t2) {
     const beziers = this.fullBeziers;
     const bezierLengths = this.bezierLengths;
     const totalLength = bezierLengths.reduce((acc, length) => acc + length, 0);
-    const targetLength = Math.ceil(Math.min(t+1e-9, 1-1e-9) * totalLength);
+    const targetStartLength = Math.ceil(Math.min(t1 + 1e-9, 1-1e-9) * totalLength);
+    const targetEndLength = Math.ceil(Math.min(t2 + 1e-9, 1-1e-9) * totalLength);
     const cumulativeLengths = bezierLengths.reduce((acc, length) => {
       acc.push(acc[acc.length-1] + length);
       return acc;
     }, [0]).slice(1);
-    const filteredBeziers = beziers.filter((_, index) => index === 0 || cumulativeLengths[index-1] < targetLength);
-    const finalRatio = Math.min(1, (bezierLengths[filteredBeziers.length-1] - (cumulativeLengths[filteredBeziers.length-1] - targetLength))/bezierLengths[filteredBeziers.length-1]);
-    const finalRateFunc = inverseBezierRateFunction(...filteredBeziers[filteredBeziers.length-1]);
+    let startIndex = beziers.findIndex((_, index) => cumulativeLengths[index] > targetStartLength);
+    let endIndex = beziers.findIndex((_, index) => cumulativeLengths[index] > targetEndLength);
+    if (startIndex === -1) {
+      startIndex = beziers.length - 1;
+    }
+    if (endIndex === -1) {
+      endIndex = beziers.length - 1;
+    }
+    // From what portion of the first bezier should we draw.
+    const startRatio = Math.min(1, (bezierLengths[startIndex] - (cumulativeLengths[startIndex] - targetStartLength))/bezierLengths[startIndex]);
+    // From what portion of the final bezier should we draw.
+    const finalRatio = Math.min(1, (bezierLengths[endIndex] - (cumulativeLengths[endIndex] - targetEndLength))/bezierLengths[endIndex]);
+
+    const startRateFunc = inverseBezierRateFunction(...beziers[startIndex]);
+    const finalRateFunc = inverseBezierRateFunction(...beziers[endIndex]);
+    const filteredBeziers = beziers.slice(startIndex, endIndex+1);
+    filteredBeziers[0] = partialBezier(1 - startRateFunc(startRatio), ...filteredBeziers[0].slice().reverse()).slice().reverse();
     filteredBeziers[filteredBeziers.length-1] = partialBezier(finalRateFunc(finalRatio), ...filteredBeziers[filteredBeziers.length-1]);
+    this.startRation = startRatio;
     this.finalRatio = finalRatio;
     return filteredBeziers;
   }
 
   edgeInterp(t) {
-    t /= this.drawnAmount;
+    t /= (this.drawnAmount - this.startDrawnAmount);
     t = Math.min(Math.max(t, 0), 1-1e-9);
-    const beziers = this.generateDrawnBeziers(this.drawnAmount);
+    const beziers = this.generateDrawnBeziers(this.startDrawnAmount, this.drawnAmount);
     const actualLength = (beziers.length - 1 + this.finalRatio)
     const interpIndex = Math.floor(t * actualLength);
     let interpRatio = t * actualLength - interpIndex;
@@ -155,7 +173,7 @@ export class DrawnBezier extends PIXI.Graphics {
   }
 
   drawSmooth() {
-    const beziers = this.generateDrawnBeziers(this.drawnAmount);
+    const beziers = this.generateDrawnBeziers(this.startDrawnAmount, this.drawnAmount);
     this.clear();
     if (this.drawnAmount === 0) {
       return;
@@ -186,4 +204,97 @@ export class DrawnBezier extends PIXI.Graphics {
     bez.setDrawnBezier(this.drawnBezierPoints);
     return bez;
   }
+}
+
+export class DrawnBezierGroup extends DrawnBezier {
+  constructor(fixStyle, beziers, drawnAmount=0) {
+    super({
+      forceIntermediatePoints: true,
+      spacePointsBetweenBeziers: false,
+      ...fixStyle,
+    }, beziers, drawnAmount);
+    // drawnBezierPoints is now an array of bezier arrays.
+  }
+
+  getDrawnPoints () {
+    const forceIntermediatePoints = this.fixStyle.forceIntermediatePoints;
+    const spacePointsBetweenBeziers = this.fixStyle.spacePointsBetweenBeziers;
+    const scaleRandomsWithDrawnAmount = this.fixStyle.scaleRandomsWithDrawnAmount;
+    const bezierDistances = this.drawnBezierPoints.map(bezier => bezierLength(...bezier));
+    const inverseRateFullBeziers = this.drawnBezierPoints.map(bezier => inverseBezierRateFunction(...bezier));
+    const completeDistance = bezierDistances.reduce((acc, distance) => acc + distance, 0);
+    const completeInverseRate = (t) => {
+      // Returns the bezier index and the t value within that bezier
+      let currentDistance = 0;
+      for (let i=0; i<bezierDistances.length; i++) {
+        const nextDistance = currentDistance + bezierDistances[i];
+        if (nextDistance >= t * completeDistance) {
+          return { bezierIndex: i, t: inverseRateFullBeziers[i]((t * completeDistance - currentDistance) / bezierDistances[i]) };
+        }
+        currentDistance = nextDistance;
+      }
+      return { bezierIndex: bezierDistances.length - 1, t: 1 };
+    }
+    const randoms = this.drawnRandoms.slice();
+    if (forceIntermediatePoints) {
+      for (let i=0; i<bezierDistances.length-1; i++) {
+        if (spacePointsBetweenBeziers) {
+          // The random remap will place the beziers at equal distances from 0-1.
+          randoms.push({ distance: 0, position: (i+1) / bezierDistances.length });
+        } else {
+          randoms.push({distance: 0, position: bezierDistances.slice(0, i+1).reduce((acc, distance) => acc + distance, 0) / completeDistance});
+        }
+      }
+    }
+    randoms.sort((a, b) => a.position - b.position);
+
+    const transforms = randoms.map(({distance, position}) => {
+      let bezierIndex;
+      let t;
+      if (spacePointsBetweenBeziers) {
+        const index = Math.floor(position * bezierDistances.length);
+        bezierIndex = index;
+        t = inverseRateFullBeziers[index](position * bezierDistances.length - index);
+      }
+      else {
+        const res = completeInverseRate(position);
+        bezierIndex = res.bezierIndex;
+        t = res.t;
+      }
+      const transform = bezier(t, ...this.drawnBezierPoints[bezierIndex]);
+      const scaledNormal = { x: -distance * Math.sin(transform.angle), y: distance * Math.cos(transform.angle) };
+      return vectorCombine(transform.position, scaledNormal);
+    });
+    const finalIncluded = randoms.length - 1;
+    const allPoints = [this.drawnBezierPoints[0][0]];
+    if (finalIncluded !== -1) {
+      allPoints.push(...transforms.slice(0, finalIncluded+1));
+    }
+    if (scaleRandomsWithDrawnAmount) {
+      allPoints.push(bezier(1, ...this.drawnBezierPoints[this.drawnBezierPoints.length - 1]).position);
+    } else {
+      const finalBezier = this.drawnBezierPoints[this.drawnBezierPoints.length - 1];
+      const endPoint = finalBezier[finalBezier.length - 1];
+      allPoints.push(endPoint);
+    }
+    this.transforms = transforms;
+    return allPoints;
+  }
+
+  updateDrawnGraphic() {
+    super.updateDrawnGraphic();
+    /*this.transforms.forEach(transform => {
+      this.circle(transform.x, transform.y, 3).fill(white);
+    })*/
+    /*this.drawnBezierPoints.forEach(bezier => {
+      this.circle(bezier[0].x, bezier[0].y, 3).fill(white);
+      this.moveTo(bezier[0].x, bezier[0].y);
+      for (let i=1; i<bezier.length; i++) {
+        this.lineTo(bezier[i].x, bezier[i].y);
+      }
+      this.stroke({ color: green, width: 1 });
+      this.circle(bezier[bezier.length-1].x, bezier[bezier.length-1].y, 3).fill(white);
+    });*/
+  }
+
 }

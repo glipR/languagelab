@@ -49,6 +49,42 @@ export const tasks = [
     },
     description: "The language of strings that are expressible as x+x for some string x.",
     n: 3,
+  },
+  {
+    type: "Regular",
+    dfa: {
+      states: [
+        { name: "S", position: dummyPosition, starting: true, accepting: true },
+        { name: "1", position: dummyPosition, accepting: true },
+        { name: "2", position: dummyPosition, accepting: true },
+        { name: "3", position: dummyPosition, accepting: true },
+        { name: "4", position: dummyPosition, accepting: true },
+        { name: "E", position: dummyPosition },
+      ],
+      transitions: [
+        { from: "S", to: "1", label: "1" },
+        { from: "S", to: "2", label: "2" },
+        { from: "S", to: "3", label: "3" },
+        { from: "S", to: "4", label: "4" },
+        { from: "1", to: "2", label: "2" },
+        { from: "1", to: "E", label: "1,3,4" },
+        { from: "2", to: "1", label: "1" },
+        { from: "2", to: "3", label: "3" },
+        { from: "2", to: "E", label: "2,4" },
+        { from: "3", to: "4", label: "4" },
+        { from: "3", to: "2", label: "2" },
+        { from: "3", to: "E", label: "3,1" },
+        { from: "4", to: "3", label: "3" },
+        { from: "4", to: "E", label: "4,2,1" },
+        { from: "E", to: "E", label: "1,2,3,4" },
+      ]
+    },
+    wordSelector: (n) => {
+      const substr = "123432";
+      return substr.repeat(Math.ceil(n / substr.length)).slice(0, n);
+    },
+    description: "Strings on {1,2,3,4} where adjacent characters are adjacent on the number line.",
+    n: 6,
   }
 ]
 

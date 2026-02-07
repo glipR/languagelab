@@ -52,6 +52,13 @@ const manifest = {
         "42-invalid-1": "/img/intro/42-invalid-1.png",
         "42-invalid-2": "/img/intro/42-invalid-2.png",
       }
+    },
+    {
+      name: "toadFrogBundle",
+      assets: {
+        "toad": "/img/toadfrog/toad.png",
+        "frog": "/img/toadfrog/frog.png",
+      }
     }
   ]
 }

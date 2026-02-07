@@ -1,6 +1,8 @@
-import Graph from "./graph.js";
+import Graph, { AbstractEdge, Node } from "./graph.js";
 import { bg_dark, black } from "./colours.js";
-import { mergeDeep } from "./utils.js";
+import { magnitude, mergeDeep, multiply, negate, rotate, vectorCombine } from "./utils.js";
+import createGraph from 'https://cdn.jsdelivr.net/npm/ngraph.graph@20.0.1/+esm'
+import createLayout from 'https://cdn.jsdelivr.net/npm/ngraph.forcelayout@3.3.1/+esm';
 
 const gsc = window.gameScaling ?? 1;
 
@@ -446,6 +448,137 @@ class DFA extends Graph {
     }
     return this.combine(other, (me, other) => !!me !== !!other).empty();
   }
+
+  static randomConfiguration = {
+    minNodes: 3,
+    maxNodes: 6,
+    chanceAccepting: 0.5,
+    forceConnected: true,
+    area: {
+      width: 1000 * gsc,
+      height: 600 * gsc,
+      x: 0,
+      y: 0,
+    },
+    alphabet: null,
+  }
+
+  static randomDFA(config = {}, nodeStyle={}, edgeStyle={}) {
+    const merged = mergeDeep({}, DFA.randomConfiguration, config);
+    if (merged.alphabet === null) {
+      merged.alphabet = Array.from({length: Math.floor(Math.random() * 3) + 2}, (_, i) => String.fromCharCode(97 + i));
+    }
+    const dfa = new DFA();
+    const g = createGraph();
+    const numNodes = Math.floor(Math.random() * (merged.maxNodes - merged.minNodes + 1)) + merged.minNodes;
+    const labels = Array.from({length: numNodes}, (_, i) => String.fromCharCode(65 + i));
+    for (let i = 0; i < numNodes; i++) {
+      dfa.addNode(new Node(labels[i], {x: Math.random() * merged.area.width + merged.area.x, y: Math.random() * merged.area.height + merged.area.y}, {
+        ...nodeStyle,
+        doubleBorder: Math.random() < merged.chanceAccepting,
+        isEntry: i === 0,
+      }));
+      g.addNode(labels[i]);
+    }
+    const alphabet = merged.alphabet;
+    const nodes = Object.values(dfa.nodes);
+    const charMapping = {};
+    nodes.forEach((node) => {
+      charMapping[node.label] = {};
+      for (let char of alphabet) {
+        const target = nodes[Math.floor(Math.random() * nodes.length)];
+        if (!charMapping[node.label][target.label]) {
+          charMapping[node.label][target.label] = [];
+        }
+        charMapping[node.label][target.label].push(char);
+      }
+    })
+    if (merged.forceConnected) {
+      // DFS from i=0 to make sure all nodes are connected.
+      const visited = new Set([nodes[0].label]);
+      const stack = [nodes[0].label];
+      while (stack.length > 0) {
+        const cur = stack.pop();
+        visited.add(cur);
+        Object.keys(charMapping[cur] ?? {}).forEach((next) => {
+          if (!visited.has(next)) stack.push(next);
+        });
+      }
+      nodes.forEach((node) => {
+        if (!visited.has(node.label)) {
+          console.log(node.label, mergeDeep({}, charMapping))
+          // Find all possible edges that could be redirected.
+          const possible = [];
+          nodes.forEach(n => n.curCount = 0);
+          nodes.forEach(start => {
+            Object.keys(charMapping[start.label] ?? {}).forEach((end) => {
+              if (visited.has(start.label) && visited.has(end)) {
+                dfa.nodes[end].curCount++;
+              }
+            })
+          })
+          nodes.forEach(start => {
+            Object.keys(charMapping[start.label] ?? {}).forEach((e) => {
+              if (charMapping[start.label][e].length === 0) return;
+              const end = dfa.nodes[e];
+              if (start.label === end.label) {
+                possible.push([start.label, end.label]);
+              } else if (charMapping[start.label][end.label].length > 1) {
+                possible.push([start.label, end.label]);
+              } else if (end.curCount > 1) {
+                possible.push([start.label, end.label]);
+              }
+            });
+          });
+          const [start, end] = possible[Math.floor(Math.random() * possible.length)];
+          const char = charMapping[start][end].pop();
+          charMapping[start][node.label] = [char];
+        }
+      })
+    }
+
+    nodes.forEach((node) => {
+      Object.keys(charMapping[node.label] ?? {}).forEach((end) => {
+        if (charMapping[node.label][end].length === 0) return;
+        g.addLink(node.label, `${node.label}-${end}`)
+        g.addLink(`${node.label}-${end}`, end);
+      });
+    });
+
+    const layout = createLayout(g);
+    for (let i = 0; i < 500; i++) layout.step();
+
+    const { min_x, min_y, max_x, max_y } = layout.getGraphRect();
+    Object.keys(dfa.nodes).forEach((node, i) => {
+      const pos = layout.getNodePosition(node);
+      const transformed = {
+        x: (pos.x - min_x) / (max_x - min_x) * merged.area.width + merged.area.x,
+        y: (pos.y - min_y) / (max_y - min_y) * merged.area.height + merged.area.y,
+      }
+      dfa.nodes[node].moveTo(transformed);
+    });
+
+    Object.entries(charMapping).forEach(([from, tos]) => {
+      Object.entries(tos).forEach(([to, chars]) => {
+        if (chars.length === 0) return;
+        const reverse = !!(charMapping[to]??{})[from] && from !== to;
+        const vec = vectorCombine(dfa.nodes[to].position, negate(dfa.nodes[from].position));
+        const normal = multiply(rotate(vec, Math.PI / 2), 1/magnitude(vec));
+        const extraStyle = {};
+        if (reverse) {
+          extraStyle.edgeAnchor = multiply(normal, 40);
+        }
+        dfa.addEdge(AbstractEdge.decide(dfa.nodes[from], dfa.nodes[to], {
+          ...edgeStyle,
+          ...extraStyle,
+          edgeLabel: chars.join(','),
+        }));
+      })
+    });
+
+    return dfa;
+  }
+
 }
 
 export default DFA;
